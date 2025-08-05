@@ -183,12 +183,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { userId: string } }
 ) {
   try {
     await requireRole(["ADMIN"]);
 
-    const userId = params.id;
+    const { userId } = params;
 
     const user = await db.user.findFirst({
       where: {

@@ -20,7 +20,7 @@ export const verifyToken = (token: string): UserAuth | null => {
   }
 };
 
-export async function getCurrentUser() {
+export const getCurrentUser = async () => {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
@@ -78,31 +78,31 @@ export async function getCurrentUser() {
     console.error("getCurrentUser error:", error);
     return null;
   }
-}
+};
 
-export async function requireAuth() {
+export const requireAuth = async () => {
   const user = await getCurrentUser();
   if (!user) {
     throw new Error("Unauthorized");
   }
   return user;
-}
+};
 
-export async function requireRole(allowedRoles: string[]) {
+export const requireRole = async (allowedRoles: string[]) => {
   const user = await requireAuth();
   if (!allowedRoles.includes(user.role)) {
     throw new Error("Forbidden");
   }
   return user;
-}
+};
 
-export async function hashPassword(password: string): Promise<string> {
+export const hashPassword = async (password: string): Promise<string> => {
   return bcrypt.hash(password, 12);
-}
+};
 
-export async function verifyPassword(
+export const verifyPassword = async (
   password: string,
   hashedPassword: string
-): Promise<boolean> {
+): Promise<boolean> => {
   return bcrypt.compare(password, hashedPassword);
-}
+};

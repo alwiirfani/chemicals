@@ -1,7 +1,7 @@
 import { DashboardData } from "@/types/dashboard";
 import axios from "axios";
 
-export async function getDashboardData(): Promise<DashboardData> {
+export const getDashboardData = async (): Promise<DashboardData> => {
   const [chemicalsRes, activeBorrowingsRes, recentRes] = await Promise.all([
     axios.get("/api/v1/chemicals/stats"),
     axios.get("/api/v1/borrowings/active"),
@@ -16,4 +16,4 @@ export async function getDashboardData(): Promise<DashboardData> {
     activeAllBorrowings: activeBorrowingsRes.data.allActive,
     recentActivities: recentRes.data.recentActivities,
   };
-}
+};

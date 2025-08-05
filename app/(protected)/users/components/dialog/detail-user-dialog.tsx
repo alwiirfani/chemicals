@@ -12,17 +12,17 @@ import { Separator } from "@/components/ui/separator";
 import { UserAuth } from "@/types/auth";
 import { User, Mail, Calendar, Clock, Shield, Hash } from "lucide-react";
 
-interface UserDetailDialogProps {
+interface DetaiUserlDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: UserAuth;
 }
 
-export function UserDetailDialog({
+export const DetailUserDialog: React.FC<DetaiUserlDialogProps> = ({
   open,
   onOpenChange,
   user,
-}: UserDetailDialogProps) {
+}) => {
   const getRoleLabel = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -203,4 +203,4 @@ export function UserDetailDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};

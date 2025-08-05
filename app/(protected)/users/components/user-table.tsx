@@ -42,7 +42,7 @@ interface UserTableProps {
   ) => void;
 }
 
-export function UserTable({
+export const UserTable: React.FC<UserTableProps> = ({
   users,
   pagination,
   onPageChange,
@@ -50,7 +50,7 @@ export function UserTable({
   onView,
   onDelete,
   onToggleStatus,
-}: UserTableProps) {
+}) => {
   const getRoleLabel = (role: string) => {
     switch (role) {
       case "ADMIN":
@@ -296,4 +296,4 @@ export function UserTable({
       </div>
     </>
   );
-}
+};

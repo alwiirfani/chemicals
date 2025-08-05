@@ -31,12 +31,12 @@ interface EditUserDialogProps {
   onUserUpdated: (user: UserAuth) => void;
 }
 
-export function EditUserDialog({
+export const EditUserDialog: React.FC<EditUserDialogProps> = ({
   open,
   onOpenChange,
   user,
   onUserUpdated,
-}: EditUserDialogProps) {
+}) => {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
@@ -223,4 +223,4 @@ export function EditUserDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};

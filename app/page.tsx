@@ -8,5 +8,5 @@ export default async function HomePage() {
 
   if (!user) redirect("/login");
 
-  redirect("/dasboard");
+  redirect("/dashboard");
 }

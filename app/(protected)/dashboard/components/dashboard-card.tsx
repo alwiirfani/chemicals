@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 interface DashboardCardProps {
   title: string;
@@ -8,12 +8,12 @@ interface DashboardCardProps {
   children: ReactNode;
 }
 
-export function DashboardCard({
+export const DashboardCard: React.FC<DashboardCardProps> = ({
   title,
   icon,
   badge,
   children,
-}: DashboardCardProps) {
+}) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -26,4 +26,4 @@ export function DashboardCard({
       <CardContent>{children}</CardContent>
     </Card>
   );
-}
+};

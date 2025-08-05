@@ -203,7 +203,7 @@ interface LoginGuideProps {
   onQuickLogin?: (email: string, password: string) => void;
 }
 
-export default function LoginGuide({ onQuickLogin }: LoginGuideProps) {
+const LoginGuide: React.FC<LoginGuideProps> = ({ onQuickLogin }) => {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>(
     {}
   );
@@ -324,7 +324,7 @@ export default function LoginGuide({ onQuickLogin }: LoginGuideProps) {
       </Card>
     </div>
   );
-}
+};
 
 interface AccountCardProps {
   account: Account;
@@ -334,13 +334,13 @@ interface AccountCardProps {
   onQuickLogin: (email: string, password: string) => void;
 }
 
-function AccountCard({
+const AccountCard: React.FC<AccountCardProps> = ({
   account,
   showPassword,
   onTogglePassword,
   onCopy,
   onQuickLogin,
-}: AccountCardProps) {
+}) => {
   return (
     <Card className="relative">
       <CardHeader className="pb-3">
@@ -425,4 +425,6 @@ function AccountCard({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default LoginGuide;

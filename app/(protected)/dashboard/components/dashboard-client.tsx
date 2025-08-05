@@ -8,18 +8,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getDashboardData } from "@/lib/services/dashboard/dashboard-data";
-import { User } from "@/types/auth";
 import { MappedActivity } from "@/types/dashboard";
 import { Package, FileText, AlertTriangle, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DashboardCard } from "./dashboard-card";
 import { Badge } from "@/components/ui/badge";
+import { UserAuth } from "@/types/auth";
 
 interface DashboardClientProps {
-  user: User;
+  user: UserAuth;
 }
 
-export function DashboardClient({ user }: DashboardClientProps) {
+export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
   const [stats, setStats] = useState({
     totalChemicals: 0,
     activeBorrowings: 0,
@@ -240,4 +240,4 @@ export function DashboardClient({ user }: DashboardClientProps) {
       </div>
     </div>
   );
-}
+};

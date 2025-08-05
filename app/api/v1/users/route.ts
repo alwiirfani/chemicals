@@ -57,10 +57,10 @@ export async function GET(request: NextRequest) {
                 },
               ],
             }
-          : null, // ✅ null bukan string kosong
+          : null, // null
         status ? { status } : null,
         role ? { role } : null,
-      ].filter(Boolean) as Prisma.UserWhereInput[], // ✅ filter buang null
+      ].filter(Boolean) as Prisma.UserWhereInput[], // filter buang null
     };
 
     const [

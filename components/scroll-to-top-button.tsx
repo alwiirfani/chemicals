@@ -4,7 +4,7 @@ import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export default function ScrollToTopButton() {
+const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -34,4 +34,6 @@ export default function ScrollToTopButton() {
       <ArrowUp className="w-5 h-5" />
     </button>
   );
-}
+};
+
+export default ScrollToTopButton;

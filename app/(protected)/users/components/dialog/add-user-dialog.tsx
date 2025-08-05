@@ -29,11 +29,11 @@ interface AddUserDialogProps {
   onUserAdded: () => void;
 }
 
-export function AddUserDialog({
+export const AddUserDialog: React.FC<AddUserDialogProps> = ({
   open,
   onOpenChange,
   onUserAdded,
-}: AddUserDialogProps) {
+}) => {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
@@ -282,4 +282,4 @@ export function AddUserDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};
