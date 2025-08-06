@@ -15,11 +15,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FlaskConical } from "lucide-react";
 import LoginGuide from "@/components/login-guide";
 import LoginForm from "./login-form";
-import { useAuthStore } from "@/stores/auth-store";
 import Footer from "@/components/footer";
+import { useLogin } from "@/stores/use-login";
 
 export default function LoginClient() {
-  const { setEmail, setPassword } = useAuthStore();
+  const { setEmail, setPassword } = useLogin();
   const [activeTab, setActiveTab] = useState("login");
 
   const handleQuickLogin = (quickEmail: string, quickPassword: string) => {

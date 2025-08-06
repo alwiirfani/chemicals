@@ -1,18 +1,22 @@
-import { Sidebar } from "@/components/layout/sidebar";
-import { getCurrentUser } from "@/lib/auth";
-import React from "react";
+"use client";
 
-const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
-  const user = await getCurrentUser();
+import { Sidebar } from "@/components/layout/sidebar";
+import { AuthProvider } from "@/providers/auth-provider";
+import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
+const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="min-h-screen">
-      {user && (
-        <>
-          <Sidebar user={user} />
-          {children}
-        </>
-      )}
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <div className="min-h-screen">
+          <Sidebar />
+          <main>{children}</main>
+        </div>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 

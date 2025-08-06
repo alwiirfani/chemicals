@@ -122,6 +122,7 @@ export async function GET(request: NextRequest) {
       return {
         email: user.email,
         name,
+        username: user.username,
         roleId,
         role: user.role,
         status: user.status,

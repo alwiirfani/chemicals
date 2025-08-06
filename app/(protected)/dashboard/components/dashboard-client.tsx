@@ -9,17 +9,19 @@ import {
 } from "@/components/ui/card";
 import { getDashboardData } from "@/lib/services/dashboard/dashboard-data";
 import { MappedActivity } from "@/types/dashboard";
-import { Package, FileText, AlertTriangle, Calendar } from "lucide-react";
+import {
+  Package,
+  FileText,
+  AlertTriangle,
+  Calendar,
+  Activity,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { DashboardCard } from "./dashboard-card";
 import { Badge } from "@/components/ui/badge";
-import { UserAuth } from "@/types/auth";
+import { useUser } from "@/providers/auth-provider";
+import CardStats from "@/components/card-stats";
 
-interface DashboardClientProps {
-  user: UserAuth;
-}
-
-export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
+export const DashboardClient = () => {
   const [stats, setStats] = useState({
     totalChemicals: 0,
     activeBorrowings: 0,
@@ -27,6 +29,8 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
     expiringChemicals: 0,
   });
   const [activities, setActivities] = useState<MappedActivity[]>([]);
+
+  const { user, isLoading } = useUser();
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -65,140 +69,127 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
 
     fetchDashboard();
   }, []);
+
+  if (isLoading || !user) return null;
+
   return (
-    <div className="flex min-h-screen bg-gray-50 mt-16 sm:mt-0">
+    <div className="flex min-h-screen bg-background sm:mt-0">
       <div className="flex-1 md:ml-64">
         <div className="p-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Dashboard
+            </h1>
+            <p className="text-gray-600 text-sm sm:text-base">
               Selamat datang, <span className="font-medium">{user.name}</span>!
               Berikut ringkasan sistem inventaris bahan kimia.
             </p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <DashboardCard
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <CardStats
               title="Total Bahan Kimia"
               icon={<Package className="h-4 w-4 text-muted-foreground" />}>
               <div className="text-2xl font-bold">{stats.totalChemicals}</div>
               <p className="text-xs text-muted-foreground">
                 bahan padat, cair dan gas
               </p>
-            </DashboardCard>
+            </CardStats>
 
-            <DashboardCard
-              title="Peminajaman Aktif"
+            <CardStats
+              title="Peminjaman Aktif"
               badge={
-                <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-[9px] sm:px-3 text-[9px] sm:text-xs">
                   Anda
                 </Badge>
               }
               icon={<FileText className="h-4 w-4 text-muted-foreground" />}>
               <div className="text-2xl font-bold">{stats.activeBorrowings}</div>
               <p className="text-xs text-muted-foreground">transaksi</p>
-            </DashboardCard>
+            </CardStats>
 
             {user.role === "ADMIN" && (
-              <DashboardCard
-                title="Peminjaman aktif"
-                badge={
-                  <Badge className="bg-red-100 text-red-800 border-red-200">
-                    Semua
-                  </Badge>
-                }
+              <CardStats
+                title="Semua Peminjaman Aktif"
                 icon={<FileText className="h-4 w-4 text-muted-foreground" />}>
                 <div className="text-2xl font-bold">
                   {stats.totalChemicals - stats.activeBorrowings}
                 </div>
                 <p className="text-xs text-muted-foreground">transaksi</p>
-              </DashboardCard>
+              </CardStats>
             )}
 
-            <DashboardCard
+            <CardStats
               title="Stok Hampir Habis"
               icon={<AlertTriangle className="h-4 w-4 text-yellow-600" />}>
               <div className="text-2xl font-bold text-yellow-600">
                 {stats.lowStockChemicals}
               </div>
               <p className="text-xs text-muted-foreground">item</p>
-            </DashboardCard>
+            </CardStats>
 
-            <DashboardCard
+            <CardStats
               title="Kadaluarsa Bulan Ini"
               icon={<Calendar className="h-4 w-4 text-red-600" />}>
               <div className="text-2xl font-bold text-red-600">
                 {stats.expiringChemicals}
               </div>
               <p className="text-xs text-muted-foreground">item</p>
-            </DashboardCard>
+            </CardStats>
           </div>
 
           {/* Recent Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Aktivitas Terbaru</CardTitle>
-                <CardDescription>
-                  Peminjaman dan pengembalian terbaru
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {activities.map((activity) => (
+            <CardStats
+              title="Ringkasan Aktivitas"
+              description="Peminjaman dan pengembalian terbaru"
+              icon={<Activity className="h-4 w-4 text-blue-600" />}>
+              <div className="space-y-4 mt-2">
+                {activities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center space-x-4">
                     <div
-                      key={activity.id}
-                      className="flex items-center space-x-4">
-                      <div
-                        className={`w-2 h-2 ${activity.color} rounded-full`}></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {activity.message}
-                        </p>
-                        <p className="text-xs text-gray-500">{activity.time}</p>
-                      </div>
+                      className={`w-2 h-2 ${activity.color} rounded-full`}></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{activity.message}</p>
+                      <p className="text-xs text-gray-500">{activity.time}</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                ))}
+              </div>
+            </CardStats>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Peringatan</CardTitle>
-                <CardDescription>
-                  Item yang memerlukan perhatian
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {stats.expiringChemicals} bahan akan kadaluwarsa bulan
-                        ini
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Periksa tanggal kadaluwarsa
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {stats.lowStockChemicals} bahan stok rendah
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Pertimbangkan untuk restok
-                      </p>
-                    </div>
+            <CardStats
+              title="Pemberitahuan"
+              description="Item yang memerlukan perhatian"
+              icon={<AlertTriangle className="h-4 w-4 text-red-500" />}>
+              <div className="space-y-4 mt-2">
+                <div className="flex items-center space-x-4">
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">
+                      {stats.expiringChemicals} bahan akan kadaluwarsa bulan ini
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Periksa tanggal kadaluwarsa
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center space-x-4">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">
+                      {stats.lowStockChemicals} bahan stok rendah
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Pertimbangkan untuk restok
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardStats>
           </div>
 
           {/* Role-specific content */}

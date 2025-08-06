@@ -39,7 +39,7 @@ export default function UsersLoading() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="h-10 bg-gray-200 rounded w-full sm:w-1/2" />
+              <div className="h-10 bg-gray-200 rounded w-full sm:w-3/4" />
               <div className="h-10 bg-gray-200 rounded w-full sm:w-40" />
               <div className="h-10 bg-gray-200 rounded w-full sm:w-40" />
             </div>

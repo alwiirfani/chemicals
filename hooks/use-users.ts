@@ -47,6 +47,8 @@ export const useUsers = () => {
         };
 
         const { data } = await axios.get("/api/v1/users", { params });
+        console.log("from useUsers: ", data.users);
+
         setUsers(data.users);
         setPagination({
           currentPage: data.pagination.page,
@@ -109,28 +111,6 @@ export const useUsers = () => {
     }
   };
 
-  const handleToggleStatus = async (
-    userId: string,
-    newStatus: "ACTIVE" | "INACTIVE" | "BLOCKED"
-  ) => {
-    try {
-      const { data } = await axios.patch(`/api/v1/users/${userId}/status`, {
-        status: newStatus,
-      });
-      toast({
-        title: "Status Diubah",
-        description: `Status kini ${data.newStatus}`,
-      });
-      fetchUsers(pagination.currentPage);
-    } catch {
-      toast({
-        title: "Error",
-        description: "Gagal mengubah status",
-        variant: "destructive",
-      });
-    }
-  };
-
   return {
     // data users
     users,
@@ -156,6 +136,5 @@ export const useUsers = () => {
     // actions
     fetchUsers,
     handlePageChange,
-    handleToggleStatus,
   };
 };

@@ -16,13 +16,9 @@ import {
   X,
   FlaskConical,
 } from "lucide-react";
-import { UserAuth } from "@/types/auth";
 import SidebarNav from "./sidebar-nav";
 import SidebarFooter from "./sidebar-footer";
-
-interface SidebarProps {
-  user: UserAuth;
-}
+import { useUser } from "@/providers/auth-provider";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -35,10 +31,12 @@ const navigation = [
   { name: "Pengaturan", href: "/settings", icon: Settings },
 ];
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+
+  const { user } = useUser();
 
   // untuk handle scroll
   useEffect(() => {
@@ -79,7 +77,7 @@ export function Sidebar({ user }: SidebarProps) {
         )}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200 gap-1">
+          <div className="flex items-center h-16 px-4 border-b border-gray-200 gap-1">
             <div className="relative w-12 h-12 flex items-center justify-center">
               <div className="absolute w-11 h-11 bg-blue-300 opacity-50 rounded-full border border-background z-0" />
               <FlaskConical className="relative h-6 w-6 text-blue-600 z-10" />

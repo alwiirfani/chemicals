@@ -3,13 +3,15 @@ import { UserAuth } from "@/types/auth";
 import { cookies } from "next/headers";
 import db from "./db";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
-const JWT_SECRET = process.env.JWT_SECRET || "";
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export const generateToken = (payload: UserAuth): string => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d", algorithm: "HS256" });
+  return jwt.sign(payload, JWT_SECRET, { algorithm: "HS256" });
 };
 
+// verifikasi token dengan format payload UserAuth
 export const verifyToken = (token: string): UserAuth | null => {
   try {
     return jwt.verify(token, JWT_SECRET, {
@@ -19,6 +21,20 @@ export const verifyToken = (token: string): UserAuth | null => {
     return null;
   }
 };
+
+// apakah token masih aktif (tidak expired)
+export function isTokenExpired(token: string): boolean {
+  try {
+    const payload = verifyToken(token) as UserAuth;
+    console.log("Payload: ", payload);
+
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp < now;
+  } catch (error) {
+    console.log("Token expired: ", error);
+    return true;
+  }
+}
 
 export const getCurrentUser = async () => {
   try {
@@ -69,10 +85,13 @@ export const getCurrentUser = async () => {
       roleId: roleId,
       email: user.email,
       name: name,
+      username: user.username,
       role: user.role,
       status: user.status,
       createdAt: user.created_at.toISOString(),
       lastLogin: user.updated_at.toISOString(),
+      exp: payload.exp,
+      iat: payload.iat,
     };
   } catch (error) {
     console.error("getCurrentUser error:", error);
@@ -80,6 +99,7 @@ export const getCurrentUser = async () => {
   }
 };
 
+// Client
 export const requireAuth = async () => {
   const user = await getCurrentUser();
   if (!user) {
@@ -92,6 +112,26 @@ export const requireRole = async (allowedRoles: string[]) => {
   const user = await requireAuth();
   if (!allowedRoles.includes(user.role)) {
     throw new Error("Forbidden");
+  }
+  return user;
+};
+
+// Server
+export const requireAuthOrNull = async () => {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return user;
+};
+
+export const requireRoleOrNull = async (allowedRoles: string[]) => {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!allowedRoles.includes(user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   return user;
 };

@@ -29,8 +29,10 @@ export const DetailUserDialog: React.FC<DetaiUserlDialogProps> = ({
         return "Administrator";
       case "LABORAN":
         return "Laboran";
-      case "USER":
-        return "Pengguna";
+      case "MAHASISWA":
+        return "Mahasiswa";
+      case "DOSEN":
+        return "Dosen";
       default:
         return role;
     }
@@ -42,7 +44,9 @@ export const DetailUserDialog: React.FC<DetaiUserlDialogProps> = ({
         return "default";
       case "LABORAN":
         return "secondary";
-      case "USER":
+      case "MAHASISWA":
+        return "outline";
+      case "DOSEN":
         return "outline";
       default:
         return "outline";
@@ -55,7 +59,7 @@ export const DetailUserDialog: React.FC<DetaiUserlDialogProps> = ({
         return "default";
       case "INACTIVE":
         return "secondary";
-      case "SUSPENDED":
+      case "BLOCKED":
         return "destructive";
       default:
         return "outline";
@@ -68,8 +72,8 @@ export const DetailUserDialog: React.FC<DetaiUserlDialogProps> = ({
         return "Aktif";
       case "INACTIVE":
         return "Tidak Aktif";
-      case "SUSPENDED":
-        return "Ditangguhkan";
+      case "BLOCKED":
+        return "Diblokir";
       default:
         return status;
     }

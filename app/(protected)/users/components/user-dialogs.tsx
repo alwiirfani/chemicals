@@ -1,6 +1,6 @@
-import { AddUserDialog } from "./dialog/add-user-dialog";
-import { EditUserDialog } from "./dialog/edit-user-dialog";
-import { DetailUserDialog } from "./dialog/detail-user-dialog";
+import { AddUserDialog } from "@/components/dialog/users/add-user-dialog";
+import { EditUserDialog } from "@/components/dialog/users/edit-user-dialog";
+import { DetailUserDialog } from "@/components/dialog/users/detail-user-dialog";
 import { UserAuth } from "@/types/auth";
 
 interface UserDialogsProps {

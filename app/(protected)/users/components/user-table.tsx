@@ -15,14 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Trash2,
-  UserCheck,
-  UserX,
-} from "lucide-react";
+import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import { UserAuth } from "@/types/auth";
 
 interface UserPaginationProps {
@@ -36,10 +29,6 @@ interface UserTableProps {
   onEdit: (user: UserAuth) => void;
   onView: (user: UserAuth) => void;
   onDelete: (userId: string) => void;
-  onToggleStatus: (
-    userId: string,
-    newStatus: "ACTIVE" | "INACTIVE" | "BLOCKED"
-  ) => void;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({
@@ -49,7 +38,6 @@ export const UserTable: React.FC<UserTableProps> = ({
   onEdit,
   onView,
   onDelete,
-  onToggleStatus,
 }) => {
   const getRoleLabel = (role: string) => {
     switch (role) {
@@ -184,7 +172,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="p-2">
                           <DropdownMenuItem onClick={() => onView(user)}>
                             <Eye className="mr-2 h-4 w-4" />
                             Lihat Detail
@@ -193,66 +181,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          {user.status === "ACTIVE" && (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  onToggleStatus(user.userId, "BLOCKED")
-                                }>
-                                <UserX className="mr-2 h-4 w-4 text-red-600" />
-                                <span className="text-red-600">Blokir</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  onToggleStatus(user.userId, "INACTIVE")
-                                }>
-                                <UserX className="mr-2 h-4 w-4 text-yellow-600" />
-                                <span className="text-yellow-600">
-                                  Nonaktifkan
-                                </span>
-                              </DropdownMenuItem>
-                            </>
-                          )}
 
-                          {user.status === "INACTIVE" && (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  onToggleStatus(user.userId, "BLOCKED")
-                                }>
-                                <UserX className="mr-2 h-4 w-4 text-red-600" />
-                                <span className="text-red-600">Blokir</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  onToggleStatus(user.userId, "ACTIVE")
-                                }>
-                                <UserCheck className="mr-2 h-4 w-4 text-green-600" />
-                                <span className="text-green-600">Aktifkan</span>
-                              </DropdownMenuItem>
-                            </>
-                          )}
-
-                          {user.status === "BLOCKED" && (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  onToggleStatus(user.userId, "INACTIVE")
-                                }>
-                                <UserX className="mr-2 h-4 w-4 text-yellow-600" />
-                                <span className="text-yellow-600">
-                                  Nonaktifkan
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  onToggleStatus(user.userId, "ACTIVE")
-                                }>
-                                <UserCheck className="mr-2 h-4 w-4 text-green-600" />
-                                <span className="text-green-600">Aktifkan</span>
-                              </DropdownMenuItem>
-                            </>
-                          )}
                           <DropdownMenuItem
                             onClick={() => onDelete(user.userId)}
                             className="text-red-600">

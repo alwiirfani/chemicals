@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { generateToken, verifyPassword } from "@/lib/auth";
 import db from "@/lib/db";
 
+const iat = Math.floor(Date.now() / 1000);
+const exp = iat + 60 * 60 * 24; // 1 hari
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -72,10 +75,13 @@ export async function POST(request: NextRequest) {
       roleId,
       email: user.email,
       name,
+      username: user.username,
       role: user.role,
       status: user.status,
       createdAt: user.created_at.toISOString(),
       lastLogin: user.updated_at.toISOString(),
+      exp,
+      iat,
     });
 
     const response = NextResponse.json({
@@ -84,6 +90,7 @@ export async function POST(request: NextRequest) {
         roleId,
         email: user.email,
         name,
+        username: user.username,
         role: user.role,
         status: user.status,
         createdAt: user.created_at.toISOString(),
@@ -94,8 +101,9 @@ export async function POST(request: NextRequest) {
     response.cookies.set("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: "/",
     });
 
     // Update last login

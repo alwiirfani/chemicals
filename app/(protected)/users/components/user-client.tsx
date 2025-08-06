@@ -36,7 +36,6 @@ export function UserClient() {
     handlePageChange,
     handleRequestDelete,
     handleConfirmDelete,
-    handleToggleStatus,
     fetchUsers,
   } = useUsers();
   const [selectedUser, setSelectedUser] = useState<UserAuth | null>(null);
@@ -96,7 +95,7 @@ export function UserClient() {
         </CardHeader>
         <CardContent className="p-0">
           {loadingTable ? (
-            <div className="flex items-center justify-center h-40 text-sm text-gray-500">
+            <div className="flex items-center justify-center h-48 text-sm text-gray-500">
               Memuat data...
             </div>
           ) : (
@@ -107,7 +106,6 @@ export function UserClient() {
               onEdit={handleEditUser}
               onView={handleViewUser}
               onDelete={handleRequestDelete}
-              onToggleStatus={handleToggleStatus}
             />
           )}
         </CardContent>

@@ -10,12 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default async function UsersPage() {
-  await new Promise((resolve) => setTimeout(resolve, 4000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
   const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) return null;
 
   if (!["ADMIN", "LABORAN"].includes(user.role)) {
     return (
@@ -44,7 +42,7 @@ export default async function UsersPage() {
 
   return (
     <div className="flex min-h-screen">
-      <main className="flex-1 p-2 md:p-8 md:ml-64 overflow-auto">
+      <main className="flex-1 px-2 md:ml-64 overflow-auto">
         <UserClient />
       </main>
     </div>

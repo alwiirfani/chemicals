@@ -10,7 +10,7 @@ type AuthState = {
   resetAuth: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useLogin = create<AuthState>((set) => ({
   email: "",
   password: "",
   error: "",

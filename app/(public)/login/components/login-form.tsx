@@ -9,24 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/stores/auth-store";
+import { useLogin } from "@/stores/use-login";
+import { UserAuth } from "@/types/auth";
 
 interface LoginResponseProps {
-  user: {
-    userId: string;
-    roleId: string;
-    email: string;
-    name: string;
-    role: string;
-    status: string;
-    createdAt: string;
-    lastLogin: string;
-  };
+  user: UserAuth;
 }
 
 export default function LoginForm() {
   const { email, password, error, setEmail, setPassword, setError } =
-    useAuthStore();
+    useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
