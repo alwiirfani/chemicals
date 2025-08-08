@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { registerSchema, RegisterSchemaFormData } from "@/lib/validation/auth";
 import { FormInput } from "@/components/form/form-input";
-import { getRoleIdLabel, getRoleIdPlaceholder } from "@/helpers/users/users";
+import { getRoleIdLabel, getRoleIdPlaceholder } from "@/helpers/users/user-api";
 import { FormSelect } from "@/components/form/form-select";
 import { SelectItem } from "@/components/ui/select";
 
@@ -138,6 +138,7 @@ export const AddUserDialog: React.FC<AddUserDialogProps> = ({
                   ...formData,
                   role: value as RegisterSchemaFormData["role"],
                   roleId: "",
+                  name: value === "ADMIN" ? "Administrator" : "",
                 })
               }
               error={errors.role}>
@@ -166,7 +167,9 @@ export const AddUserDialog: React.FC<AddUserDialogProps> = ({
             <FormInput
               id="name"
               label="Nama Lengkap"
-              value={formData.name}
+              value={
+                formData.role === "ADMIN" ? "Administrator" : formData.name
+              }
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }

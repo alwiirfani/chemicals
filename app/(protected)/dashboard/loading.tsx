@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function Loading() {
   return (
-    <div className="flex min-h-screen bg-gray-50 mt-16 sm:mt-0">
+    <div className="flex min-h-screen bg-background sm:mt-0">
       <div className="flex-1 md:ml-64">
         <div className="p-6">
           <div className="mb-8">

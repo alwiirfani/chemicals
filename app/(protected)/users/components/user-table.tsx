@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import { UserAuth } from "@/types/auth";
+import {
+  getRoleBadgeVariant,
+  getRoleLabel,
+  getStatusBadgeVariant,
+  getStatusLabel,
+} from "@/helpers/users/user-table";
+import { formatDateToString } from "@/helpers/format-date";
 
 interface UserPaginationProps {
   currentPage: number;
@@ -39,79 +46,13 @@ export const UserTable: React.FC<UserTableProps> = ({
   onView,
   onDelete,
 }) => {
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return "Administrator";
-      case "LABORAN":
-        return "Laboran";
-      case "MAHASISWA":
-        return "Mahasiswa";
-      case "DOSEN":
-        return "Dosen";
-      default:
-        return role;
-    }
-  };
-
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return "default";
-      case "LABORAN":
-        return "secondary";
-      case "MAHASISWA":
-        return "outline";
-      case "DOSEN":
-        return "outline";
-      default:
-        return "outline";
-    }
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "default";
-      case "INACTIVE":
-        return "secondary";
-      case "BLOCKED":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "Aktif";
-      case "INACTIVE":
-        return "Tidak Aktif";
-      case "BLOCKED":
-        return "Diblokir";
-      default:
-        return status;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
     <>
       <div className="rounded-md border overflow-hidden">
         <div className="w-full overflow-x-auto">
           <Table className="min-w-[800px]">
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-blue-50 hover:bg-blue-100">
                 <TableHead className="whitespace-nowrap">Nama</TableHead>
                 <TableHead className="whitespace-nowrap">Email</TableHead>
                 <TableHead className="whitespace-nowrap">ID</TableHead>
@@ -159,11 +100,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {user.lastLogin
-                        ? formatDate(user.lastLogin)
+                        ? formatDateToString(user.lastLogin)
                         : "Belum pernah"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
-                      {formatDate(user.createdAt)}
+                      {formatDateToString(user.createdAt)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       <DropdownMenu>
@@ -177,10 +118,12 @@ export const UserTable: React.FC<UserTableProps> = ({
                             <Eye className="mr-2 h-4 w-4" />
                             Lihat Detail
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onEdit(user)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
+                          {user.role !== "ADMIN" && (
+                            <DropdownMenuItem onClick={() => onEdit(user)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                          )}
 
                           <DropdownMenuItem
                             onClick={() => onDelete(user.userId)}

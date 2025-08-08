@@ -1,28 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { requireRole, hashPassword, requireRoleOrNull } from "@/lib/auth";
+import { hashPassword, requireRoleOrNull, requireAuthOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { editUserForAdminSchema } from "@/lib/validation/users";
-import { updateUserRoleData } from "@/helpers/users/users";
+import { updateUserRoleData } from "@/helpers/users/user-api";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function GET({ params }: { params: { userId: string } }) {
   try {
-    await requireRole(["ADMIN", "LABORAN"]);
+    const userAccess = await requireAuthOrNull();
+    if (userAccess instanceof NextResponse) return userAccess;
 
     const userId = params.userId;
 
-    const user = await db.user.findFirst({
-      where: {
-        OR: [
-          { id: userId },
-          { admin: { pin: userId } },
-          { mahasiswa: { nim: userId } },
-          { dosen: { nidn: userId } },
-          { laboran: { nip: userId } },
-        ],
-      },
+    const user = await db.user.findUnique({
+      where: { id: userId },
       include: {
         admin: true,
         mahasiswa: true,
@@ -152,7 +142,7 @@ export async function PUT(
     });
 
     return NextResponse.json(
-      { message: "User updated successfully", userId: updatedUser.id },
+      { message: "User berhasil diupdate", userId: updatedUser.id },
       { status: 200 }
     );
   } catch (error) {
@@ -164,25 +154,15 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function DELETE({ params }: { params: { userId: string } }) {
   try {
-    await requireRole(["ADMIN"]);
+    const userAccess = await requireRoleOrNull(["ADMIN"]);
+    if (userAccess instanceof NextResponse) return userAccess;
 
     const { userId } = await params;
 
-    const user = await db.user.findFirst({
-      where: {
-        OR: [
-          { id: userId },
-          { admin: { pin: userId } },
-          { mahasiswa: { nim: userId } },
-          { dosen: { nidn: userId } },
-          { laboran: { nip: userId } },
-        ],
-      },
+    const user = await db.user.findUnique({
+      where: { id: userId },
     });
 
     if (!user) {
@@ -193,7 +173,10 @@ export async function DELETE(
       where: { id: user.id },
     });
 
-    return NextResponse.json({ message: "User deleted successfully" });
+    return NextResponse.json(
+      { message: "User deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Delete user error:", error);
     return NextResponse.json(

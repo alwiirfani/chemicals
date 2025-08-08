@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isTokenExpiredRuntimeEdge } from "./lib/auth";
 
 const publicPaths = ["/login", "/about", "/contact", "/privacy"];
 
@@ -11,7 +12,7 @@ export const middleware = (request: NextRequest) => {
   console.log("Token found:", !!token);
 
   // cek apakah token ada dan token apakah sudah expired
-  if (token && isTokenExpired(token)) {
+  if (token && isTokenExpiredRuntimeEdge(token)) {
     console.log("Token is expired. Deleting cookie and redirecting to /login.");
     const response = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.delete("access_token");
@@ -36,32 +37,4 @@ export const middleware = (request: NextRequest) => {
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-};
-
-// cek token apakah expired
-const isTokenExpired = (token: string): boolean => {
-  try {
-    const payloadBase64 = token.split(".")[1];
-    const decodedPayload = atob(payloadBase64);
-    const { exp } = JSON.parse(decodedPayload);
-
-    console.log("Token Expiration Time (exp):", new Date(exp * 1000));
-    console.log("Current Time:", new Date());
-
-    if (!exp) {
-      console.log("Token does not have an 'exp' property.");
-      return true;
-    }
-
-    const expiryDate = new Date(exp * 1000);
-    const isExpired = expiryDate.getTime() < Date.now();
-    console.log("Is token expired?", isExpired);
-    return isExpired;
-  } catch (error) {
-    console.error(
-      "Error parsing token. Token will be considered invalid.",
-      error
-    );
-    return true;
-  }
 };

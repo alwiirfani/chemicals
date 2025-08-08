@@ -57,7 +57,7 @@ export const useUsers = () => {
         });
         setStats(data.stats);
       } catch (error) {
-        console.log("Error fetching users:", error);
+        console.log("Gagal memuat data: ", error);
         toast({
           title: "Gagal",
           description: "Tidak dapat memuat data pengguna",

@@ -14,7 +14,7 @@ import { UserTable } from "./user-table";
 import { UserAuth } from "@/types/auth";
 import { UserStats } from "./user-stats";
 import { UserFilter } from "./user-filter";
-import { UserDialogs } from "./user-dialogs";
+import { UserDialogs } from "@/components/dialog/users/user-dialogs";
 import { useUsers } from "@/hooks/use-users";
 import { AlertModal } from "@/components/alert-modal";
 

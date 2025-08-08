@@ -15,6 +15,7 @@ interface RoleSelectProps {
   onChange: (value: string) => void;
   error?: string;
   children?: React.ReactNode;
+  required?: boolean;
 }
 
 export const FormSelect: React.FC<RoleSelectProps> = ({
@@ -24,11 +25,12 @@ export const FormSelect: React.FC<RoleSelectProps> = ({
   onChange,
   error,
   children,
+  required = false,
 }) => {
   return (
     <div className="space-y-2">
       <Label htmlFor={htmlFor}>
-        {label} <span className="text-red-500">*</span>
+        {label} <span className="text-red-500">{required ? "*" : ""}</span>
       </Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger>

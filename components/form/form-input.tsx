@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 interface FormInputProps {
   id: string;
   label: string;
-  value: string;
+  value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   type?: string;
@@ -14,6 +14,7 @@ interface FormInputProps {
   disabled?: boolean;
   error?: string;
   hint?: string;
+  className?: string;
 }
 
 export const FormInput: React.FC<FormInputProps> = ({
@@ -27,6 +28,7 @@ export const FormInput: React.FC<FormInputProps> = ({
   disabled = false,
   error,
   hint,
+  className,
 }) => {
   return (
     <div className="space-y-2">
@@ -35,6 +37,7 @@ export const FormInput: React.FC<FormInputProps> = ({
       </Label>
       <Input
         id={id}
+        className={className}
         value={value}
         onChange={onChange}
         placeholder={placeholder}

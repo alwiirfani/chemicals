@@ -73,10 +73,10 @@ export const DashboardClient = () => {
   if (isLoading || !user) return null;
 
   return (
-    <div className="flex min-h-screen bg-background sm:mt-0">
+    <div className="flex min-h-screen bg-background">
       <div className="flex-1 md:ml-64">
         <div className="p-6">
-          <div className="mb-8">
+          <div className="mb-4">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Dashboard
             </h1>
@@ -91,7 +91,9 @@ export const DashboardClient = () => {
             <CardStats
               title="Total Bahan Kimia"
               icon={<Package className="h-4 w-4 text-muted-foreground" />}>
-              <div className="text-2xl font-bold">{stats.totalChemicals}</div>
+              <div className="text-2xl font-bold pt-4 sm:pt-7">
+                {stats.totalChemicals}
+              </div>
               <p className="text-xs text-muted-foreground">
                 bahan padat, cair dan gas
               </p>
@@ -113,7 +115,7 @@ export const DashboardClient = () => {
               <CardStats
                 title="Semua Peminjaman Aktif"
                 icon={<FileText className="h-4 w-4 text-muted-foreground" />}>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold pt-4 sm:pt-7">
                   {stats.totalChemicals - stats.activeBorrowings}
                 </div>
                 <p className="text-xs text-muted-foreground">transaksi</p>
@@ -123,7 +125,7 @@ export const DashboardClient = () => {
             <CardStats
               title="Stok Hampir Habis"
               icon={<AlertTriangle className="h-4 w-4 text-yellow-600" />}>
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-2xl font-bold text-yellow-600 pt-9 sm:pt-7">
                 {stats.lowStockChemicals}
               </div>
               <p className="text-xs text-muted-foreground">item</p>
@@ -132,10 +134,12 @@ export const DashboardClient = () => {
             <CardStats
               title="Kadaluarsa Bulan Ini"
               icon={<Calendar className="h-4 w-4 text-red-600" />}>
-              <div className="text-2xl font-bold text-red-600">
-                {stats.expiringChemicals}
+              <div className=" pt-4 sm:pt-7">
+                <span className="text-2xl font-bold text-red-600">
+                  {stats.expiringChemicals}
+                </span>
+                <p className="text-xs text-muted-foreground">item</p>
               </div>
-              <p className="text-xs text-muted-foreground">item</p>
             </CardStats>
           </div>
 

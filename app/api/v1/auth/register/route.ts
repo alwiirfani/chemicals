@@ -1,4 +1,4 @@
-import { createUserRoleData, isRoleIdTaken } from "@/helpers/users/users";
+import { createUserRoleData, isRoleIdTaken } from "@/helpers/users/user-api";
 import { hashPassword, requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { registerSchema } from "@/lib/validation/auth";

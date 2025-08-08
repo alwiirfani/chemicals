@@ -28,7 +28,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
   return (
     <div className="bg-white rounded-xl border">
       <div className="p-6 space-y-2">
-        <div className="text-lg font-semibold">Filter & Pencarian</div>
+        <span className="text-lg font-semibold">Filter & Pencarian</span>
         <p className="text-sm text-muted-foreground">
           Cari pengguna berdasarkan nama atau email.
         </p>

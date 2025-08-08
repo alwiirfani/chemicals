@@ -35,12 +35,14 @@ export const UserDialogs: React.FC<UserDialogsProps> = ({
       />
       {selectedUser && (
         <>
-          <EditUserDialog
-            open={showEditDialog}
-            onOpenChange={onCloseEdit}
-            user={selectedUser}
-            onUserUpdated={onUserUpdated}
-          />
+          {selectedUser.role !== "ADMIN" && (
+            <EditUserDialog
+              open={showEditDialog}
+              onOpenChange={onCloseEdit}
+              user={selectedUser}
+              onUserUpdated={onUserUpdated}
+            />
+          )}
           <DetailUserDialog
             open={showDetailDialog}
             onOpenChange={onCloseDetail}

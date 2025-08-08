@@ -1,11 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { requireRole, hashPassword } from "@/lib/auth";
+import { hashPassword, requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
-    await requireRole(["ADMIN", "LABORAN"]);
+    const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
+    if (userAccess instanceof NextResponse) return userAccess;
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
@@ -161,7 +162,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireRole(["ADMIN"]);
+    const userAccess = await requireRoleOrNull(["ADMIN"]);
+    if (userAccess instanceof NextResponse) return userAccess;
 
     const body = await request.json();
     const { email, password, role, roleId, name } = body;

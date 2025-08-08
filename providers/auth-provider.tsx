@@ -29,10 +29,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: user = null, isLoading } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: fetchUserMe,
-    staleTime: 1000 * 60 * 5, // cache 5 menit
+    staleTime: 1000 * 60 * 10, // cache 10 menit
+    gcTime: 1000 * 60 * 30, // cache selama 30 menit setelah tidak digunakan
     refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    refetchOnMount: "always",
     refetchOnReconnect: true,
+    retry: 2,
   });
 
   return (
