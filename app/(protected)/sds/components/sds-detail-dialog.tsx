@@ -1,0 +1,215 @@
+"use client";
+
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  FileText,
+  Download,
+  ExternalLink,
+  Package,
+  Globe,
+  Calendar,
+  User,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { SDS } from "@/types/sds";
+
+interface SDSDetailDialogProps {
+  sds: SDS;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  userRole: string;
+}
+
+export function SDSDetailDialog({
+  sds,
+  open,
+  onOpenChange,
+}: SDSDetailDialogProps) {
+  const { toast } = useToast();
+
+  const handleDownload = async () => {
+    try {
+      if (sds.filePath) {
+        toast({
+          title: "Download Started! 📥",
+          description: `Mengunduh ${sds.fileName}`,
+        });
+      } else if (sds.externalUrl) {
+        window.open(sds.externalUrl, "_blank");
+        toast({
+          title: "External Link Opened! 🔗",
+          description: "Dokumen SDS dibuka di tab baru",
+        });
+      }
+    } catch (error) {
+      console.error("Error downloading SDS:", error);
+      toast({
+        title: "Error ❌",
+        description: "Gagal mengunduh dokumen SDS",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Safety Data Sheet - {sds.chemical.name}
+          </DialogTitle>
+          <DialogDescription>
+            Informasi keselamatan dan bahaya bahan kimia
+          </DialogDescription>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[calc(90vh-120px)]">
+          <div className="space-y-6 pr-4">
+            {/* Status and Actions */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge variant="outline">
+                  {sds.language === "ID"
+                    ? "🇮🇩 Indonesia"
+                    : sds.language === "EN"
+                    ? "🇺🇸 English"
+                    : sds.language}
+                </Badge>
+              </div>
+              <Button
+                onClick={handleDownload}
+                className="flex items-center gap-2">
+                {sds.filePath ? (
+                  <>
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink className="h-4 w-4" />
+                    Buka Link
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Chemical Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Package className="h-4 w-4" />
+                    Informasi Bahan Kimia
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Nama:</span>
+                      <span className="font-medium">{sds.chemical.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Rumus:</span>
+                      <span className="font-medium">
+                        {sds.chemical.formula}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">CAS Number:</span>
+                      <span className="font-medium">
+                        {sds.chemical.casNumber}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Bentuk:</span>
+                      <span className="font-medium">
+                        {sds.chemical.form === "LIQUID"
+                          ? "Cair"
+                          : sds.chemical.form === "SOLID"
+                          ? "Padat"
+                          : "Gas"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Informasi Dokumen
+                  </h4>
+                </div>
+              </div>
+            </div>
+
+            {/* Document Info */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium mb-3 flex items-center gap-2">
+                {sds.fileName ? (
+                  <FileText className="h-4 w-4" />
+                ) : (
+                  <Globe className="h-4 w-4" />
+                )}
+                Dokumen
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">File:</span>
+                  <p className="font-medium">
+                    {sds.fileName || "External Link"}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-gray-600">Upload:</span>
+                  <p className="font-medium">
+                    {format(sds.createdAt, "dd/MM/yyyy", { locale: id })}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-gray-600">Diunduh:</span>
+                  <p className="font-medium">{sds.downloadCount} kali</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Upload Information */}
+            <Separator />
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium mb-3 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Informasi Upload
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Diupload oleh:</span>
+                  <p className="font-medium">{sds.createdByName}</p>
+                </div>
+                <div>
+                  <span className="text-gray-600">Tanggal upload:</span>
+                  <p className="font-medium">
+                    {format(sds.createdAt, "dd MMMM yyyy, HH:mm", {
+                      locale: id,
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+}

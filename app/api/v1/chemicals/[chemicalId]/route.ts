@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { chemicalId: string } }
+  { params }: { params: Promise<{ chemicalId: string }> }
 ) {
   try {
     const userAccess = await requireAuthOrNull();
@@ -45,7 +45,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { chemicalId: string } }
+  { params }: { params: Promise<{ chemicalId: string }> }
 ) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
@@ -126,7 +126,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { chemicalId: string } }
+  { params }: { params: Promise<{ chemicalId: string }> }
 ) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);

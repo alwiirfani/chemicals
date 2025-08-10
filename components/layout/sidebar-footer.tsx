@@ -1,13 +1,13 @@
 "use client";
 
-import { User } from "@/types/auth";
+import { UserAuth } from "@/types/auth";
 import React from "react";
 import { Button } from "../ui/button";
 import { LogOut } from "lucide-react";
 import axios from "axios";
 
 interface SidebarFooterProps {
-  user: User;
+  user: UserAuth | null;
 }
 
 const SidebarFooter = ({ user }: SidebarFooterProps) => {

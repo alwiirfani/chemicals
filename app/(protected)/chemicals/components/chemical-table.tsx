@@ -43,7 +43,7 @@ export function ChemicalTable({
   );
   const router = useRouter();
 
-  const canEdit = userRole === "ADMIN" || userRole === "LABORAN";
+  const canAction = userRole === "ADMIN" || userRole === "LABORAN";
 
   return (
     <>
@@ -60,9 +60,13 @@ export function ChemicalTable({
                 <TableHead className="whitespace-nowrap">Stok</TableHead>
                 <TableHead className="whitespace-nowrap">Lokasi</TableHead>
                 <TableHead className="whitespace-nowrap">Kadaluwarsa</TableHead>
-                <TableHead className="whitespace-nowrap text-center sm:text-left">
-                  Aksi
-                </TableHead>
+                {canAction ? (
+                  <TableHead className="whitespace-nowrap text-center sm:text-left">
+                    Aksi
+                  </TableHead>
+                ) : (
+                  <TableHead className="whitespace-nowrap text-center sm:text-left"></TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -133,16 +137,18 @@ export function ChemicalTable({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-white hover:bg-gray-100 text-gray-800 border-gray-300 hover:border-gray-400 transition-all duration-200 hover:scale-105"
-                        onClick={() => setSelectedChemical(chemical)}>
-                        <QrCode className="h-4 w-4" />
-                      </Button>
-                      {canEdit && (
+                      {canAction && (
                         <>
                           <Button
+                            title="QR Code"
+                            variant="outline"
+                            size="sm"
+                            className="bg-white hover:bg-gray-100 text-gray-800 border-gray-300 hover:border-gray-400 transition-all duration-200 hover:scale-105"
+                            onClick={() => setSelectedChemical(chemical)}>
+                            <QrCode className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            title="Edit"
                             variant="outline"
                             size="sm"
                             className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 hover:text-white border-yellow-400 hover:border-yellow-500 transition-all duration-200 hover:scale-105"
@@ -152,6 +158,7 @@ export function ChemicalTable({
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
+                            title="Hapus"
                             variant="outline"
                             size="sm"
                             className="bg-red-400 hover:bg-red-500 text-red-900 hover:text-white border-red-400 hover:border-red-500 transition-all duration-200 hover:scale-105"

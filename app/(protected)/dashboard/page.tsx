@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 const DashboardPage = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   return <DashboardClient />;
 };

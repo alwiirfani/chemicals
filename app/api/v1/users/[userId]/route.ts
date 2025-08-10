@@ -4,12 +4,15 @@ import db from "@/lib/db";
 import { editUserForAdminSchema } from "@/lib/validation/users";
 import { updateUserRoleData } from "@/helpers/users/user-api";
 
-export async function GET({ params }: { params: { userId: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
     const userAccess = await requireAuthOrNull();
     if (userAccess instanceof NextResponse) return userAccess;
 
-    const userId = params.userId;
+    const { userId } = await params;
 
     const user = await db.user.findUnique({
       where: { id: userId },
@@ -71,7 +74,7 @@ export async function GET({ params }: { params: { userId: string } }) {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN"]);
@@ -154,7 +157,10 @@ export async function PUT(
   }
 }
 
-export async function DELETE({ params }: { params: { userId: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN"]);
     if (userAccess instanceof NextResponse) return userAccess;

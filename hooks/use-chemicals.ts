@@ -11,7 +11,7 @@ const useChemicals = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterForm, setFilterForm] = useState("all");
   const [filterLocation, setFilterLocation] = useState("all");
-  const [loadingTable, setLoadingTable] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deletingChemicalId, setDeletingChemicalId] = useState<string | null>(
@@ -29,7 +29,7 @@ const useChemicals = () => {
   const fetchChemicals = useCallback(
     async (page = 1) => {
       try {
-        setLoadingTable(true);
+        setLoading(true);
         const params = {
           page,
           limit: 10,
@@ -62,7 +62,7 @@ const useChemicals = () => {
           variant: "destructive",
         });
       } finally {
-        setLoadingTable(false);
+        setLoading(false);
       }
     },
     [debouncedSearch, filterForm, filterLocation, toast]
@@ -122,7 +122,7 @@ const useChemicals = () => {
     chemicals,
     total,
     pagination,
-    loadingTable,
+    loading,
 
     // Filter & search
     searchTerm,

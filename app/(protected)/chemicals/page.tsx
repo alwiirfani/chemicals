@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { ChemicalsClient } from "./components/chemical-client";
 
 export default async function ChemicalsPage() {
-  await new Promise((resolve) => setTimeout(resolve, 4000));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   const user = await getCurrentUser();
   if (!user) return null;
 

@@ -32,41 +32,41 @@ export const DashboardClient = () => {
 
   const { user, isLoading } = useUser();
 
+  const fetchDashboard = async () => {
+    try {
+      const data = await getDashboardData();
+
+      setStats({
+        totalChemicals: data.totalChemicals,
+        activeBorrowings: data.activeBorrowings,
+        lowStockChemicals: data.lowStockChemicals,
+        expiringChemicals: data.expiringChemicals,
+      });
+
+      const mappedActivities: MappedActivity[] = data.recentActivities.map(
+        (act) => ({
+          id: act.id,
+          type: act.status,
+          message: `${act.borrower.username} meminjam ${
+            act.items[0]?.chemical?.name ?? "bahan"
+          } (${act.items[0]?.chemical?.unit})`,
+          time: new Date(act.requestDate).toLocaleString("id-ID"),
+          color:
+            act.status === "RETURNED"
+              ? "bg-blue-500"
+              : act.status === "OVERDUE"
+              ? "bg-red-500"
+              : "bg-green-500",
+        })
+      );
+
+      setActivities(mappedActivities);
+    } catch (error) {
+      console.error("Gagal mengambil data dashboard:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const data = await getDashboardData();
-
-        setStats({
-          totalChemicals: data.totalChemicals,
-          activeBorrowings: data.activeBorrowings,
-          lowStockChemicals: data.lowStockChemicals,
-          expiringChemicals: data.expiringChemicals,
-        });
-
-        const mappedActivities: MappedActivity[] = data.recentActivities.map(
-          (act) => ({
-            id: act.id,
-            type: act.status,
-            message: `${act.borrower.username} meminjam ${
-              act.items[0]?.chemical?.name ?? "bahan"
-            } (${act.items[0]?.chemical?.unit})`,
-            time: new Date(act.requestDate).toLocaleString("id-ID"),
-            color:
-              act.status === "RETURNED"
-                ? "bg-blue-500"
-                : act.status === "OVERDUE"
-                ? "bg-red-500"
-                : "bg-green-500",
-          })
-        );
-
-        setActivities(mappedActivities);
-      } catch (error) {
-        console.error("Gagal mengambil data dashboard:", error);
-      }
-    };
-
     fetchDashboard();
   }, []);
 

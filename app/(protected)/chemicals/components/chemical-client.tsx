@@ -26,7 +26,7 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
     chemicals,
     total,
     pagination,
-    loadingTable,
+    loading,
 
     searchTerm,
     setSearchTerm,
@@ -111,7 +111,7 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          {loadingTable ? (
+          {loading ? (
             <div className="flex items-center justify-center h-48 text-sm text-gray-500">
               Memuat data...
             </div>

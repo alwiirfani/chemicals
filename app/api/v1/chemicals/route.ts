@@ -58,6 +58,9 @@ export async function GET(request: NextRequest) {
           createdBy: {
             include: { admin: true, laboran: true },
           },
+          updatedBy: {
+            include: { admin: true, laboran: true },
+          },
           sds: true,
           borrowings: { include: { borrowing: true } },
           usageHistory: true,
@@ -87,12 +90,17 @@ export async function GET(request: NextRequest) {
 
     const formattedChemicals = chemicals.map((chemical) => {
       let createdByName = "";
+      let updatedByName = undefined;
       switch (chemical.createdBy.role) {
         case "ADMIN":
           createdByName = "Administrator";
+          updatedByName = chemical.updatedBy ? "Administrator" : "";
           break;
         case "LABORAN":
           createdByName = chemical.createdBy.laboran?.full_name || "";
+          updatedByName = chemical.updatedBy
+            ? chemical.updatedBy.laboran?.full_name
+            : "";
           break;
         default:
           createdByName = "Tidak diketahui";
@@ -115,6 +123,7 @@ export async function GET(request: NextRequest) {
         temperature: chemical.temperature,
         qr_code: chemical.qrCode,
         created_by: createdByName,
+        updated_by: updatedByName,
         created_at: chemical.createdAt.toISOString(),
         updated_at: chemical.updatedAt.toISOString(),
         sds_count: chemical.sds ? 1 : 0,
@@ -124,6 +133,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
+      message: "Chemicals fetched successfully",
       chemicals: chemicals,
       formattedChemicals: formattedChemicals,
       pagination: {
@@ -178,17 +188,15 @@ export async function POST(request: NextRequest) {
       temperature,
     } = parsed.data;
 
+    const chemicaExist = await db.chemical.findFirst({
+      where: { casNumber },
+    });
     // Pengecekan duplikat CAS number
-    if (casNumber) {
-      const exists =
-        (await db.chemical.count({ where: { casNumber }, take: 1 })) > 0;
-
-      if (exists) {
-        return NextResponse.json(
-          { error: "Bahan kimia dengan CAS number tersebut sudah ada" },
-          { status: 409 }
-        );
-      }
+    if (chemicaExist) {
+      return NextResponse.json(
+        { error: "Bahan kimia dengan CAS number tersebut sudah ada" },
+        { status: 409 }
+      );
     }
 
     const chemical = await db.chemical.create({

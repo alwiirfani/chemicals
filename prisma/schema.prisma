@@ -55,8 +55,10 @@ model User {
   laboran          Laboran?
   borrowings       Borrowing[]
   reports          Report[]
-  createdChemicals Chemical[]  @relation("CreatedBy")
-  updatedChemicals Chemical[]  @relation("UpdatedBy")
+  createdChemicals Chemical[]        @relation("CreatedBy")
+  updatedChemicals Chemical[]        @relation("UpdatedBy")
+  createdSDS       SafetyDataSheet[] @relation("CreatedBy")
+  updatedSDS       SafetyDataSheet[] @relation("UpdatedBy")
 
   @@index([username, email])
   @@map("users")
@@ -98,19 +100,19 @@ model Laboran {
 }
 
 model Chemical {
-  id             String       @id @default(nanoid())
-  name           String       @db.VarChar(255)
-  formula        String?      @db.VarChar(100)
-  casNumber      String?      @map("cas_number") @db.VarChar(50)
-  form           ChemicalForm
-  stock          Int
-  unit           String       @db.VarChar(20)
-  purchaseDate   DateTime     @map("purchase_date")
-  expirationDate DateTime?    @map("expiration_date")
-  location       String       @db.VarChar(255)
-  cabinet        String?      @db.VarChar(100)
-  room           String?      @db.VarChar(100)
-  temperature    String?      @db.VarChar(50)
+  id             String       @id @default(nanoid()) @db.VarChar(255)
+  name           String       @db.VarChar(255) // Nama bahan kimia
+  formula        String?      @db.VarChar(100) // Rumus kimia (contoh: H2O, NaCl)
+  casNumber      String?      @map("cas_number") @db.VarChar(50) // Nomor CAS (Chemical Abstracts Service) untuk identifikasi unik bahan kimia
+  form           ChemicalForm // Bentuk fisik bahan (contoh: padat, cair, gas)
+  stock          Int          @default(0) // Jumlah stok bahan yang tersedia
+  unit           String       @db.VarChar(20) // Satuan stok (contoh: gram, liter, botol)
+  purchaseDate   DateTime     @map("purchase_date") // Tanggal pembelian bahan
+  expirationDate DateTime?    @map("expiration_date") // Tanggal kadaluarsa (jika ada)
+  location       String       @db.VarChar(255) // Lokasi penyimpanan (misal: Gudang A, Laboratorium Kimia)
+  cabinet        String?      @db.VarChar(100) // Lemari penyimpanan (jika ada)
+  room           String?      @db.VarChar(100) // Ruangan tempat bahan disimpan
+  temperature    String?      @db.VarChar(50) // Suhu penyimpanan yang disarankan (contoh: 25°C, suhu ruang, suhu dingin)
   qrCode         String?      @unique @map("qr_code") @db.VarChar(255)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
@@ -123,29 +125,43 @@ model Chemical {
 
   borrowings   BorrowingItem[]
   usageHistory UsageHistory[]
-  sds          SDS?
+  sds          SafetyDataSheet?
 
   @@map("chemicals")
 }
 
-model SDS {
-  id          String   @id @default(nanoid())
-  chemicalId  String   @unique @map("chemical_id")
-  fileName    String?  @map("file_name") @db.VarChar(255)
-  filePath    String?  @map("file_path") @db.VarChar(500)
-  externalUrl String?  @map("external_url") @db.VarChar(500)
-  uploadedAt  DateTime @default(now()) @map("uploaded_at")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+model SafetyDataSheet {
+  id                     String   @id @default(nanoid()) @db.VarChar(255)
+  fileName               String?  @map("file_name") @db.VarChar(255)
+  filePath               String?  @map("file_path") @db.VarChar(500)
+  externalUrl            String?  @map("external_url") @db.VarChar(500)
+  language               String   @db.VarChar(255)
+  hazardClassification   String[] @map("hazard_classification") @db.Text // Klasifikasi bahaya (contoh: Skin Corrosion/Irritation - Category 1A)
+  precautionaryStatement String[] @map("precautionary_statement") @db.Text // Pernyataan kehati-hatian (contoh: P280: Wear protective gloves...)
+  firstAidInhalation     String?  @map("first_aid_inhalation") @db.Text // Tindakan pertolongan pertama jika terhirup
+  firstAidSkin           String?  @map("first_aid_skin") @db.Text // Tindakan pertolongan pertama jika terkena kulit
+  firstAidEye            String?  @map("first_aid_eye") @db.Text // Tindakan pertolongan pertama jika terkena mata
+  firstAidIngestion      String?  @map("first_aid_ingestion") @db.Text // Tindakan pertolongan pertama jika tertelan
+  storageConditions      String?  @map("storage_conditions") @db.Text // Kondisi penyimpanan yang aman
+  disposalInfo           String?  @map("disposal_info") @db.Text // Informasi pembuangan yang aman
+  downloadCount          Int?     @default(0) @map("download_count") // Jumlah total download file SDS
 
   // Relations
-  chemical Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
+  chemical    Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
+  chemicalId  String   @unique @map("chemical_id")
+  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById String   @map("created_by_id") @db.VarChar(255)
+  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
+  updatedById String?  @map("updated_by_id") @db.VarChar(255)
 
-  @@map("sds")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("safety_data_sheets")
 }
 
 model Borrowing {
-  id          String          @id @default(nanoid())
+  id          String          @id @default(nanoid()) @db.VarChar(255)
   borrowerId  String          @map("borrower_id") @db.VarChar(255)
   purpose     String          @db.Text
   status      BorrowingStatus @default(PENDING)
@@ -164,7 +180,7 @@ model Borrowing {
 }
 
 model BorrowingItem {
-  id          String   @id @default(nanoid())
+  id          String   @id @default(nanoid()) @db.VarChar(255)
   borrowingId String   @map("borrowing_id")
   chemicalId  String   @map("chemical_id")
   quantity    Float
@@ -181,7 +197,7 @@ model BorrowingItem {
 }
 
 model UsageHistory {
-  id         String   @id @default(nanoid())
+  id         String   @id @default(nanoid()) @db.VarChar(255)
   chemicalId String   @map("chemical_id")
   quantity   Float
   purpose    String   @db.Text
@@ -197,7 +213,7 @@ model UsageHistory {
 }
 
 model Report {
-  id          String   @id @default(nanoid())
+  id          String   @id @default(nanoid()) @db.VarChar(255)
   title       String   @db.VarChar(255)
   description String?  @db.Text
   type        String   @db.VarChar(100)
