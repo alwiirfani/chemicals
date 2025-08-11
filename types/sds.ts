@@ -9,7 +9,7 @@ export interface SDS {
   firstAidInhalation: string;
   firstAidSkin: string;
   firstAidEye: string;
-  firstAidIngestio: string;
+  firstAidIngestion: string;
   storageConditions: string;
   disposalInfo: string;
   downloadCount: number;

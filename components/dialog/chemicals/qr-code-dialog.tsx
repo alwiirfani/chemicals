@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Download, Printer } from "lucide-react";
 import Image from "next/image";
+import axios from "axios";
 
 interface Chemical {
   id: string;
@@ -34,16 +35,15 @@ export function QRCodeDialog({
 
   const generateQRCode = useCallback(async () => {
     try {
-      const response = await fetch("/api/v1/chemicals/qr-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chemicalId: chemical.id }),
-      });
+      const { data } = await axios.post(
+        "/api/v1/chemicals/qr-code",
+        { chemicalId: chemical.id },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        setQrCodeUrl(data.qrCode);
-      }
+      setQrCodeUrl(data.qrCode);
     } catch (error) {
       console.error("Failed to generate QR code:", error);
     }

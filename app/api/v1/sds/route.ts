@@ -39,7 +39,14 @@ export async function GET(request: NextRequest) {
                     formula: { contains: search, mode: "insensitive" },
                   },
                 },
-                { chemical: { casNumber: { contains: search } } },
+                {
+                  chemical: {
+                    casNumber: { contains: search, mode: "insensitive" },
+                  },
+                },
+                {
+                  chemical: { form: { contains: search, mode: "insensitive" } },
+                },
                 { fileName: { contains: search, mode: "insensitive" } },
               ],
             }
@@ -55,7 +62,7 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           chemical: {
-            select: { name: true, formula: true, casNumber: true },
+            select: { name: true, formula: true, casNumber: true, form: true },
           },
           createdBy: { include: { admin: true, laboran: true } },
           updatedBy: { include: { admin: true, laboran: true } },
@@ -107,6 +114,7 @@ export async function GET(request: NextRequest) {
           name: sds.chemical.name,
           formula: sds.chemical.formula,
           cas_number: sds.chemical.casNumber,
+          form: sds.chemical.form,
         },
       };
     });

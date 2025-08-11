@@ -24,7 +24,6 @@ interface ChemicalsClientProps {
 export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
   const {
     chemicals,
-    total,
     pagination,
     loading,
 
@@ -107,7 +106,8 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
         <CardHeader>
           <CardTitle className="text-lg">Data Bahan Kimia</CardTitle>
           <CardDescription>
-            Menampilkan {filteredChemicals.length} dari {total} bahan kimia
+            Menampilkan {filteredChemicals.length} dari {chemicals.length} bahan
+            kimia
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

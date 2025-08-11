@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
+import Link from "next/link";
 
 interface SDSDetailDialogProps {
   sds: SDS;
@@ -39,15 +40,25 @@ export function SDSDetailDialog({
 }: SDSDetailDialogProps) {
   const { toast } = useToast();
 
-  const handleDownload = async () => {
+  const handleDownload = async (path: string) => {
     try {
-      if (sds.filePath) {
+      if (path) {
+        const link = document.createElement("a");
+        link.href = path;
+        link.download = `from-sds-${sds.chemical.name.replace(
+          /\s+/g,
+          "-"
+        )}.pdf`;
+        link.click();
+
         toast({
           title: "Download Started! 📥",
           description: `Mengunduh ${sds.fileName}`,
         });
       } else if (sds.externalUrl) {
-        window.open(sds.externalUrl, "_blank");
+        const fullUrl = `${sds.externalUrl}`;
+        window.open(fullUrl, "_blank");
+
         toast({
           title: "External Link Opened! 🔗",
           description: "Dokumen SDS dibuka di tab baru",
@@ -55,12 +66,21 @@ export function SDSDetailDialog({
       }
     } catch (error) {
       console.error("Error downloading SDS:", error);
+
       toast({
         title: "Error ❌",
-        description: "Gagal mengunduh dokumen SDS",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Gagal mengunduh dokumen SDS",
         variant: "destructive",
       });
     }
+  };
+
+  const viewPdf = (fileUrl: string) => {
+    const fullUrl = `${window.location.origin}${fileUrl}`;
+    window.open(fullUrl, "_blank");
   };
 
   return (
@@ -89,21 +109,36 @@ export function SDSDetailDialog({
                     : sds.language}
                 </Badge>
               </div>
-              <Button
-                onClick={handleDownload}
-                className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 {sds.filePath ? (
-                  <>
-                    <Download className="h-4 w-4" />
-                    Download PDF
-                  </>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="destructive"
+                      className="flex items-center gap-2 px-4 py-2"
+                      onClick={() => handleDownload(sds.filePath || "")}>
+                      <Download className="h-4 w-4" />
+                      <span>Download PDF</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="px-4 py-2"
+                      onClick={() => viewPdf(sds.filePath || "")}>
+                      <FileText className="h-4 w-4" />
+                      Baca Dokumen
+                    </Button>
+                  </div>
                 ) : (
-                  <>
-                    <ExternalLink className="h-4 w-4" />
-                    Buka Link
-                  </>
+                  <Button variant="outline">
+                    <Link
+                      href={sds.externalUrl || ""}
+                      target="_blank"
+                      className="flex items-center gap-2">
+                      <ExternalLink className="h-4 w-4" />
+                      Buka Link
+                    </Link>
+                  </Button>
                 )}
-              </Button>
+              </div>
             </div>
 
             {/* Chemical Information */}
