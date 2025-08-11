@@ -6,8 +6,8 @@ import { Combobox } from "@/components/ui/combobox";
 import { SDSFormData } from "@/types/sds";
 
 interface ChemicalSelectProps {
-  formData: SDSFormData;
-  setFormData: React.Dispatch<React.SetStateAction<SDSFormData>>;
+  formData: Pick<SDSFormData, "chemicalId">;
+  setFormData: (field: string, value: string) => void;
 }
 
 export function ChemicalSelect({ formData, setFormData }: ChemicalSelectProps) {
@@ -24,9 +24,7 @@ export function ChemicalSelect({ formData, setFormData }: ChemicalSelectProps) {
       label="Bahan Kimia *"
       options={chemicalOptions}
       value={formData.chemicalId}
-      onValueChange={(newValue) =>
-        setFormData((prev) => ({ ...prev, chemicalId: newValue }))
-      }
+      onValueChange={(newValue) => setFormData("chemicalId", newValue || "")}
       searchTerm={searchTerm}
       onSearchChange={setSearchTerm}
       placeholder="Pilih Bahan Kimia..."

@@ -17,20 +17,17 @@ export async function POST(
 
     const formData = await request.formData();
     const parsed = sdsCreateSchema.safeParse({
-      externalUrl: formData.get("externalUrl") as string,
+      externalUrl: formData.get("externalUrl") || undefined,
       language: formData.get("language"),
-      hazardClassification: JSON.parse(
-        formData.get("hazardClassification") as string
-      ),
-      precautionaryStatement: JSON.parse(
-        formData.get("precautionaryStatement") as string
-      ),
-      firstAidInhalation: formData.get("firstAidInhalation") as string,
-      firstAidSkin: formData.get("firstAidSkin") as string,
-      firstAidEye: formData.get("firstAidEye") as string,
-      firstAidIngestion: formData.get("firstAidIngestion") as string,
-      storageConditions: formData.get("storageConditions") as string,
-      sdsFile: formData.get("sdsFile") as File,
+      hazardClassification: formData.getAll("hazardClassification"),
+      precautionaryStatement: formData.getAll("precautionaryStatement"),
+      firstAidInhalation: formData.get("firstAidInhalation"),
+      firstAidSkin: formData.get("firstAidSkin"),
+      firstAidEye: formData.get("firstAidEye"),
+      firstAidIngestion: formData.get("firstAidIngestion"),
+      storageConditions: formData.get("storageConditions"),
+      disposalInfo: formData.get("disposalInfo"),
+      sdsFile: formData.get("sdsFile") || undefined,
     });
 
     if (!parsed.success) {
@@ -64,23 +61,40 @@ export async function POST(
       );
     }
 
+    //! Validasi hanya salah satu
+    if (!externalUrl && !sdsFile) {
+      return NextResponse.json(
+        { error: "Harus mengirim file SDS atau link eksternal" },
+        { status: 400 }
+      );
+    }
+    if (externalUrl && sdsFile) {
+      return NextResponse.json(
+        { error: "Pilih salah satu: file SDS atau link eksternal" },
+        { status: 400 }
+      );
+    }
+
     // Simpan file ke folder public/uploads/sds
-    const bytes = await sdsFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const uploadsDir = path.join(process.cwd(), "public/uploads/sds");
-    await fs.mkdir(uploadsDir, { recursive: true });
+    let fileUrl = null;
+    if (sdsFile) {
+      const bytes = await sdsFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const uploadsDir = path.join(process.cwd(), "public/uploads/sds");
+      await fs.mkdir(uploadsDir, { recursive: true });
 
-    const fileName = `${Date.now()}-${sdsFile.name}`;
-    const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, buffer);
+      const fileName = `${Date.now()}-${sdsFile.name}`;
+      const filePath = path.join(uploadsDir, fileName);
+      await fs.writeFile(filePath, buffer);
 
-    // Path yang akan disimpan ke DB (akses dari FE)
-    const fileUrl = `/uploads/sds/${fileName}`;
+      // Path yang akan disimpan ke DB (akses dari FE)
+      fileUrl = `/uploads/sds/${fileName}`;
+    }
 
     const sds = await db.safetyDataSheet.create({
       data: {
-        fileName: sdsFile.name.toString(),
-        filePath: fileUrl,
+        fileName: sdsFile?.name || null,
+        filePath: fileUrl || null,
         externalUrl,
         language,
         hazardClassification,
@@ -91,10 +105,12 @@ export async function POST(
         firstAidIngestion,
         storageConditions,
         disposalInfo,
-        chemical: { connect: { id: chemicalId } },
-        createdBy: { connect: { id: userAccess.userId } },
+        chemicalId: chemicalId,
+        createdById: userAccess.userId,
       },
     });
+
+    console.log("SDS created:", sds);
 
     return NextResponse.json(
       { message: "Safety Data Sheet berhasil ditambahkan", sds },
@@ -102,5 +118,9 @@ export async function POST(
     );
   } catch (error) {
     console.error("Error fetching SDS [POST]:", error);
+    return NextResponse.json(
+      { error: "Error fetching SDS", detail: String(error) },
+      { status: 500 }
+    );
   }
 }

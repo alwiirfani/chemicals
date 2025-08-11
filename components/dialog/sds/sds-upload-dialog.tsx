@@ -2,7 +2,6 @@
 
 import type React from "react";
 
-import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,220 +24,71 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Link, Plus, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChemicalSelect } from "./chemical-select";
+import { ChemicalSelect } from "@/components/sds/chemical-select";
 import useChemicals from "@/hooks/use-chemicals";
-import { FormInput } from "@/components/form/form-input";
+import { useSds } from "@/hooks/use-sds";
 
 interface UploadSDSDialogProps {
   children: React.ReactNode;
 }
 
 export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [uploadType, setUploadType] = useState<"file" | "link">("file");
   const { toast } = useToast();
-
-  const [formData, setFormData] = useState({
-    chemicalId: "",
-    fileName: "",
-    filePath: "",
-    externalUrl: "",
-    language: "ID",
-    hazardClassification: "",
-    precautionaryStatement: "",
-    firstAidInhalation: "",
-    firstAidSkin: "",
-    firstAidEye: "",
-    firstAidIngestio: "",
-    storageConditions: "",
-    disposalInfo: "",
-  });
-
-  const [file, setFile] = useState<File | null>(null);
-  const [hazardClassifications, setHazardClassifications] = useState<string[]>([
-    "",
-  ]);
-  const [precautionaryStatements, setPrecautionaryStatements] = useState<
-    string[]
-  >([""]);
-  const [firstAidMeasures, setFirstAidMeasures] = useState({
-    inhalation: "",
-    skinContact: "",
-    eyeContact: "",
-    ingestion: "",
-  });
-
   const { chemicals } = useChemicals();
-
-  const addHazardClassification = () => {
-    setHazardClassifications([...hazardClassifications, ""]);
-  };
-
-  const removeHazardClassification = (index: number) => {
-    if (hazardClassifications.length > 1) {
-      setHazardClassifications(
-        hazardClassifications.filter((_, i) => i !== index)
-      );
-    }
-  };
-
-  const updateHazardClassification = (index: number, value: string) => {
-    const updated = [...hazardClassifications];
-    updated[index] = value;
-    setHazardClassifications(updated);
-  };
-
-  const addPrecautionaryStatement = () => {
-    setPrecautionaryStatements([...precautionaryStatements, ""]);
-  };
-
-  const removePrecautionaryStatement = (index: number) => {
-    if (precautionaryStatements.length > 1) {
-      setPrecautionaryStatements(
-        precautionaryStatements.filter((_, i) => i !== index)
-      );
-    }
-  };
-
-  const updatePrecautionaryStatement = (index: number, value: string) => {
-    const updated = [...precautionaryStatements];
-    updated[index] = value;
-    setPrecautionaryStatements(updated);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.type !== "application/pdf") {
-        toast({
-          title: "Error ❌",
-          description: "Hanya file PDF yang diperbolehkan",
-          variant: "destructive",
-        });
-        return;
-      }
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        // 10MB limit
-        toast({
-          title: "Error ❌",
-          description: "Ukuran file maksimal 10MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      setFile(selectedFile);
-    }
-  };
+  const {
+    open,
+    setOpen,
+    loading,
+    uploadType,
+    setUploadType,
+    file,
+    formData,
+    hazardClassifications,
+    precautionaryStatements,
+    firstAidMeasures,
+    storageInfo,
+    updateStorageInfo,
+    updateFormData,
+    addHazardClassification,
+    removeHazardClassification,
+    updateHazardClassification,
+    addPrecautionaryStatement,
+    removePrecautionaryStatement,
+    updatePrecautionaryStatement,
+    updateFirstAidMeasure,
+    handleFileChange,
+    uploadSds,
+    resetForm,
+  } = useSds();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      if (uploadType === "file" && !file)
-        throw new Error("Pilih file PDF untuk diupload");
+      const data = await uploadSds();
 
-      if (uploadType === "link" && !formData.externalUrl)
-        throw new Error("Masukkan URL eksternal");
-
-      // Validate hazard classifications and precautionary statements
-      const validHazards = hazardClassifications.filter((h) => h.trim() !== "");
-      const validStatements = precautionaryStatements.filter(
-        (s) => s.trim() !== ""
-      );
-
-      if (validHazards.length === 0)
-        throw new Error("Masukkan minimal satu klasifikasi bahaya");
-
-      if (validStatements.length === 0)
-        throw new Error("Masukkan minimal satu pernyataan kehati-hatian");
-
-      // Validate first aid measures
-      if (
-        !firstAidMeasures.inhalation ||
-        !firstAidMeasures.skinContact ||
-        !firstAidMeasures.eyeContact ||
-        !firstAidMeasures.ingestion
-      )
-        throw new Error("Semua tindakan pertolongan pertama harus diisi");
-
-      // In a real app, this would upload the file and save to database
-      const fd = new FormData();
-      fd.append("externalUrl", formData.externalUrl);
-      fd.append("language", formData.language);
-      fd.append("hazardClassification", JSON.stringify(validHazards));
-      fd.append("precautionaryStatement", JSON.stringify(validStatements));
-      fd.append("firstAidInhalation", firstAidMeasures.inhalation);
-      fd.append("firstAidSkin", firstAidMeasures.skinContact);
-      fd.append("firstAidEye", firstAidMeasures.eyeContact);
-      fd.append("firstAidIngestion", firstAidMeasures.ingestion);
-      fd.append("storageConditions", formData.storageConditions);
-      fd.append("disposalInfo", formData.disposalInfo || "");
-
-      if (uploadType === "file" && file) {
-        fd.append("sdsFile", file); // Pastikan ini sama dengan nama yang di-backend
-      }
-
-      const res = await fetch(`/api/chemicals/${formData.chemicalId}/sds`, {
-        method: "POST",
-        body: fd,
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Gagal mengupload SDS");
-      }
-
-      console.log("data SDS:", res);
+      console.log("Data: SDS uploaded", data);
 
       toast({
         title: "SDS Berhasil Diupload! 🎉",
         description: `Dokumen SDS untuk ${
-          chemicals.find((c) => c.id === formData.chemicalId)?.name
+          chemicals.find((c) => c.id)?.name
         } telah disimpan`,
       });
 
-      // Reset form
-      setFormData({
-        chemicalId: "",
-        fileName: "",
-        filePath: "",
-        externalUrl: "",
-        language: "ID",
-        hazardClassification: "",
-        precautionaryStatement: "",
-        firstAidInhalation: "",
-        firstAidSkin: "",
-        firstAidEye: "",
-        firstAidIngestio: "",
-        storageConditions: "",
-        disposalInfo: "",
-      });
-      setFile(null);
-      setHazardClassifications([""]);
-      setPrecautionaryStatements([""]);
-      setFirstAidMeasures({
-        inhalation: "",
-        skinContact: "",
-        eyeContact: "",
-        ingestion: "",
-      });
+      resetForm();
       setOpen(false);
 
-      // Refresh page to show new data
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 200);
     } catch (error) {
       console.error("Error uploading SDS:", error);
       toast({
         title: "Error ❌",
-        description: "Gagal mengupload SDS",
+        description: "Gagal mengupload dokumen SDS",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -257,16 +107,14 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Chemical Selection */}
-            <ChemicalSelect formData={formData} setFormData={setFormData} />
+            <ChemicalSelect formData={formData} setFormData={updateFormData} />
 
             {/* Language Selection */}
             <div>
               <Label htmlFor="language">Bahasa *</Label>
               <Select
                 value={formData.language}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, language: value })
-                }>
+                onValueChange={(value) => updateFormData("language", value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -331,7 +179,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
                     type="url"
                     value={formData.externalUrl}
                     onChange={(e) =>
-                      setFormData({ ...formData, externalUrl: e.target.value })
+                      updateFormData("externalUrl", e.target.value)
                     }
                     placeholder="https://www.supplier.com/sds/chemical-name"
                   />
@@ -437,10 +285,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
                   id="inhalation"
                   value={firstAidMeasures.inhalation}
                   onChange={(e) =>
-                    setFirstAidMeasures({
-                      ...firstAidMeasures,
-                      inhalation: e.target.value,
-                    })
+                    updateFirstAidMeasure("inhalation", e.target.value)
                   }
                   required
                   placeholder="Tindakan jika terhirup..."
@@ -454,10 +299,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
                   id="skinContact"
                   value={firstAidMeasures.skinContact}
                   onChange={(e) =>
-                    setFirstAidMeasures({
-                      ...firstAidMeasures,
-                      skinContact: e.target.value,
-                    })
+                    updateFirstAidMeasure("skinContact", e.target.value)
                   }
                   required
                   placeholder="Tindakan jika terkena kulit..."
@@ -471,10 +313,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
                   id="eyeContact"
                   value={firstAidMeasures.eyeContact}
                   onChange={(e) =>
-                    setFirstAidMeasures({
-                      ...firstAidMeasures,
-                      eyeContact: e.target.value,
-                    })
+                    updateFirstAidMeasure("eyeContact", e.target.value)
                   }
                   required
                   placeholder="Tindakan jika terkena mata..."
@@ -488,10 +327,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
                   id="ingestion"
                   value={firstAidMeasures.ingestion}
                   onChange={(e) =>
-                    setFirstAidMeasures({
-                      ...firstAidMeasures,
-                      ingestion: e.target.value,
-                    })
+                    updateFirstAidMeasure("ingestion", e.target.value)
                   }
                   required
                   placeholder="Tindakan jika tertelan..."
@@ -504,35 +340,31 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
           {/* Storage and Disposal */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Storage Conditions */}
-            <FormInput
-              id="storageConditions"
-              label="Kondisi Penyimpanan"
-              value={formData.storageConditions}
-              onChange={(e) =>
-                setFormData({ ...formData, storageConditions: e.target.value })
-              }
-              placeholder="Kondisi penyimpanan yang aman..."
-              required
-            />
-
-            {/* <div>
-              <Label htmlFor="disposalInformation">
-                Informasi Pembuangan *
-              </Label>
+            <div>
+              <Label htmlFor="conditions">Kondisi Penyimpanan *</Label>
               <Textarea
-                id="disposalInformation"
-                value={formData.disposalInformation}
+                id="conditions"
+                value={storageInfo.conditions}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    disposalInformation: e.target.value,
-                  })
+                  updateStorageInfo("conditions", e.target.value)
                 }
+                required
+                placeholder="Kondisi penyimpanan yang aman..."
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="disposal">Informasi Pembuangan *</Label>
+              <Textarea
+                id="disposal"
+                value={storageInfo.disposal}
+                onChange={(e) => updateStorageInfo("disposal", e.target.value)}
                 required
                 placeholder="Cara pembuangan yang aman..."
                 rows={3}
               />
-            </div> */}
+            </div>
           </div>
 
           {/* Submit */}

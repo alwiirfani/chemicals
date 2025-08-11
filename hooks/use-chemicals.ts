@@ -39,10 +39,6 @@ const useChemicals = () => {
         };
 
         const { data } = await axios.get("/api/v1/chemicals", { params });
-        console.log(
-          "Data bahan kimia dari useChemicals:",
-          data.formattedChemicals
-        );
 
         const chemicalsCamelCase = convertSnakeToCamel<Chemical[]>(
           data.formattedChemicals

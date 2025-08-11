@@ -1,11 +1,27 @@
-import { SDS } from "@/types/sds";
 import { useCallback, useEffect, useState } from "react";
-import { useToast } from "./use-toast";
-import { useDebounce } from "./use-debounce";
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { useDebounce } from "./use-debounce";
 import { convertSnakeToCamel } from "@/helpers/case";
+import { SDS } from "@/types/sds";
 
-const useSds = () => {
+type UploadType = "file" | "link";
+type FirstAidMeasures = {
+  inhalation: string;
+  skinContact: string;
+  eyeContact: string;
+  ingestion: string;
+};
+type StorageInfo = {
+  conditions: string;
+  disposal: string;
+};
+
+export const useSds = () => {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploadType, setUploadType] = useState<UploadType>("file");
+  const [file, setFile] = useState<File | null>(null);
   const [sdsRecords, setSdsRecords] = useState<SDS[]>([]);
   const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +38,45 @@ const useSds = () => {
 
   const debouncedSearch = useDebounce(searchTerm, 400);
   const { toast } = useToast();
+
+  // State untuk form
+  const [formData, setFormData] = useState({
+    chemicalId: "",
+    externalUrl: "",
+    language: "ID",
+    firstAidMeasures: {
+      inhalation: "",
+      skinContact: "",
+      eyeContact: "",
+      ingestion: "",
+    },
+    storageInfo: {
+      conditions: "",
+      disposal: "",
+    },
+    hazardInfo: {
+      classifications: [""],
+      statements: [""],
+    },
+  });
+
+  // State untuk data array
+  const [hazardClassifications, setHazardClassifications] = useState<string[]>([
+    "",
+  ]);
+  const [precautionaryStatements, setPrecautionaryStatements] = useState<
+    string[]
+  >([""]);
+  const [firstAidMeasures, setFirstAidMeasures] = useState<FirstAidMeasures>({
+    inhalation: "",
+    skinContact: "",
+    eyeContact: "",
+    ingestion: "",
+  });
+  const [storageInfo, setStorageInfo] = useState<StorageInfo>({
+    conditions: "",
+    disposal: "",
+  });
 
   const fetchSds = useCallback(
     async (page = 1) => {
@@ -101,6 +156,187 @@ const useSds = () => {
     if (page < 1 || page > pagination.totalPages) return;
     setPagination((prev) => ({ ...prev, currentPage: page }));
   };
+
+  // Fungsi untuk update form dasar
+  const updateFormData = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Fungsi untuk update storage info
+  const updateStorageInfo = (field: keyof StorageInfo, value: string) => {
+    setStorageInfo((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Fungsi untuk klasifikasi bahaya
+  const addHazardClassification = () => {
+    setHazardClassifications((prev) => [...prev, ""]);
+  };
+
+  const removeHazardClassification = (index: number) => {
+    if (hazardClassifications.length > 1) {
+      setHazardClassifications((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateHazardClassification = (index: number, value: string) => {
+    setHazardClassifications((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  // Fungsi untuk pernyataan kehati-hatian
+  const addPrecautionaryStatement = () => {
+    setPrecautionaryStatements((prev) => [...prev, ""]);
+  };
+
+  const removePrecautionaryStatement = (index: number) => {
+    if (precautionaryStatements.length > 1) {
+      setPrecautionaryStatements((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const updatePrecautionaryStatement = (index: number, value: string) => {
+    setPrecautionaryStatements((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  // Fungsi untuk first aid measures
+  const updateFirstAidMeasure = (
+    field: keyof FirstAidMeasures,
+    value: string
+  ) => {
+    setFirstAidMeasures((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Fungsi untuk handle file upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    try {
+      validateFile(selectedFile);
+      setFile(selectedFile);
+    } catch (error) {
+      console.error("Error validating file:", error);
+
+      toast({
+        title: "Error ❌",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const validateFile = (file: File) => {
+    if (file.type !== "application/pdf") {
+      throw new Error("Hanya file PDF yang diperbolehkan");
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error("Ukuran file maksimal 10MB");
+    }
+  };
+
+  // Fungsi utama untuk upload SDS
+  const uploadSds = async () => {
+    setLoading(true);
+
+    try {
+      // Validasi manual sebelum kirim
+      if (!formData.chemicalId) throw new Error("Pilih bahan kimia");
+
+      // Prepare form data
+      const fd = new FormData();
+      fd.append("chemicalId", formData.chemicalId);
+      fd.append("language", formData.language);
+
+      // Hazard classifications
+      hazardClassifications
+        .filter((h) => h.trim() !== "")
+        .forEach((h) => fd.append("hazardClassification", h));
+
+      // Precautionary statements
+      precautionaryStatements
+        .filter((s) => s.trim() !== "")
+        .forEach((s) => fd.append("precautionaryStatement", s));
+
+      fd.append("firstAidInhalation", firstAidMeasures.inhalation);
+      fd.append("firstAidSkin", firstAidMeasures.skinContact);
+      fd.append("firstAidEye", firstAidMeasures.eyeContact);
+      fd.append("firstAidIngestion", firstAidMeasures.ingestion);
+
+      fd.append("storageConditions", storageInfo.conditions || "");
+      fd.append("disposalInfo", storageInfo.disposal || "");
+
+      // File atau URL
+      if (uploadType === "file" && file) {
+        fd.append("sdsFile", file);
+      } else if (uploadType === "link") {
+        fd.append("externalUrl", formData.externalUrl || "");
+      }
+      // Debugging - log isi FormData
+      console.log("=== ISI FORM DATA ===");
+      for (const [key, value] of fd.entries()) {
+        console.log(key, value);
+      }
+
+      // Kirim ke API
+      const { data } = await axios.post(
+        `/api/v1/chemicals/${formData.chemicalId}/sds`,
+        fd
+      );
+
+      return data;
+    } catch (error) {
+      // LOG ERROR
+      if (axios.isAxiosError(error)) {
+        if (axios.isAxiosError(error)) {
+          console.error("Detail error:", error.response?.data);
+          throw new Error(error.response?.data.error || "Gagal mengupload SDS");
+        }
+        throw error;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fungsi reset form
+  const resetForm = () => {
+    setFormData({
+      chemicalId: "",
+      externalUrl: "",
+      language: "ID",
+      firstAidMeasures: {
+        inhalation: "",
+        skinContact: "",
+        eyeContact: "",
+        ingestion: "",
+      },
+      storageInfo: {
+        conditions: "",
+        disposal: "",
+      },
+      hazardInfo: {
+        classifications: [""],
+        statements: [""],
+      },
+    });
+    setHazardClassifications([""]);
+    setPrecautionaryStatements([""]);
+    setFirstAidMeasures({
+      inhalation: "",
+      skinContact: "",
+      eyeContact: "",
+      ingestion: "",
+    });
+    setFile(null);
+  };
+
   return {
     // Data
     sdsRecords,
@@ -124,7 +360,32 @@ const useSds = () => {
     isDeleting,
     handleRequestDelete,
     handleConfirmDelete,
+
+    // State
+    open,
+    setOpen,
+    loading,
+    uploadType,
+    setUploadType,
+    file,
+    formData,
+    hazardClassifications,
+    precautionaryStatements,
+    firstAidMeasures,
+    storageInfo,
+
+    // Functions
+    updateStorageInfo,
+    updateFormData,
+    addHazardClassification,
+    removeHazardClassification,
+    updateHazardClassification,
+    addPrecautionaryStatement,
+    removePrecautionaryStatement,
+    updatePrecautionaryStatement,
+    updateFirstAidMeasure,
+    handleFileChange,
+    uploadSds,
+    resetForm,
   };
 };
-
-export default useSds;

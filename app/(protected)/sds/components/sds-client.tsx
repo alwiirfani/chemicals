@@ -1,10 +1,10 @@
 "use client";
 
 import { SDSTable } from "./sds-table";
-import { UploadSDSDialog } from "./sds-upload-dialog";
+import { UploadSDSDialog } from "../../../../components/dialog/sds/sds-upload-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Download } from "lucide-react";
+import { Plus, Search, Download, File } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,8 +20,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserAuth } from "@/types/auth";
-import useSds from "@/hooks/use-sds";
 import { AlertModal } from "@/components/alert-modal";
+import { useSds } from "@/hooks/use-sds";
+import CardStats from "@/components/card-stats";
 
 interface SDSClientProps {
   user: UserAuth;
@@ -98,16 +99,15 @@ export function SDSClient({ user }: SDSClientProps) {
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total SDS</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{sdsRecords.length}</div>
-                <p className="text-xs text-muted-foreground">dokumen</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+            <CardStats
+              title="Total SDS"
+              icon={<File className="h-4 w-4 text-green-600" />}>
+              <div className="text-xl sm:text-2xl text-green-600 font-bold pt-4 sm:pt-7">
+                {sdsRecords.length}
+              </div>
+              <p className="text-xs text-muted-foreground">dokumen</p>
+            </CardStats>
           </div>
 
           {/* Search and Filter */}

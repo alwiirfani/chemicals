@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
           updatedBy: {
             include: { admin: true, laboran: true },
           },
-          sds: true,
+          safetyDataSheet: true,
           borrowings: { include: { borrowing: true } },
           usageHistory: true,
         },
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
         updated_by: updatedByName,
         created_at: chemical.createdAt.toISOString(),
         updated_at: chemical.updatedAt.toISOString(),
-        sds_count: chemical.sds ? 1 : 0,
+        sds_count: chemical.safetyDataSheet ? 1 : 0,
         borrowing_count: chemical.borrowings.length,
         usage_count: chemical.usageHistory.length,
       };

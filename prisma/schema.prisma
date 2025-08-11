@@ -123,9 +123,9 @@ model Chemical {
   updatedBy   User?   @relation("UpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id") @db.VarChar(255)
 
-  borrowings   BorrowingItem[]
-  usageHistory UsageHistory[]
-  sds          SafetyDataSheet?
+  borrowings      BorrowingItem[]
+  usageHistory    UsageHistory[]
+  safetyDataSheet SafetyDataSheet?
 
   @@map("chemicals")
 }
