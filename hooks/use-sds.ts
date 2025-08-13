@@ -3,19 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useDebounce } from "./use-debounce";
 import { convertSnakeToCamel } from "@/helpers/case";
-import { SDS } from "@/types/sds";
-
-type UploadType = "file" | "link";
-type FirstAidMeasures = {
-  inhalation: string;
-  skinContact: string;
-  eyeContact: string;
-  ingestion: string;
-};
-type StorageInfo = {
-  conditions: string;
-  disposal: string;
-};
+import { FirstAidMeasures, SDS, StorageInfo, UploadType } from "@/types/sds";
 
 export const useSds = () => {
   const [open, setOpen] = useState(false);
@@ -89,11 +77,12 @@ export const useSds = () => {
           ...(filterLanguage !== "all" && { language: filterLanguage }),
         };
         const { data } = await axios.get("/api/v1/sds", { params });
-        console.log("Data safety documents: ", data);
 
         const sdsCamelCase = convertSnakeToCamel<SDS[]>(
           data.formattedSdsRecords
         );
+
+        console.log("Data safety documents: ", sdsCamelCase);
 
         setSdsRecords(sdsCamelCase);
         setTotal(data.total);
@@ -287,7 +276,10 @@ export const useSds = () => {
       // Kirim ke API
       const { data } = await axios.post(
         `/api/v1/chemicals/${formData.chemicalId}/sds`,
-        fd
+        fd,
+        {
+          withCredentials: true,
+        }
       );
 
       return data;
@@ -300,6 +292,66 @@ export const useSds = () => {
         }
         throw error;
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fungsi untuk update sds
+  const updateSds = async (sdsId: string) => {
+    setLoading(true);
+
+    try {
+      if (!formData.chemicalId) throw new Error("Pilih bahan kimia");
+
+      const fd = new FormData();
+      fd.append("chemicalId", formData.chemicalId);
+      fd.append("language", formData.language);
+
+      // Hazard classifications
+      hazardClassifications
+        .filter((h) => h.trim() !== "")
+        .forEach((h) => fd.append("hazardClassification", h));
+
+      // Precautionary statements
+      precautionaryStatements
+        .filter((s) => s.trim() !== "")
+        .forEach((s) => fd.append("precautionaryStatement", s));
+
+      fd.append("firstAidInhalation", firstAidMeasures.inhalation);
+      fd.append("firstAidSkin", firstAidMeasures.skinContact);
+      fd.append("firstAidEye", firstAidMeasures.eyeContact);
+      fd.append("firstAidIngestion", firstAidMeasures.ingestion);
+
+      fd.append("storageConditions", storageInfo.conditions || "");
+      fd.append("disposalInfo", storageInfo.disposal || "");
+
+      // File atau URL
+      if (uploadType === "file" && file) {
+        // Hanya append file jika user memilih file baru
+        fd.append("sdsFile", file);
+      } else if (uploadType === "link") {
+        fd.append("externalUrl", formData.externalUrl || "");
+      }
+
+      // Debugging isi FormData
+      console.log("=== ISI FORM DATA (UPDATE) ===");
+      for (const [key, value] of fd.entries()) {
+        console.log(key, value);
+      }
+
+      // Kirim ke API
+      const { data } = await axios.put(`/api/v1/sds/${sdsId}`, fd, {
+        withCredentials: true,
+      });
+
+      return data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Detail error:", error.response?.data);
+        throw new Error(error.response?.data.error || "Gagal mengupdate SDS");
+      }
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -369,6 +421,7 @@ export const useSds = () => {
     setUploadType,
     file,
     formData,
+    setFormData,
     hazardClassifications,
     precautionaryStatements,
     firstAidMeasures,
@@ -386,6 +439,7 @@ export const useSds = () => {
     updateFirstAidMeasure,
     handleFileChange,
     uploadSds,
+    updateSds,
     resetForm,
   };
 };

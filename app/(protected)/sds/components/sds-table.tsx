@@ -22,7 +22,7 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
-import { SDSDetailDialog } from "./sds-detail-dialog";
+import { SDSDetailDialog } from "@/components/dialog/sds/sds-detail-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
 import { useRouter } from "next/navigation";

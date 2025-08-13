@@ -1,7 +1,7 @@
 "use client";
 
 import { SDSTable } from "./sds-table";
-import { UploadSDSDialog } from "../../../../components/dialog/sds/sds-upload-dialog";
+import { UploadSDSDialog } from "@/components/dialog/sds/sds-upload-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus, File } from "lucide-react";
 import {

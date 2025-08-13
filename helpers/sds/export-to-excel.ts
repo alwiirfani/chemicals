@@ -56,7 +56,7 @@ export const exportSdsToExcel = async (sds: SDS[]) => {
       precautionaryStatement: sds.precautionaryStatement.join("\n"),
       firstAidInhalation: sds.firstAidInhalation || "-",
       firstAidSkin: sds.firstAidSkin || "-",
-      firstAidEye: sds.firstAidEye || "-",
+      firstAidEye: sds.firstAidEyes || "-",
       firstAidIngestion: sds.firstAidIngestion || "-",
       storageConditions: sds.storageConditions || "-",
       disposalInfo: sds.disposalInfo || "-",

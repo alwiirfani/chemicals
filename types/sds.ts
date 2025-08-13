@@ -2,13 +2,13 @@ export interface SDS {
   id: string;
   fileName: string | null;
   filePath: string | null;
-  externalUrl: string | null;
+  externalUrl: string;
   language: string;
   hazardClassification: string[];
   precautionaryStatement: string[];
   firstAidInhalation: string;
   firstAidSkin: string;
-  firstAidEye: string;
+  firstAidEyes: string;
   firstAidIngestion: string;
   storageConditions: string;
   disposalInfo: string;
@@ -38,14 +38,14 @@ export interface SDSFormData {
 }
 
 // Sub-interfaces
-interface FirstAidMeasures {
+export interface FirstAidMeasures {
   inhalation: string;
   skinContact: string;
   eyeContact: string;
   ingestion: string;
 }
 
-interface StorageInfo {
+export interface StorageInfo {
   conditions: string;
   disposal: string;
 }
@@ -59,3 +59,5 @@ interface FileInfo {
   name?: string;
   path?: string;
 }
+
+export type UploadType = "file" | "link";

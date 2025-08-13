@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UsersPage() {
-  await new Promise((resolve) => setTimeout(resolve, 4000));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   const user = await getCurrentUser();
 
   if (!user) return null;

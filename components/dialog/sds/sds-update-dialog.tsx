@@ -27,12 +27,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChemicalSelect } from "@/components/sds/chemical-select";
 import useChemicals from "@/hooks/use-chemicals";
 import { useSds } from "@/hooks/use-sds";
+import { SDS } from "@/types/sds";
+import { useEffect } from "react";
 
-interface UploadSDSDialogProps {
+interface UpdateSDSDialogProps {
   children: React.ReactNode;
+  sds: SDS;
 }
 
-export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
+export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
   const { toast } = useToast();
   const { chemicals } = useChemicals();
   const {
@@ -43,6 +46,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
     setUploadType,
     file,
     formData,
+    setFormData,
     hazardClassifications,
     precautionaryStatements,
     firstAidMeasures,
@@ -60,6 +64,32 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
     uploadSds,
     resetForm,
   } = useSds();
+
+  // preload data SDS
+  useEffect(() => {
+    if (sds) {
+      setFormData({
+        chemicalId: sds.chemical.id,
+        externalUrl: sds.externalUrl,
+        language: sds.language,
+        firstAidMeasures: {
+          inhalation: sds.firstAidInhalation,
+          skinContact: sds.firstAidSkin,
+          eyeContact: sds.firstAidEyes,
+          ingestion: sds.firstAidIngestion,
+        },
+        storageInfo: {
+          conditions: sds.storageConditions,
+          disposal: sds.disposalInfo,
+        },
+        hazardInfo: {
+          classifications: sds.hazardClassification,
+          statements: sds.precautionaryStatement,
+        },
+      });
+      setUploadType(sds.externalUrl ? "link" : "file");
+    }
+  }, [sds, setFormData, setUploadType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
