@@ -23,9 +23,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { SDSDetailDialog } from "@/components/dialog/sds/sds-detail-dialog";
+import { UpdateSDSDialog } from "@/components/dialog/sds/sds-update-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
-import { useRouter } from "next/navigation";
+import type { SDSData } from "@/hooks/use-sds";
 
 interface SDSPaginationProps {
   currentPage: number;
@@ -48,7 +49,7 @@ export function SDSTable({
   onDelete,
 }: SDSTableProps) {
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
-  const router = useRouter();
+  const [editingSDS, setEditingSDS] = useState<SDSData | null>(null);
   const { toast } = useToast();
 
   const getLanguageBadge = (language: string) => {
@@ -71,7 +72,14 @@ export function SDSTable({
   const handleDownload = async (sds: SDS) => {
     try {
       if (sds.filePath) {
-        // In a real app, this would download the file
+        const link = document.createElement("a");
+        link.href = sds.filePath;
+        link.download = `from-sds-${sds.chemical.name.replace(
+          /\s+/g,
+          "-"
+        )}.pdf`;
+        link.click();
+
         toast({
           title: "Download Started! 📥",
           description: `Mengunduh ${sds.fileName}`,
@@ -91,6 +99,31 @@ export function SDSTable({
         variant: "destructive",
       });
     }
+  };
+
+  const handleEdit = (sds: SDS) => {
+    // Transform SDS data to SDSData format untuk UpdateSDSDialog
+    const sdsData: SDSData = {
+      id: sds.id,
+      chemicalId: sds.chemical.id,
+      language: sds.language,
+      uploadType: sds.filePath ? "file" : "link",
+      externalUrl: sds.externalUrl || "",
+      hazardClassifications: sds.hazardClassification || [""],
+      precautionaryStatements: sds.precautionaryStatement || [""],
+      firstAidMeasures: {
+        inhalation: sds.firstAidInhalation || "",
+        skinContact: sds.firstAidSkin || "",
+        eyeContact: sds.firstAidEyes || "",
+        ingestion: sds.firstAidIngestion || "",
+      },
+      storageInfo: {
+        conditions: sds.storageConditions || "",
+        disposal: sds.disposalInfo || "",
+      },
+    };
+
+    setEditingSDS(sdsData);
   };
 
   const canAction = userRole === "ADMIN" || userRole === "LABORAN";
@@ -185,9 +218,7 @@ export function SDSTable({
                             variant="outline"
                             size="sm"
                             className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 hover:text-white border-yellow-400 hover:border-yellow-500 transition-all duration-200 hover:scale-105"
-                            onClick={() => {
-                              router.push(`/chemicals/${sds.id}/update`);
-                            }}>
+                            onClick={() => handleEdit(sds)}>
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
@@ -234,12 +265,22 @@ export function SDSTable({
         </div>
       </div>
 
+      {/* Detail Dialog */}
       {selectedSDS && (
         <SDSDetailDialog
           sds={selectedSDS}
           open={!!selectedSDS}
           onOpenChange={(open) => !open && setSelectedSDS(null)}
           userRole={userRole}
+        />
+      )}
+
+      {/* Update Dialog */}
+      {editingSDS && (
+        <UpdateSDSDialog
+          sdsData={editingSDS}
+          open={!!editingSDS}
+          onOpenChange={(open) => !open && setEditingSDS(null)}
         />
       )}
     </>

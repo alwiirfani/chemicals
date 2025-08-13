@@ -61,3 +61,24 @@ interface FileInfo {
 }
 
 export type UploadType = "file" | "link";
+
+// Interface untuk data SDS yang akan di-populate
+export interface SDSData {
+  id: string;
+  chemicalId: string;
+  language: string;
+  uploadType: "file" | "link";
+  externalUrl?: string;
+  hazardClassifications: string[];
+  precautionaryStatements: string[];
+  firstAidMeasures: {
+    inhalation: string;
+    skinContact: string;
+    eyeContact: string;
+    ingestion: string;
+  };
+  storageInfo: {
+    conditions: string;
+    disposal: string;
+  };
+}

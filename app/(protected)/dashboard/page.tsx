@@ -1,3 +1,4 @@
+import { getCurrentUser } from "@/lib/auth";
 import { DashboardClient } from "./components/dashboard-client";
 import { Metadata } from "next";
 
@@ -7,7 +8,10 @@ export const metadata: Metadata = {
 };
 
 const DashboardPage = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  const user = await getCurrentUser();
+
+  if (!user) return null;
 
   return <DashboardClient />;
 };

@@ -44,8 +44,6 @@ const useChemicals = () => {
           data.formattedChemicals
         );
 
-        console.log("Data bahan kimia:", chemicalsCamelCase);
-
         setChemicals(chemicalsCamelCase);
         setTotal(data.total);
         setPagination({

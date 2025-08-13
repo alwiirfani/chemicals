@@ -1,8 +1,14 @@
 import { getCurrentUser } from "@/lib/auth";
 import { ChemicalsClient } from "./components/chemical-client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Chemicals",
+  description: "Chemicals of Chemical Inventory Management System",
+};
 
 export default async function ChemicalsPage() {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 200));
   const user = await getCurrentUser();
   if (!user) return null;
 

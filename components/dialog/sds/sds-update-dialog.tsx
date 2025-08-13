@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,31 +21,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Link, Plus, Trash2 } from "lucide-react";
+import { Save, FileText, Link, Plus, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChemicalSelect } from "@/components/sds/chemical-select";
 import useChemicals from "@/hooks/use-chemicals";
-import { useSds } from "@/hooks/use-sds";
-import { SDS } from "@/types/sds";
+import { SDSData, useSds } from "@/hooks/use-sds";
 import { useEffect } from "react";
 
 interface UpdateSDSDialogProps {
-  children: React.ReactNode;
-  sds: SDS;
+  sdsData: SDSData;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
+export function UpdateSDSDialog({
+  sdsData,
+  open,
+  onOpenChange,
+}: UpdateSDSDialogProps) {
   const { toast } = useToast();
   const { chemicals } = useChemicals();
   const {
-    open,
-    setOpen,
     loading,
     uploadType,
     setUploadType,
     file,
     formData,
-    setFormData,
     hazardClassifications,
     precautionaryStatements,
     firstAidMeasures,
@@ -61,75 +61,64 @@ export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
     updatePrecautionaryStatement,
     updateFirstAidMeasure,
     handleFileChange,
-    uploadSds,
+    updateSds,
     resetForm,
+    populateFormData,
   } = useSds();
 
-  // preload data SDS
+  // Populate form dengan data SDS ketika dialog dibuka
   useEffect(() => {
-    if (sds) {
-      setFormData({
-        chemicalId: sds.chemical.id,
-        externalUrl: sds.externalUrl,
-        language: sds.language,
-        firstAidMeasures: {
-          inhalation: sds.firstAidInhalation,
-          skinContact: sds.firstAidSkin,
-          eyeContact: sds.firstAidEyes,
-          ingestion: sds.firstAidIngestion,
-        },
-        storageInfo: {
-          conditions: sds.storageConditions,
-          disposal: sds.disposalInfo,
-        },
-        hazardInfo: {
-          classifications: sds.hazardClassification,
-          statements: sds.precautionaryStatement,
-        },
-      });
-      setUploadType(sds.externalUrl ? "link" : "file");
+    if (open && sdsData) {
+      populateFormData(sdsData);
+      setUploadType(sdsData.uploadType);
     }
-  }, [sds, setFormData, setUploadType]);
+  }, [open, sdsData, populateFormData, setUploadType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const data = await uploadSds();
+      const data = await updateSds(sdsData.id);
 
-      console.log("Data: SDS uploaded", data);
+      console.log("Data: SDS updated", data);
 
       toast({
-        title: "SDS Berhasil Diupload! 🎉",
+        title: "SDS Berhasil Diperbarui! ✅",
         description: `Dokumen SDS untuk ${
-          chemicals.find((c) => c.id)?.name
-        } telah disimpan`,
+          chemicals.find((c) => c.id === formData.chemicalId)?.name
+        } telah diperbarui`,
       });
 
       resetForm();
-      setOpen(false);
+      onOpenChange(false);
 
+      // Refresh halaman untuk menampilkan data terbaru
       setTimeout(() => {
         window.location.reload();
       }, 200);
     } catch (error) {
-      console.error("Error uploading SDS:", error);
+      console.error("Error updating SDS:", error);
       toast({
         title: "Error ❌",
-        description: "Gagal mengupload dokumen SDS",
+        description: "Gagal memperbarui dokumen SDS",
         variant: "destructive",
       });
     }
   };
 
+  const handleCancel = () => {
+    resetForm();
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload Safety Data Sheet (SDS)</DialogTitle>
+          <DialogTitle>Edit Safety Data Sheet (SDS)</DialogTitle>
           <DialogDescription>
-            Upload dokumen SDS atau tambahkan link eksternal untuk bahan kimia
+            Perbarui informasi dokumen SDS atau ubah link eksternal untuk bahan
+            kimia
           </DialogDescription>
         </DialogHeader>
 
@@ -177,7 +166,7 @@ export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
 
               <TabsContent value="file" className="space-y-4">
                 <div>
-                  <Label htmlFor="file">File PDF SDS *</Label>
+                  <Label htmlFor="file">File PDF SDS</Label>
                   <div className="mt-1">
                     <Input
                       id="file"
@@ -196,7 +185,8 @@ export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
                     </div>
                   )}
                   <p className="text-xs text-gray-500 mt-1">
-                    Maksimal 10MB, format PDF
+                    Maksimal 10MB, format PDF. Kosongkan jika tidak ingin
+                    mengubah file
                   </p>
                 </div>
               </TabsContent>
@@ -402,7 +392,7 @@ export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={handleCancel}
               disabled={loading}>
               Batal
             </Button>
@@ -410,12 +400,12 @@ export function UpdateSDSDialog({ children, sds }: UpdateSDSDialogProps) {
               {loading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Mengupload...
+                  Menyimpan...
                 </div>
               ) : (
                 <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload SDS
+                  <Save className="mr-2 h-4 w-4" />
+                  Simpan Perubahan
                 </>
               )}
             </Button>

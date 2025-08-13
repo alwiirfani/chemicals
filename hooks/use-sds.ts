@@ -3,7 +3,13 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useDebounce } from "./use-debounce";
 import { convertSnakeToCamel } from "@/helpers/case";
-import { FirstAidMeasures, SDS, StorageInfo, UploadType } from "@/types/sds";
+import {
+  FirstAidMeasures,
+  SDS,
+  SDSData,
+  StorageInfo,
+  UploadType,
+} from "@/types/sds";
 
 export const useSds = () => {
   const [open, setOpen] = useState(false);
@@ -230,6 +236,63 @@ export const useSds = () => {
     }
   };
 
+  // Fungsi untuk populate form dengan data existing (untuk update)
+  const populateFormData = useCallback((sdsData: SDSData) => {
+    // Update form data dasar
+    setFormData({
+      chemicalId: sdsData.chemicalId,
+      externalUrl: sdsData.externalUrl || "",
+      language: sdsData.language,
+      firstAidMeasures: {
+        inhalation: "",
+        skinContact: "",
+        eyeContact: "",
+        ingestion: "",
+      },
+      storageInfo: {
+        conditions: "",
+        disposal: "",
+      },
+      hazardInfo: {
+        classifications: [""],
+        statements: [""],
+      },
+    });
+
+    // Update array states
+    setHazardClassifications(
+      sdsData.hazardClassifications.length > 0
+        ? sdsData.hazardClassifications
+        : [""]
+    );
+
+    setPrecautionaryStatements(
+      sdsData.precautionaryStatements.length > 0
+        ? sdsData.precautionaryStatements
+        : [""]
+    );
+
+    // Update first aid measures
+    setFirstAidMeasures({
+      inhalation: sdsData.firstAidMeasures.inhalation || "",
+      skinContact: sdsData.firstAidMeasures.skinContact || "",
+      eyeContact: sdsData.firstAidMeasures.eyeContact || "",
+      ingestion: sdsData.firstAidMeasures.ingestion || "",
+    });
+
+    // Update storage info
+    setStorageInfo({
+      conditions: sdsData.storageInfo.conditions || "",
+      disposal: sdsData.storageInfo.disposal || "",
+    });
+
+    // Reset file karena kita akan menggunakan existing file atau upload baru
+    setFile(null);
+
+    // Set upload type
+    setUploadType(sdsData.uploadType);
+  }, []);
+
   // Fungsi utama untuk upload SDS
   const uploadSds = async () => {
     setLoading(true);
@@ -386,7 +449,12 @@ export const useSds = () => {
       eyeContact: "",
       ingestion: "",
     });
+    setStorageInfo({
+      conditions: "",
+      disposal: "",
+    });
     setFile(null);
+    setUploadType("file");
   };
 
   return {
@@ -441,5 +509,9 @@ export const useSds = () => {
     uploadSds,
     updateSds,
     resetForm,
+    populateFormData, // ADDED: Fungsi untuk populate form data
   };
 };
+
+// Export interface untuk digunakan di komponen lain
+export type { SDSData };
