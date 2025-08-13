@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "University Chemical Inventory Management System",
 
   icons: {
-    icon: "/flaskConical.svg",
+    icon: "/flaskConical.ico",
   },
 };
 
