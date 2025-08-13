@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
   icons: {
     icon: {
-      url: "/flaskConical.svg",
+      url: "./flaskConical.svg",
       type: "image/svg+xml",
       rel: "icon",
     },
