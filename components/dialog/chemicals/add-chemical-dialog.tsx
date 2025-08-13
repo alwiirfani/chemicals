@@ -109,6 +109,7 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
       });
 
       setOpen(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error adding chemical:", error);
 

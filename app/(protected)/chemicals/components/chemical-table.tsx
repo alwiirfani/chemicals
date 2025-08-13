@@ -111,21 +111,25 @@ export function ChemicalTable({
                       <div className="flex items-center gap-2">
                         <span
                           className={
-                            isExpired(chemical.expirationDate)
+                            isExpired(new Date(chemical.expirationDate))
                               ? "text-red-600 font-medium"
-                              : isExpiringSoon(chemical.expirationDate)
+                              : isExpiringSoon(
+                                  new Date(chemical.expirationDate)
+                                )
                               ? "text-yellow-600 font-medium"
                               : ""
                           }>
-                          {formatDateToString(chemical.expirationDate)}
+                          {formatDateToString(
+                            new Date(chemical.expirationDate)
+                          )}
                         </span>
-                        {isExpired(chemical.expirationDate) && (
+                        {isExpired(new Date(chemical.expirationDate)) && (
                           <Badge variant="destructive" className="text-xs">
                             Expired
                           </Badge>
                         )}
-                        {isExpiringSoon(chemical.expirationDate) &&
-                          !isExpired(chemical.expirationDate) && (
+                        {isExpiringSoon(new Date(chemical.expirationDate)) &&
+                          !isExpired(new Date(chemical.expirationDate)) && (
                             <Badge variant="secondary" className="text-xs">
                               Soon
                             </Badge>
