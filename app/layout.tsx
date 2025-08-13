@@ -16,13 +16,11 @@ export const metadata: Metadata = {
   },
   description: "University Chemical Inventory Management System",
 
-  icons: {
-    icon: {
-      url: "/icon.svg",
-      type: "image/svg+xml",
-      rel: "icon",
-    },
-  },
+  icons: [
+    { rel: "icon", url: "/favicon.ico" },
+    { rel: "icon", type: "image/svg+xml", url: "/icon.svg" },
+    { rel: "apple-touch-icon", url: "/apple-touch-icon.png" },
+  ],
 };
 
 export default function RootLayout({
