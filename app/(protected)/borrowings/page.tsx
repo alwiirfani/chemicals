@@ -1,11 +1,16 @@
-import React from "react";
+import { getCurrentUser } from "@/lib/auth";
+import { BorrowingsClient } from "./components/borrowings-client";
+import { Metadata } from "next";
 
-const BorrowingPage = () => {
-  return (
-    <div className="w-full min-h-screen justify-center items-center">
-      Page belum ada
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "Borrow",
+  description: "",
 };
 
-export default BorrowingPage;
+export default async function BorrowingsPage() {
+  const user = await getCurrentUser();
+
+  if (!user) return null;
+
+  return <BorrowingsClient user={user} />;
+}

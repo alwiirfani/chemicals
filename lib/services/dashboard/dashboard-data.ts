@@ -4,8 +4,8 @@ import axios from "axios";
 export const getDashboardData = async (): Promise<DashboardData> => {
   const [chemicalsRes, activeBorrowingsRes, recentRes] = await Promise.all([
     axios.get("/api/v1/chemicals"),
-    axios.get("/api/v1/borrowings/active"),
-    axios.get("/api/v1/borrowings/recent"),
+    axios.get("/api/v1/borrowings"),
+    axios.get("/api/v1/borrowings"),
   ]);
 
   return {

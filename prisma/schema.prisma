@@ -162,7 +162,6 @@ model SafetyDataSheet {
 
 model Borrowing {
   id          String          @id @default(nanoid()) @db.VarChar(255)
-  borrowerId  String          @map("borrower_id") @db.VarChar(255)
   purpose     String          @db.Text
   status      BorrowingStatus @default(PENDING)
   requestDate DateTime        @default(now()) @map("request_date")
@@ -173,16 +172,15 @@ model Borrowing {
   updatedAt   DateTime        @updatedAt @map("updated_at")
 
   // Relations
-  borrower User            @relation(fields: [borrowerId], references: [id])
-  items    BorrowingItem[]
+  borrowerId String          @map("borrower_id") @db.VarChar(255)
+  borrower   User            @relation(fields: [borrowerId], references: [id])
+  items      BorrowingItem[]
 
   @@map("borrowings")
 }
 
 model BorrowingItem {
   id          String   @id @default(nanoid()) @db.VarChar(255)
-  borrowingId String   @map("borrowing_id")
-  chemicalId  String   @map("chemical_id")
   quantity    Float
   returned    Boolean  @default(false)
   returnedQty Float?   @map("returned_qty")
@@ -190,24 +188,26 @@ model BorrowingItem {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  borrowing Borrowing @relation(fields: [borrowingId], references: [id], onDelete: Cascade)
-  chemical  Chemical  @relation(fields: [chemicalId], references: [id])
+  borrowingId String    @map("borrowing_id")
+  borrowing   Borrowing @relation(fields: [borrowingId], references: [id], onDelete: Cascade)
+  chemicalId  String    @map("chemical_id")
+  chemical    Chemical  @relation(fields: [chemicalId], references: [id])
 
   @@map("borrowing_items")
 }
 
 model UsageHistory {
-  id         String   @id @default(nanoid()) @db.VarChar(255)
-  chemicalId String   @map("chemical_id")
-  quantity   Float
-  purpose    String   @db.Text
-  usedAt     DateTime @default(now()) @map("used_at")
-  userId     String?  @map("user_id") @db.VarChar(255)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(nanoid()) @db.VarChar(255)
+  quantity  Float
+  purpose   String   @db.Text
+  usedAt    DateTime @default(now()) @map("used_at")
+  userId    String?  @map("user_id") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  chemical Chemical @relation(fields: [chemicalId], references: [id])
+  chemicalId String   @map("chemical_id")
+  chemical   Chemical @relation(fields: [chemicalId], references: [id])
 
   @@map("usage_history")
 }
@@ -218,12 +218,12 @@ model Report {
   description String?  @db.Text
   type        String   @db.VarChar(100)
   data        Json
-  createdBy   String   @map("created_by") @db.VarChar(255)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  creator User @relation(fields: [createdBy], references: [id])
+  createdBy String @map("created_by") @db.VarChar(255)
+  creator   User   @relation(fields: [createdBy], references: [id])
 
   @@map("reports")
 }
