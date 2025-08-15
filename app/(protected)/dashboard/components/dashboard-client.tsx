@@ -18,10 +18,14 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { useUser } from "@/providers/auth-provider";
 import CardStats from "@/components/card-stats";
+import { UserAuth } from "@/types/auth";
 
-export const DashboardClient = () => {
+interface DashboardClientProps {
+  user: UserAuth;
+}
+
+export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
   const [stats, setStats] = useState({
     totalChemicals: 0,
     activeBorrowings: 0,
@@ -29,11 +33,11 @@ export const DashboardClient = () => {
     expiringChemicals: 0,
   });
   const [activities, setActivities] = useState<MappedActivity[]>([]);
-
-  const { user, isLoading } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchDashboard = async () => {
     try {
+      setIsLoading(true);
       const data = await getDashboardData();
 
       setStats({
@@ -63,6 +67,8 @@ export const DashboardClient = () => {
       setActivities(mappedActivities);
     } catch (error) {
       console.error("Gagal mengambil data dashboard:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -70,7 +76,7 @@ export const DashboardClient = () => {
     fetchDashboard();
   }, []);
 
-  if (isLoading || !user) return null;
+  if (!user) return null;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -150,18 +156,30 @@ export const DashboardClient = () => {
               description="Peminjaman dan pengembalian terbaru"
               icon={<Activity className="h-4 w-4 text-blue-600" />}>
               <div className="space-y-4 mt-2">
-                {activities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center space-x-4">
-                    <div
-                      className={`w-2 h-2 ${activity.color} rounded-full`}></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{activity.message}</p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
-                    </div>
+                {isLoading ? (
+                  <div className="flex w-full justify-center items-center min-h-[100px] text-muted-foreground">
+                    Memuat...
                   </div>
-                ))}
+                ) : (
+                  <>
+                    {activities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center space-x-4">
+                        <div
+                          className={`w-2 h-2 ${activity.color} rounded-full`}></div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">
+                            {activity.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {activity.time}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             </CardStats>
 

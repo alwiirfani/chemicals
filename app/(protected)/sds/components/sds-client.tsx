@@ -113,14 +113,6 @@ export function SDSClient({ user }: SDSClientProps) {
         onExport={() => exportSdsToExcel(filteredSDS)}
       />
 
-      {/* Results Summary */}
-      <div className="mb-4">
-        <p className="text-sm text-gray-600">
-          Menampilkan {filteredSDS.length} dari {sdsRecords.length} dokumen SDS
-          {searchTerm && ` untuk pencarian "${searchTerm}"`}
-        </p>
-      </div>
-
       {/* SDS Table */}
       <Card>
         <CardHeader>

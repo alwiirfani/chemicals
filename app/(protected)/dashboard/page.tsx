@@ -13,7 +13,7 @@ const DashboardPage = async () => {
 
   if (!user) return null;
 
-  return <DashboardClient />;
+  return <DashboardClient user={user} />;
 };
 
 export default DashboardPage;

@@ -18,13 +18,24 @@ import { BorrowingDetailDialog } from "./borrowing-detail-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Borrowing } from "@/types/borrowings";
 
-interface BorrowingTableProps {
-  borrowings: Borrowing[];
-  userRole: string;
-  currentUserId: string;
+interface BorrowingPaginationProps {
+  currentPage: number;
+  totalPages: number;
 }
 
-export function BorrowingTable({ borrowings, userRole }: BorrowingTableProps) {
+interface BorrowingTableProps {
+  borrowings: Borrowing[];
+  pagination: BorrowingPaginationProps;
+  onPageChange: (page: number) => void;
+  userRole: string;
+}
+
+export function BorrowingTable({
+  borrowings,
+  pagination,
+  onPageChange,
+  userRole,
+}: BorrowingTableProps) {
   const [selectedBorrowing, setSelectedBorrowing] = useState<Borrowing | null>(
     null
   );
@@ -108,142 +119,173 @@ export function BorrowingTable({ borrowings, userRole }: BorrowingTableProps) {
 
   return (
     <>
-      <div className="rounded-md border bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>No</TableHead>
-              <TableHead>Peminjam</TableHead>
-              <TableHead>Tujuan</TableHead>
-              <TableHead>Bahan Kimia</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Tanggal</TableHead>
-              <TableHead>Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {borrowings.map((borrowing, index) => (
-              <TableRow key={borrowing.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{borrowing.borrower.name}</div>
-                    <div className="text-xs text-gray-400">
-                      {borrowing.borrower.email}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="max-w-xs">
-                    <p className="text-sm font-medium truncate">
-                      {borrowing.purpose}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {borrowing.items.length} item
-                      {borrowing.items.length > 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    {borrowing.items.slice(0, 2).map((item) => (
-                      <div key={item.id} className="text-sm">
-                        <span className="font-medium">
-                          {item.chemical.name}
-                        </span>
-                        <span className="text-gray-500 ml-2">
-                          {item.quantity} {item.chemical.unit}
-                        </span>
-                      </div>
-                    ))}
-                    {borrowing.items.length > 2 && (
-                      <div className="text-xs text-gray-400">
-                        +{borrowing.items.length - 2} lainnya
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(borrowing.status)}
-                    {getStatusBadge(borrowing.status)}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
+      <div className="rounded-md border overflow-hidden">
+        <div className="w-full overflow-x-auto">
+          <Table className="min-w-[800px]">
+            <TableHeader>
+              <TableRow className="bg-blue-50 hover:bg-blue-100">
+                <TableHead className="whitespace-nowrap pl-4 w-[60px]">
+                  No
+                </TableHead>
+                <TableHead>Peminjam</TableHead>
+                <TableHead>Tujuan</TableHead>
+                <TableHead>Bahan Kimia</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {borrowings.map((borrowing, index) => (
+                <TableRow key={borrowing.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
                     <div>
-                      Diajukan:{" "}
-                      {format(borrowing.requestDate, "dd/MM/yyyy", {
-                        locale: id,
-                      })}
+                      <div className="font-medium">
+                        {borrowing.borrower.name}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {borrowing.borrower.email}
+                      </div>
                     </div>
-                    {borrowing.approvedAt && (
-                      <div className="text-green-600">
-                        Disetujui:{" "}
-                        {format(borrowing.approvedAt, "dd/MM/yyyy", {
+                  </TableCell>
+                  <TableCell>
+                    <div className="max-w-xs">
+                      <p className="text-sm font-medium truncate">
+                        {borrowing.purpose}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {borrowing.items.length} item
+                        {borrowing.items.length > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      {borrowing.items.slice(0, 2).map((item) => (
+                        <div key={item.id} className="text-sm">
+                          <span className="font-medium">
+                            {item.chemical.name}
+                          </span>
+                          <span className="text-gray-500 ml-2">
+                            {item.quantity} {item.chemical.unit}
+                          </span>
+                        </div>
+                      ))}
+                      {borrowing.items.length > 2 && (
+                        <div className="text-xs text-gray-400">
+                          +{borrowing.items.length - 2} lainnya
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(borrowing.status)}
+                      {getStatusBadge(borrowing.status)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      <div>
+                        Diajukan:{" "}
+                        {format(borrowing.requestDate, "dd/MM/yyyy", {
                           locale: id,
                         })}
                       </div>
-                    )}
-                    {borrowing.returnedAt && (
-                      <div className="text-blue-600">
-                        Dikembalikan:{" "}
-                        {format(borrowing.returnedAt, "dd/MM/yyyy", {
-                          locale: id,
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedBorrowing(borrowing)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-
-                    {canManage && borrowing.status === "PENDING" && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-green-600 hover:text-green-700 bg-transparent"
-                          onClick={() =>
-                            handleStatusChange(borrowing.id, "APPROVED")
-                          }>
-                          <Check className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 bg-transparent"
-                          onClick={() =>
-                            handleStatusChange(borrowing.id, "REJECTED")
-                          }>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-
-                    {canManage && borrowing.status === "APPROVED" && (
+                      {borrowing.approvedAt && (
+                        <div className="text-green-600">
+                          Disetujui:{" "}
+                          {format(borrowing.approvedAt, "dd/MM/yyyy", {
+                            locale: id,
+                          })}
+                        </div>
+                      )}
+                      {borrowing.returnedAt && (
+                        <div className="text-blue-600">
+                          Dikembalikan:{" "}
+                          {format(borrowing.returnedAt, "dd/MM/yyyy", {
+                            locale: id,
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 hover:text-blue-700 bg-transparent"
-                        onClick={() =>
-                          handleStatusChange(borrowing.id, "RETURNED")
-                        }>
-                        <RotateCcw className="h-4 w-4" />
+                        onClick={() => setSelectedBorrowing(borrowing)}>
+                        <Eye className="h-4 w-4" />
                       </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+
+                      {canManage && borrowing.status === "PENDING" && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-green-600 hover:text-green-700 bg-transparent"
+                            onClick={() =>
+                              handleStatusChange(borrowing.id, "APPROVED")
+                            }>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 bg-transparent"
+                            onClick={() =>
+                              handleStatusChange(borrowing.id, "REJECTED")
+                            }>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+
+                      {canManage && borrowing.status === "APPROVED" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-700 bg-transparent"
+                          onClick={() =>
+                            handleStatusChange(borrowing.id, "RETURNED")
+                          }>
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
+        <p className="text-sm text-muted-foreground">
+          Halaman {pagination.currentPage} dari {pagination.totalPages}
+        </p>
+        <div className="flex gap-2 w-full md:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 md:flex-none"
+            onClick={() => onPageChange(pagination.currentPage - 1)}
+            disabled={pagination.currentPage <= 1}>
+            Sebelumnya
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 md:flex-none"
+            onClick={() => onPageChange(pagination.currentPage + 1)}
+            disabled={pagination.currentPage >= pagination.totalPages}>
+            Selanjutnya
+          </Button>
+        </div>
       </div>
 
       {selectedBorrowing && (
