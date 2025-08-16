@@ -13,4 +13,4 @@ export const createBorrowingSchema = z.object({
     .min(1, "Minimal harus ada satu bahan kimia yang dipinjam"),
 });
 
-export type BorrowingCreateFormData = z.infer<typeof createBorrowingSchema>;
+export type CreateBorrowingFormData = z.infer<typeof createBorrowingSchema>;

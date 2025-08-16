@@ -26,6 +26,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
 import { UserAuth } from "@/types/auth";
 import useChemicals from "@/hooks/use-chemicals";
+import {
+  CreateBorrowingFormData,
+  createBorrowingSchema,
+} from "@/lib/validation/borrowings";
+import axios from "axios";
 
 interface CreateBorrowingDialogProps {
   children: React.ReactNode;
@@ -42,23 +47,32 @@ export function CreateBorrowingDialog({
 }: CreateBorrowingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof CreateBorrowingFormData, string>>
+  >({});
+
+  const [formData, setFormData] = useState({
+    purpose: "",
+    notes: "",
+    items: [{ chemicalId: "", quantity: 0 }] as BorrowingItem[],
+  });
+
   const { toast } = useToast();
-
-  const [purpose, setPurpose] = useState("");
-  const [notes, setNotes] = useState("");
-  const [items, setItems] = useState<BorrowingItem[]>([
-    { chemicalId: "", quantity: 0 },
-  ]);
-
   const { chemicals } = useChemicals();
 
   const addItem = () => {
-    setItems([...items, { chemicalId: "", quantity: 0 }]);
+    setFormData((prev) => ({
+      ...prev,
+      items: [...prev.items, { chemicalId: "", quantity: 0 }],
+    }));
   };
 
   const removeItem = (index: number) => {
-    if (items.length > 1) {
-      setItems(items.filter((_, i) => i !== index));
+    if (formData.items.length > 1) {
+      setFormData((prev) => ({
+        ...prev,
+        items: prev.items.filter((_, i) => i !== index),
+      }));
     }
   };
 
@@ -67,9 +81,11 @@ export function CreateBorrowingDialog({
     field: keyof BorrowingItem,
     value: string | number
   ) => {
-    const updatedItems = [...items];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
-    setItems(updatedItems);
+    setFormData((prev) => {
+      const updatedItems = [...prev.items];
+      updatedItems[index] = { ...updatedItems[index], [field]: value };
+      return { ...prev, items: updatedItems };
+    });
   };
 
   const getChemicalInfo = (chemicalId: string) => {
@@ -78,11 +94,28 @@ export function CreateBorrowingDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log("FormData: ", formData);
+
+    const result = createBorrowingSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Partial<
+        Record<keyof CreateBorrowingFormData, string>
+      > = {};
+      for (const err of result.error.issues) {
+        const field = err.path[0] as keyof CreateBorrowingFormData;
+        fieldErrors[field] = err.message;
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
     setLoading(true);
 
     try {
       // Validate items
-      const validItems = items.filter(
+      const validItems = formData.items.filter(
         (item) => item.chemicalId && item.quantity > 0
       );
 
@@ -101,7 +134,14 @@ export function CreateBorrowingDialog({
       }
 
       // In a real app, this would call an API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await axios.post("/api/v1/borrowings", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("response create peminjaman: ", response.data);
 
       toast({
         title: "Peminjaman Berhasil Diajukan! 🎉",
@@ -110,21 +150,28 @@ export function CreateBorrowingDialog({
       });
 
       // Reset form
-      setPurpose("");
-      setNotes("");
-      setItems([{ chemicalId: "", quantity: 0 }]);
       setOpen(false);
+      setFormData({
+        purpose: "",
+        notes: "",
+        items: [{ chemicalId: "", quantity: 0 }],
+      });
 
       // Refresh page to show new data
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 200);
     } catch (error) {
       console.error("Gagal mengajuka peminjaman: ", error);
 
+      let errorMessage = "Gagal mengajukan peminjaman";
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data.message || errorMessage;
+      }
+
       toast({
         title: "Error ❌",
-        description: "Gagal mengajukan peminjaman",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -149,12 +196,17 @@ export function CreateBorrowingDialog({
             <Label htmlFor="purpose">Tujuan Peminjaman *</Label>
             <Textarea
               id="purpose"
-              value={purpose}
-              onChange={(e) => setPurpose(e.target.value)}
+              value={formData.purpose}
+              onChange={(e) =>
+                setFormData({ ...formData, purpose: e.target.value })
+              }
               required
               placeholder="Contoh: Praktikum Kimia Analitik - Titrasi Asam Basa"
               rows={3}
             />
+            {errors.purpose && (
+              <p className="text-xs text-red-500">{errors.purpose}</p>
+            )}
           </div>
 
           {/* Items */}
@@ -172,11 +224,11 @@ export function CreateBorrowingDialog({
             </div>
 
             <div className="space-y-3">
-              {items.map((item, index) => (
+              {formData.items.map((item, index) => (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-medium">Bahan #{index + 1}</h4>
-                    {items.length > 1 && (
+                    {formData.items.length > 1 && (
                       <Button
                         type="button"
                         variant="outline"
@@ -257,8 +309,10 @@ export function CreateBorrowingDialog({
             <Label htmlFor="notes">Catatan Tambahan</Label>
             <Textarea
               id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               placeholder="Catatan atau informasi tambahan (opsional)"
               rows={2}
             />

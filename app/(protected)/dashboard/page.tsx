@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 const DashboardPage = async () => {
   await new Promise((resolve) => setTimeout(resolve, 500));
   const user = await getCurrentUser();
-
   if (!user) return null;
 
   return <DashboardClient user={user} />;

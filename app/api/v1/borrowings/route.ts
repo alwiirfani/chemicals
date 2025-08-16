@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
-import { requireAuthOrNull, requireRoleOrNull } from "@/lib/auth";
+import { requireAuthOrNull } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
 import { createBorrowingSchema } from "@/lib/validation/borrowings";
 
@@ -93,6 +93,24 @@ export async function GET(request: NextRequest) {
               },
             },
           },
+          approvedBy: {
+            include: {
+              admin: { select: { pin: true } },
+              laboran: { select: { nip: true, full_name: true } },
+            },
+          },
+          rejectedBy: {
+            include: {
+              admin: { select: { pin: true } },
+              laboran: { select: { nip: true, full_name: true } },
+            },
+          },
+          returnedBy: {
+            include: {
+              admin: { select: { pin: true } },
+              laboran: { select: { nip: true, full_name: true } },
+            },
+          },
         },
         skip,
         take: limit,
@@ -134,12 +152,22 @@ export async function GET(request: NextRequest) {
     ]);
 
     const formattedBorrowings = borrowings.map((borrowing) => {
+      let approvedByName = undefined;
+      let rejectedByName = undefined;
+      let returnedByName = undefined;
       let name = undefined;
       switch (borrowing.borrower.role) {
         case "ADMIN":
+          approvedByName = "Administrator";
+          rejectedByName = "Administrator";
+          returnedByName = "Administrator";
           name = "Administrator";
           break;
         case "LABORAN":
+          approvedByName = borrowing.approvedBy?.laboran?.full_name;
+          rejectedByName = borrowing.rejectedBy?.laboran?.full_name;
+          returnedByName = borrowing.returnedBy?.laboran?.full_name;
+
           name = borrowing.borrower.laboran?.full_name;
           break;
         case "DOSEN":
@@ -185,6 +213,18 @@ export async function GET(request: NextRequest) {
           returned: item.returned,
           returnedQty: item.returnedQty,
         })),
+        approvedBy: {
+          userId: borrowing.approvedBy?.id,
+          name: approvedByName,
+        },
+        rejectedBy: {
+          userId: borrowing.rejectedBy?.id,
+          name: rejectedByName,
+        },
+        returnedBy: {
+          userId: borrowing.returnedBy?.id,
+          name: returnedByName,
+        },
       };
     });
 
@@ -217,12 +257,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userAccess = await requireRoleOrNull([
-      "ADMIN",
-      "LABORAN",
-      "DOSEN",
-      "MAHASISWA",
-    ]);
+    const userAccess = await requireAuthOrNull();
     if (userAccess instanceof NextResponse) return userAccess;
 
     const body = await req.json();

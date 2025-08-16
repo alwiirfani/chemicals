@@ -56,12 +56,47 @@ INSERT INTO chemicals (id, name, formula, cas_number, form, stock, unit, purchas
 ('chem008', 'Metanol', 'CH3OH', '67-56-1', 'LIQUID', 1500.0, 'mL', '2024-02-10', '2025-11-10', 'Lemari Pelarut', 'C3', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW());
 
 -- Insert sample borrowings
-INSERT INTO borrowings (id, borrower_id, purpose, status, request_date, approved_at, notes, created_at, updated_at) VALUES
-('borrow001', 'mhs001', 'Praktikum Kimia Analitik - Titrasi Asam Basa', 'APPROVED', '2024-01-25 09:00:00', '2024-01-25 10:00:00', 'Disetujui untuk praktikum', NOW(), NOW()),
-('borrow002', 'mhs002', 'Penelitian Tugas Akhir', 'PENDING', '2024-01-28 08:30:00', NULL, NULL, NOW(), NOW()),
-('borrow003', 'dosen001', 'Penelitian Dosen - Sintesis Senyawa Organik', 'APPROVED', '2024-01-26 14:00:00', '2024-01-26 15:00:00', 'Untuk penelitian jangka panjang', NOW(), NOW()),
-('borrow004', 'mhs003', 'Praktikum Kimia Organik', 'RETURNED', '2024-01-20 10:00:00', '2024-01-20 11:00:00', 'Sudah dikembalikan', NOW(), NOW()),
-('borrow005', 'dosen002', 'Penelitian Analisis Lingkungan', 'APPROVED', '2024-01-29 13:00:00', '2024-01-29 14:00:00', 'Untuk penelitian lingkungan', NOW(), NOW());
+-- Insert sample borrowings dengan informasi approved/rejected/returned
+INSERT INTO borrowings (
+  id, borrower_id, purpose, status, request_date, 
+  approved_at, rejected_at, returned_at,
+  approved_by_id, rejected_by_id, returned_by_id,
+  notes, created_at, updated_at
+) VALUES
+('borrow001', 'mhs001', 'Praktikum Kimia Analitik - Titrasi Asam Basa', 'APPROVED', 
+ '2024-01-25 09:00:00', '2024-01-25 10:00:00', NULL, NULL,
+ 'laboran001', NULL, NULL,
+ 'Disetujui untuk praktikum', NOW(), NOW()),
+
+('borrow002', 'mhs002', 'Penelitian Tugas Akhir', 'PENDING', 
+ '2024-01-28 08:30:00', NULL, NULL, NULL,
+ NULL, NULL, NULL,
+ NULL, NOW(), NOW()),
+
+('borrow003', 'dosen001', 'Penelitian Dosen - Sintesis Senyawa Organik', 'APPROVED', 
+ '2024-01-26 14:00:00', '2024-01-26 15:00:00', NULL, NULL,
+ 'laboran002', NULL, NULL,
+ 'Untuk penelitian jangka panjang', NOW(), NOW()),
+
+('borrow004', 'mhs003', 'Praktikum Kimia Organik', 'RETURNED', 
+ '2024-01-20 10:00:00', '2024-01-20 11:00:00', NULL, '2024-01-22 14:00:00',
+ 'admin001', NULL, 'laboran001',
+ 'Sudah dikembalikan', NOW(), NOW()),
+
+('borrow005', 'dosen002', 'Penelitian Analisis Lingkungan', 'APPROVED', 
+ '2024-01-29 13:00:00', '2024-01-29 14:00:00', NULL, NULL,
+ 'laboran001', NULL, NULL,
+ 'Untuk penelitian lingkungan', NOW(), NOW()),
+
+('borrow006', 'mhs004', 'Praktikum Kimia Dasar', 'REJECTED', 
+ '2024-01-27 10:00:00', NULL, '2024-01-27 11:00:00', NULL,
+ NULL, 'laboran002', NULL,
+ 'Stok tidak mencukupi', NOW(), NOW()),
+
+('borrow007', 'mhs005', 'Penelitian Skripsi', 'RETURNED', 
+ '2024-01-23 09:00:00', '2024-01-23 10:00:00', NULL, '2024-01-25 15:00:00',
+ 'admin001', NULL, 'laboran002',
+ 'Pengembalian tepat waktu', NOW(), NOW());
 
 -- Insert borrowing items
 INSERT INTO borrowing_items (id, borrowing_id, chemical_id, quantity, returned, returned_qty, created_at, updated_at) VALUES

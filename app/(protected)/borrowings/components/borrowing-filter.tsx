@@ -65,7 +65,7 @@ const BorrowingFilter = ({
 
           {canManage && (
             <Select value={filterUser} onValueChange={setFilterUser}>
-              <SelectTrigger className="w-full sm:w-[120px]">
+              <SelectTrigger className="w-full sm:w-[170px]">
                 <SelectValue placeholder="Pengguna" />
               </SelectTrigger>
               <SelectContent>

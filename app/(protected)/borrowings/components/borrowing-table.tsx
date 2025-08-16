@@ -17,6 +17,8 @@ import { Eye, Check, X, RotateCcw, Clock, AlertTriangle } from "lucide-react";
 import { BorrowingDetailDialog } from "./borrowing-detail-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Borrowing } from "@/types/borrowings";
+import axios from "axios";
+import { ReturnBorrowingDialog } from "./return-borrowing-dialog";
 
 interface BorrowingPaginationProps {
   currentPage: number;
@@ -39,6 +41,10 @@ export function BorrowingTable({
   const [selectedBorrowing, setSelectedBorrowing] = useState<Borrowing | null>(
     null
   );
+  const [returnDialogOpen, setReturnDialogOpen] = useState(false);
+  const [selectedReturnBorrowing, setSelectedReturnBorrowing] =
+    useState<Borrowing | null>(null);
+
   const { toast } = useToast();
 
   const getStatusBadge = (status: string) => {
@@ -91,19 +97,50 @@ export function BorrowingTable({
     }
   };
 
-  const handleStatusChange = async (borrowingId: string, newStatus: string) => {
+  const handleStatusChange = async (borrowingId: string, action: string) => {
     try {
-      // In a real app, this would call an API
+      let body = {};
+
+      if (action === "RETURNED") {
+        // Buka dialog untuk pengembalian
+        const borrowing = borrowings.find((b) => b.id === borrowingId);
+        if (borrowing) {
+          setSelectedReturnBorrowing(borrowing);
+          setReturnDialogOpen(true);
+        }
+        return;
+      } else {
+        body = { action };
+      }
+
+      const { data } = await axios.patch(
+        `/api/v1/borrowings/${borrowingId}`,
+        body,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(data);
+
       toast({
         title: "Status Updated! 🎉",
         description: `Peminjaman berhasil ${
-          newStatus === "APPROVED"
+          action === "APPROVED"
             ? "disetujui"
-            : newStatus === "REJECTED"
+            : action === "REJECTED"
             ? "ditolak"
             : "diperbarui"
         }`,
       });
+
+      // Refresh halaman untuk menampilkan data terbaru
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error("Error change status: ", error);
 
@@ -138,7 +175,7 @@ export function BorrowingTable({
             <TableBody>
               {borrowings.map((borrowing, index) => (
                 <TableRow key={borrowing.id}>
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell className="pl-4 w-[60px]">{index + 1}</TableCell>
                   <TableCell>
                     <div>
                       <div className="font-medium">
@@ -214,6 +251,7 @@ export function BorrowingTable({
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
+                        title="Detail Peminjaman"
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedBorrowing(borrowing)}>
@@ -223,6 +261,7 @@ export function BorrowingTable({
                       {canManage && borrowing.status === "PENDING" && (
                         <>
                           <Button
+                            title="Peminjaman disetujui"
                             variant="outline"
                             size="sm"
                             className="text-green-600 hover:text-green-700 bg-transparent"
@@ -232,6 +271,7 @@ export function BorrowingTable({
                             <Check className="h-4 w-4" />
                           </Button>
                           <Button
+                            title="Peminjaman ditolak"
                             variant="outline"
                             size="sm"
                             className="text-red-600 hover:text-red-700 bg-transparent"
@@ -244,15 +284,28 @@ export function BorrowingTable({
                       )}
 
                       {canManage && borrowing.status === "APPROVED" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-blue-600 hover:text-blue-700 bg-transparent"
-                          onClick={() =>
-                            handleStatusChange(borrowing.id, "RETURNED")
-                          }>
-                          <RotateCcw className="h-4 w-4" />
-                        </Button>
+                        <>
+                          <Button
+                            title="Peminjaman dikembalikan"
+                            variant="outline"
+                            size="sm"
+                            className="text-blue-600 hover:text-blue-700 bg-transparent"
+                            onClick={() =>
+                              handleStatusChange(borrowing.id, "RETURNED")
+                            }>
+                            <RotateCcw className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            title="Peminjaman terlambat"
+                            variant="outline"
+                            size="sm"
+                            className="text-orange-600 hover:text-orange-700 bg-transparent"
+                            onClick={() =>
+                              handleStatusChange(borrowing.id, "OVERDUE")
+                            }>
+                            <AlertTriangle className="h-4 w-4" />
+                          </Button>
+                        </>
                       )}
                     </div>
                   </TableCell>
@@ -296,6 +349,13 @@ export function BorrowingTable({
           userRole={userRole}
         />
       )}
+
+      {/* Dialog Pengembalian */}
+      <ReturnBorrowingDialog
+        borrowing={selectedReturnBorrowing}
+        open={returnDialogOpen}
+        onOpenChange={setReturnDialogOpen}
+      />
     </>
   );
 }

@@ -49,16 +49,19 @@ model User {
   updated_at    DateTime   @updatedAt
 
   // Relations
-  admin            Admin?
-  mahasiswa        Mahasiswa?
-  dosen            Dosen?
-  laboran          Laboran?
-  borrowings       Borrowing[]
-  reports          Report[]
-  createdChemicals Chemical[]        @relation("CreatedBy")
-  updatedChemicals Chemical[]        @relation("UpdatedBy")
-  createdSDS       SafetyDataSheet[] @relation("CreatedBy")
-  updatedSDS       SafetyDataSheet[] @relation("UpdatedBy")
+  admin             Admin?
+  mahasiswa         Mahasiswa?
+  dosen             Dosen?
+  laboran           Laboran?
+  borrowings        Borrowing[]
+  reports           Report[]
+  createdChemicals  Chemical[]        @relation("CreatedBy")
+  updatedChemicals  Chemical[]        @relation("UpdatedBy")
+  createdSDS        SafetyDataSheet[] @relation("CreatedBy")
+  updatedSDS        SafetyDataSheet[] @relation("UpdatedBy")
+  approvedBorrowing Borrowing[]       @relation("approvedBy")
+  rejectedBorrowing Borrowing[]       @relation("rejectedBy")
+  returnedBorrowing Borrowing[]       @relation("returnedBy")
 
   @@index([username, email])
   @@map("users")
@@ -166,15 +169,24 @@ model Borrowing {
   status      BorrowingStatus @default(PENDING)
   requestDate DateTime        @default(now()) @map("request_date")
   approvedAt  DateTime?       @map("approved_at")
+  rejectedAt  DateTime?       @map("rejected_at")
   returnedAt  DateTime?       @map("returned_at")
   notes       String?         @db.Text
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @updatedAt @map("updated_at")
 
   // Relations
-  borrowerId String          @map("borrower_id") @db.VarChar(255)
-  borrower   User            @relation(fields: [borrowerId], references: [id])
-  items      BorrowingItem[]
+  approvedById String? @map("approved_by_id") @db.VarChar(255)
+  approvedBy   User?   @relation("approvedBy", fields: [approvedById], references: [id])
+  rejectedById String? @map("rejected_by_id") @db.VarChar(255)
+  rejectedBy   User?   @relation("rejectedBy", fields: [rejectedById], references: [id])
+  returnedById String? @map("returned_by_id") @db.VarChar(255)
+  returnedBy   User?   @relation("returnedBy", fields: [returnedById], references: [id])
+
+  borrowerId   String          @map("borrower_id") @db.VarChar(255)
+  borrower     User            @relation(fields: [borrowerId], references: [id])
+  items        BorrowingItem[]
+  UsageHistory UsageHistory[]
 
   @@map("borrowings")
 }
@@ -198,7 +210,7 @@ model BorrowingItem {
 
 model UsageHistory {
   id        String   @id @default(nanoid()) @db.VarChar(255)
-  quantity  Float
+  quantity  Int
   purpose   String   @db.Text
   usedAt    DateTime @default(now()) @map("used_at")
   userId    String?  @map("user_id") @db.VarChar(255)
@@ -206,8 +218,10 @@ model UsageHistory {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  chemicalId String   @map("chemical_id")
-  chemical   Chemical @relation(fields: [chemicalId], references: [id])
+  borrowingId String?    @db.VarChar(255)
+  borrowing   Borrowing? @relation(fields: [borrowingId], references: [id])
+  chemicalId  String     @map("chemical_id")
+  chemical    Chemical   @relation(fields: [chemicalId], references: [id])
 
   @@map("usage_history")
 }
