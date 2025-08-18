@@ -3,6 +3,7 @@ import db from "@/lib/db";
 import { requireAuthOrNull } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
 import { createBorrowingSchema } from "@/lib/validation/borrowings";
+import { sendNotification } from "@/lib/notification";
 
 export async function GET(request: NextRequest) {
   try {
@@ -143,6 +144,7 @@ export async function GET(request: NextRequest) {
         },
       }),
 
+      // Menghitung jumlah peminjaman aktif yang dibuat oleh user
       db.borrowing.count({
         where: {
           status: { in: ["APPROVED", "OVERDUE"] },
@@ -301,6 +303,22 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Cari semua ADMIN & LABORAN
+    const recipients = await db.user.findMany({
+      where: { role: { in: ["ADMIN", "LABORAN"] } },
+      select: { id: true },
+    });
+
+    const userIds = recipients.map((r) => r.id);
+
+    // 🔔 Kirim notifikasi
+    await sendNotification(
+      userIds,
+      "Pengajuan Peminjaman Baru",
+      `${borrowing.borrower.username} mengajukan peminjaman`,
+      "/dashboard/borrowings"
+    );
 
     return NextResponse.json(
       { message: "Borrowing created successfully", borrowing },

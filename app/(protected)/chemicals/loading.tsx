@@ -6,7 +6,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-export default function UsersLoading() {
+export default function Loading() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <main className="flex-1 md:ml-64 p-4 sm:p-8 space-y-6">

@@ -59,7 +59,7 @@ interface BorrowingDetailDialogProps {
   userRole: string;
 }
 
-export function BorrowingDetailDialog({
+export function DetailBorrowingDialog({
   borrowing,
   open,
   onOpenChange,

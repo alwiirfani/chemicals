@@ -40,6 +40,8 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
       setIsLoading(true);
       const data = await getDashboardData();
 
+      console.log("Dashboard Data:", data);
+
       setStats({
         totalChemicals: data.totalChemicals,
         activeBorrowings: data.activeBorrowings,

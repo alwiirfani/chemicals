@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SDSPage() {
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  await new Promise((resolve) => setTimeout(resolve, 100));
   const user = await getCurrentUser();
   if (!user) return null;
 

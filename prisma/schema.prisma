@@ -37,6 +37,20 @@ enum BorrowingStatus {
   OVERDUE
 }
 
+model Device {
+  id         String   @id @default(nanoid()) @db.VarChar(255)
+  deviceType String   @map("device_type") @db.VarChar(255)
+  deviceMerk String   @map("device_merk") @db.VarChar(255)
+  fcmToken   String   @map("fcm_token")
+  lastUsed   DateTime @updatedAt
+
+  // relation
+  userId String @map("user_id") @db.VarChar(255)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("devices")
+}
+
 model User {
   id            String     @id @default(nanoid()) @db.VarChar(255)
   username      String     @unique @db.VarChar(255)
@@ -53,6 +67,7 @@ model User {
   mahasiswa         Mahasiswa?
   dosen             Dosen?
   laboran           Laboran?
+  devices           Device[]
   borrowings        Borrowing[]
   reports           Report[]
   createdChemicals  Chemical[]        @relation("CreatedBy")

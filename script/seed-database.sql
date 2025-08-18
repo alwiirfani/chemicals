@@ -126,40 +126,23 @@ INSERT INTO safety_data_sheets (
     created_by_id, updated_by_id, created_at, updated_at
 ) VALUES
 ('sds001', 'chem001', 'H2SO4_SDS.pdf', '/uploads/sds/H2SO4_SDS.pdf', NULL, 'English',
- 'Skin Corrosion/Irritation - Category 1A', 'P280: Wear protective gloves/protective clothing/eye protection/face protection.',
- 'Move to fresh air and keep at rest.', 'Remove contaminated clothing and wash with water.', 'Rinse cautiously with water for several minutes.', 'Do not induce vomiting; rinse mouth.',
- 'Store in a well-ventilated place away from incompatible materials.', 'Dispose of contents/container in accordance with local regulations.', 0,
+ '{"Skin Corrosion/Irritation - Category 1A"}',
+ '{"P280: Wear protective gloves/protective clothing/eye protection/face protection."}',
+ 'Move to fresh air and keep at rest.', 'Remove contaminated clothing and wash with water.',
+ 'Rinse cautiously with water for several minutes.', 'Do not induce vomiting; rinse mouth.',
+ 'Store in a well-ventilated place away from incompatible materials.',
+ 'Dispose of contents/container in accordance with local regulations.', 0,
  'admin001', 'laboran001', NOW(), NOW()),
 
 ('sds002', 'chem002', 'NaOH_SDS.pdf', '/uploads/sds/NaOH_SDS.pdf', NULL, 'English',
- 'Skin Corrosion/Irritation - Category 1A', 'P264: Wash hands thoroughly after handling.',
- 'Move to fresh air.', 'Wash with plenty of soap and water.', 'Rinse cautiously with water.', 'Rinse mouth, do not induce vomiting.',
- 'Keep container tightly closed in a dry and well-ventilated place.', 'Dispose according to local environmental regulations.', 0,
- 'admin001', 'laboran001', NOW(), NOW()),
+ '{"Skin Corrosion/Irritation - Category 1A"}',
+ '{"P264: Wash hands thoroughly after handling."}',
+ 'Move to fresh air.', 'Wash with plenty of soap and water.',
+ 'Rinse cautiously with water.', 'Rinse mouth, do not induce vomiting.',
+ 'Keep container tightly closed in a dry and well-ventilated place.',
+ 'Dispose according to local environmental regulations.', 0,
+ 'admin001', 'laboran001', NOW(), NOW());
 
-('sds003', 'chem003', 'HCl_SDS.pdf', '/uploads/sds/HCl_SDS.pdf', NULL, 'English',
- 'Skin Corrosion/Irritation - Category 1B', 'P261: Avoid breathing vapors.',
- 'Remove to fresh air.', 'Immediately wash with water.', 'Flush eyes with plenty of water.', 'Rinse mouth, seek medical advice.',
- 'Store away from oxidizing agents.', 'Neutralize before disposal.', 0,
- 'admin001', 'laboran002', NOW(), NOW()),
-
-('sds004', 'chem004', 'Ethanol_SDS.pdf', '/uploads/sds/Ethanol_SDS.pdf', NULL, 'English',
- 'Flammable liquids - Category 2', 'P210: Keep away from heat/sparks/open flames/hot surfaces.',
- 'Remove to fresh air.', 'Wash with soap and water.', 'Rinse eyes with water.', 'Rinse mouth and drink water.',
- 'Keep container tightly closed.', 'Dilute with water before disposal.', 0,
- 'admin001', 'laboran002', NOW(), NOW()),
-
-('sds005', 'chem005', 'Benzene_SDS.pdf', '/uploads/sds/Benzene_SDS.pdf', NULL, 'English',
- 'Carcinogenicity - Category 1A', 'P260: Do not breathe vapors.',
- 'Move to fresh air.', 'Wash skin with soap and water.', 'Flush with water for several minutes.', 'Seek immediate medical advice.',
- 'Store in well-ventilated area away from ignition sources.', 'Follow hazardous waste disposal procedures.', 0,
- 'admin001', 'laboran001', NOW(), NOW()),
-
-('sds006', 'chem007', 'KMnO4_SDS.pdf', '/uploads/sds/KMnO4_SDS.pdf', NULL, 'English',
- 'Oxidizing solids - Category 2', 'P220: Keep away from combustible materials.',
- 'Move person to fresh air.', 'Wash with plenty of water.', 'Rinse cautiously with water.', 'Rinse mouth, do not induce vomiting.',
- 'Store in a cool, dry place.', 'Dispose of according to environmental regulations.', 0,
- 'admin001', 'laboran002', NOW(), NOW());
 
 
 -- Insert sample reports

@@ -47,6 +47,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
+                  disabled={loading}
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                   required
                 />
@@ -61,6 +62,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     console.log(formData);
                   }}
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
                   required
                 />
 
@@ -73,6 +75,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     setFormData({ ...formData, casNumber: e.target.value })
                   }
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
                   required
                 />
               </div>
@@ -115,6 +118,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     }}
                     placeholder="1000"
                     className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                    disabled={loading}
                     required
                   />
 
@@ -128,6 +132,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     }
                     className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                     placeholder="gram, ml, kg"
+                    disabled={loading}
                     required
                   />
                 </div>
@@ -157,6 +162,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     setFormData({ ...formData, expirationDate: e.target.value })
                   }
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -170,6 +176,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   setFormData({ ...formData, location: e.target.value })
                 }
                 className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                disabled={loading}
                 required
               />
             </div>
@@ -183,6 +190,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     setFormData({ ...formData, cabinet: e.target.value })
                   }
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -193,6 +201,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     setFormData({ ...formData, room: e.target.value })
                   }
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -203,6 +212,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     setFormData({ ...formData, temperature: e.target.value })
                   }
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
                 />
               </div>
             </div>

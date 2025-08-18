@@ -14,11 +14,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Check, X, RotateCcw, Clock, AlertTriangle } from "lucide-react";
-import { BorrowingDetailDialog } from "./borrowing-detail-dialog";
+import { DetailBorrowingDialog } from "@/components/dialog/borrowings/detail-borrowing-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Borrowing } from "@/types/borrowings";
 import axios from "axios";
-import { ReturnBorrowingDialog } from "./return-borrowing-dialog";
+import { ReturnBorrowingDialog } from "@/components/dialog/borrowings/return-borrowing-dialog";
 
 interface BorrowingPaginationProps {
   currentPage: number;
@@ -342,7 +342,7 @@ export function BorrowingTable({
       </div>
 
       {selectedBorrowing && (
-        <BorrowingDetailDialog
+        <DetailBorrowingDialog
           borrowing={selectedBorrowing}
           open={!!selectedBorrowing}
           onOpenChange={(open) => !open && setSelectedBorrowing(null)}

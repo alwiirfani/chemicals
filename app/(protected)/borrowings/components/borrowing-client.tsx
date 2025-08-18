@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BorrowingTable } from "./borrowing-table";
-import { CreateBorrowingDialog } from "./create-borrowing-dialog";
+import { CreateBorrowingDialog } from "@/components/dialog/borrowings/create-borrowing-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
