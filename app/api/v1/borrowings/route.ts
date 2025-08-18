@@ -257,12 +257,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const userAccess = await requireAuthOrNull();
     if (userAccess instanceof NextResponse) return userAccess;
 
-    const body = await req.json();
+    const body = await request.json();
     const parsed = createBorrowingSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -317,7 +317,7 @@ export async function POST(req: NextRequest) {
       userIds,
       "Pengajuan Peminjaman Baru",
       `${borrowing.borrower.username} mengajukan peminjaman`,
-      "/dashboard/borrowings"
+      "/borrowings"
     );
 
     return NextResponse.json(

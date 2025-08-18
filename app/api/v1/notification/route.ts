@@ -29,14 +29,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Tidak ada device" }, { status: 404 });
     }
 
-    await admin.messaging().sendEachForMulticast({
+    const response = await admin.messaging().sendEachForMulticast({
       tokens: devices.map((d) => d.fcmToken),
       notification: { title, body },
       webpush: {
         notification: { icon: "/icon.svg" },
-        fcmOptions: { link: url || "http://localhost:3000" },
+        fcmOptions: {
+          link:
+            url || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+        },
       },
     });
+
+    console.log("Notification sent:", response);
 
     return NextResponse.json({ success: true });
   } catch (error) {
