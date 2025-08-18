@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { getFirebaseMessaging } from "@/lib/firebase";
-import { getToken } from "firebase/messaging";
+import { getToken, onMessage } from "firebase/messaging";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { UAParser } from "ua-parser-js";
@@ -70,6 +70,22 @@ export default function FCMHandler() {
           fcmToken: tokens,
           deviceType,
           deviceMerk,
+        });
+
+        // 🔥 Tangkap notifikasi saat tab aktif (foreground)
+        onMessage(messaging, (payload) => {
+          console.log("📩 Pesan foreground diterima: ", payload);
+
+          const notificationTitle =
+            payload.notification?.title || "Notifikasi Baru";
+          const notificationBody =
+            payload.notification?.body || "Anda punya pesan baru";
+
+          // Native browser notification
+          new Notification(notificationTitle, {
+            body: notificationBody,
+            icon: payload.notification?.icon || "/icon.svg", // URL gambar ikon
+          });
         });
       } catch (error) {
         console.error("Error registering FCM:", error);
