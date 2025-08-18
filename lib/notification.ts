@@ -12,7 +12,7 @@ export async function sendNotification(
   if (!userIds || userIds.length === 0) return;
 
   try {
-    await axios.post(`${BASE_URL}/api/v1/notifications`, {
+    await axios.post(`${BASE_URL}/api/v1/notification`, {
       userIds,
       title,
       body,
