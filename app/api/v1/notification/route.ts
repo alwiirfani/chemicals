@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       tokens: devices.map((d) => d.fcmToken),
       notification: { title, body },
       webpush: {
-        notification: { icon: "/icon.svg" },
+        notification: { icon: "/notification.png" },
         fcmOptions: {
           link:
             url || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",

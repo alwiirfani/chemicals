@@ -84,7 +84,7 @@ export default function FCMHandler() {
           // Native browser notification
           new Notification(notificationTitle, {
             body: notificationBody,
-            icon: payload.notification?.icon || "/icon.svg", // URL gambar ikon
+            icon: payload.notification?.icon || "/notification.png", // URL gambar ikon
           });
         });
       } catch (error) {
