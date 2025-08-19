@@ -7,7 +7,8 @@ export async function POST(request: NextRequest) {
     const userAccess = await requireAuthOrNull();
     if (userAccess instanceof NextResponse) return userAccess;
 
-    const { fcmToken, deviceType, deviceMerk } = await request.json();
+    const { fcmToken, browserName, deviceType, deviceMerk } =
+      await request.json();
 
     if (!fcmToken) {
       return NextResponse.json({ error: "Token tidak valid" }, { status: 400 });
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
       await db.device.create({
         data: {
           fcmToken,
+          browserName,
           deviceType,
           deviceMerk,
           userId: userAccess.userId,

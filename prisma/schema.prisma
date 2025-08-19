@@ -38,11 +38,12 @@ enum BorrowingStatus {
 }
 
 model Device {
-  id         String   @id @default(nanoid()) @db.VarChar(255)
-  deviceType String   @map("device_type") @db.VarChar(255)
-  deviceMerk String   @map("device_merk") @db.VarChar(255)
-  fcmToken   String   @map("fcm_token")
-  lastUsed   DateTime @updatedAt
+  id          String   @id @default(nanoid()) @db.VarChar(255)
+  browserName String   @map("browser_name") @db.VarChar(255)
+  deviceType  String   @map("device_type") @db.VarChar(255)
+  deviceMerk  String   @map("device_merk") @db.VarChar(255)
+  fcmToken    String   @map("fcm_token")
+  lastUsed    DateTime @updatedAt
 
   // relation
   userId String @map("user_id") @db.VarChar(255)

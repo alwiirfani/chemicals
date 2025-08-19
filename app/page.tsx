@@ -1,12 +1,18 @@
+import HomeClient from "@/components/home/home-client";
 import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
 
-  if (!user) redirect("/login");
-
-  redirect("/dashboard");
+  return (
+    <div className="flex min-h-screen">
+      <main
+        className={cn("flex-1 px-2 overflow-auto", user ? "ml-64" : "ml-0")}>
+        <HomeClient user={user} />
+      </main>
+    </div>
+  );
 }

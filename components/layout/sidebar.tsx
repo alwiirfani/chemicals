@@ -14,12 +14,14 @@ import {
   Menu,
   X,
   FlaskConical,
+  Home,
 } from "lucide-react";
 import SidebarNav from "./sidebar-nav";
 import SidebarFooter from "./sidebar-footer";
 import { useUser } from "@/providers/auth-provider";
 
 const navigation = [
+  { name: "Beranda", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Inventaris Bahan", href: "/chemicals", icon: Package },
   { name: "Peminjaman/Bon", href: "/borrowings", icon: FileText },

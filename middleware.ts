@@ -11,6 +11,8 @@ export const middleware = (request: NextRequest) => {
   console.log("Current path:", pathname);
   console.log("Token found:", !!token);
 
+  if (pathname === "/") return NextResponse.next();
+
   // cek apakah token ada dan token apakah sudah expired
   if (token && isTokenExpiredRuntimeEdge(token)) {
     console.log("Token is expired. Deleting cookie and redirecting to /login.");

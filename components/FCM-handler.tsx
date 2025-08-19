@@ -60,6 +60,9 @@ export default function FCMHandler() {
         const parser = new UAParser();
         const result = parser.getResult();
 
+        console.log("Detected Device: ", result);
+
+        const browserName = result.browser.name || "Unknown";
         const deviceType = result.device.type || "desktop";
         const deviceMerk =
           result.device.vendor ||
@@ -68,6 +71,7 @@ export default function FCMHandler() {
         // Kirim token ke backend
         await axios.post("/api/v1/fcm", {
           fcmToken: tokens,
+          browserName,
           deviceType,
           deviceMerk,
         });
