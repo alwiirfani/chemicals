@@ -12,6 +12,25 @@ export default function FCMHandler() {
   useEffect(() => {
     const registerFCM = async () => {
       try {
+        // ✅ Cek apakah browser support Service Worker dan Push API
+        if (!("serviceWorker" in navigator)) {
+          console.warn("Browser tidak mendukung Service Worker");
+          toast({
+            title: "Browser tidak mendukung Service Worker",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!("PushManager" in window)) {
+          console.warn("Browser tidak mendukung Push API");
+          toast({
+            title: "Browser tidak mendukung Push API",
+            variant: "destructive",
+          });
+          return;
+        }
+
         // Cek apakah browser mendukung notifikasi
         if (!("Notification" in window)) {
           console.warn("Browser tidak mendukung notifikasi");
@@ -39,10 +58,7 @@ export default function FCMHandler() {
         }
 
         // Register service worker
-        await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-          scope: "/firebase-cloud-messaging-push-scope/",
-        });
-
+        await navigator.serviceWorker.register("/firebase-messaging-sw.js");
         const registration = await navigator.serviceWorker.ready;
 
         // Dapatkan FCM Token
