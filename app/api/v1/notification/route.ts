@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import admin from "firebase-admin";
 import db from "@/lib/db";
 
+const FE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -34,22 +36,14 @@ export async function POST(request: NextRequest) {
       notification: { title, body },
       webpush: {
         notification: {
-          icon: "/notification192.png",
-          badge: "/notification48.png",
+          icon: `${FE_URL}/notification192.png`,
+          badge: `${FE_URL}/notification48.png`,
         },
         fcmOptions: {
-          link:
-            url || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+          link: url || FE_URL,
         },
       },
       data: { url: url || "/" },
-      android: {
-        notification: {
-          icon: "/notification192.png",
-          color: "#2196F3", // biru muda
-          clickAction: "FLUTTER_NOTIFICATION_CLICK",
-        },
-      },
     });
 
     console.log("Notification sent:", response);
