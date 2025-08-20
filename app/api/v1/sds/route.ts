@@ -27,24 +27,17 @@ export async function GET(request: NextRequest) {
               OR: [
                 {
                   chemical: {
-                    is: { name: { contains: search, mode: "insensitive" } },
+                    name: { contains: search, mode: "insensitive" },
                   },
                 },
                 {
                   chemical: {
-                    is: { formula: { contains: search, mode: "insensitive" } },
+                    formula: { contains: search, mode: "insensitive" },
                   },
                 },
                 {
                   chemical: {
-                    is: {
-                      casNumber: { contains: search, mode: "insensitive" },
-                    },
-                  },
-                },
-                {
-                  chemical: {
-                    is: { form: { contains: search, mode: "insensitive" } },
+                    casNumber: { contains: search, mode: "insensitive" },
                   },
                 },
                 { fileName: { contains: search, mode: "insensitive" } },
@@ -109,7 +102,7 @@ export async function GET(request: NextRequest) {
         created_at: sds.createdAt.toISOString(),
         updated_at: sds.updatedAt.toISOString(),
         created_by: createdByName,
-        opdated_by: updatedByName,
+        updated_by: updatedByName,
         chemical: {
           name: sds.chemical.name,
           formula: sds.chemical.formula,

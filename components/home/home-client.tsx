@@ -38,7 +38,7 @@ const HomeClient: React.FC<HomeClientProps> = ({ user }) => {
         {/* login button and qr code integration */}
         <div className="w-full flex justify-end">
           {!user ? (
-            <div className="flex items-center justify-end gap-4 py-2">
+            <div className="flex items-center justify-end gap-2 py-2">
               {/* qr code */}
               <Button
                 title="QR Code"
