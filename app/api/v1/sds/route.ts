@@ -27,21 +27,25 @@ export async function GET(request: NextRequest) {
               OR: [
                 {
                   chemical: {
-                    name: { contains: search, mode: "insensitive" },
+                    is: { name: { contains: search, mode: "insensitive" } },
                   },
                 },
                 {
                   chemical: {
-                    formula: { contains: search, mode: "insensitive" },
+                    is: { formula: { contains: search, mode: "insensitive" } },
                   },
                 },
                 {
                   chemical: {
-                    casNumber: { contains: search, mode: "insensitive" },
+                    is: {
+                      casNumber: { contains: search, mode: "insensitive" },
+                    },
                   },
                 },
                 {
-                  chemical: { form: { contains: search, mode: "insensitive" } },
+                  chemical: {
+                    is: { form: { contains: search, mode: "insensitive" } },
+                  },
                 },
                 { fileName: { contains: search, mode: "insensitive" } },
               ],
