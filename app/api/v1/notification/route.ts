@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const response = await admin.messaging().sendEachForMulticast({
       tokens: devices.map((d) => d.fcmToken),
-      notification: { title, body, imageUrl: "/notification192.png" },
+      notification: { title, body },
       webpush: {
         notification: { icon: "/notification192.png" },
         fcmOptions: {
