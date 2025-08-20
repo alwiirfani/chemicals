@@ -39,6 +39,24 @@ const HomeClient: React.FC<HomeClientProps> = ({ user }) => {
         <div className="w-full flex justify-end">
           {!user ? (
             <div className="flex items-center justify-end gap-2 py-2">
+              {/* uji notif */}
+              <button
+                onClick={() => {
+                  navigator.serviceWorker.ready.then((registration) => {
+                    registration.showNotification(
+                      "Test Notifikasi di Tab Baru",
+                      {
+                        body: "Ini adalah notifikasi uji",
+                        icon: "https://chemicalss.vercel.app/notification192.png",
+                        badge:
+                          "https://chemicalss.vercel.app/notification48.png",
+                      }
+                    );
+                  });
+                }}>
+                Uji Notifikasi
+              </button>
+
               {/* qr code */}
               <Button
                 title="QR Code"
