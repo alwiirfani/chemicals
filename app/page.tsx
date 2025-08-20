@@ -10,7 +10,7 @@ export default async function HomePage() {
   return (
     <div className="flex min-h-screen">
       <main
-        className={cn("flex-1 px-2 overflow-auto", user ? "ml-64" : "ml-0")}>
+        className={cn("flex-1 px-2 overflow-auto", user ? "md:ml-64" : "ml-0")}>
         <HomeClient user={user} />
       </main>
     </div>

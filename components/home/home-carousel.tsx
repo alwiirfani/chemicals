@@ -32,10 +32,9 @@ const HomeCarousel = () => {
 
   return (
     <div className="w-full bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Desktop Layout */}
       <div className="flex flex-col md:flex-row">
-        <div className="w-1/2 p-8 flex flex-col justify-center bg-gradient-to-r from-blue-50 to-white">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+        <div className="w-full md:w-1/2 p-8 flex flex-col justify-center bg-gradient-to-r from-blue-50 to-white">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
             Sistem Peminjaman Bahan Kimia
           </h2>
           <p className="text-gray-600 mb-6">
@@ -58,7 +57,7 @@ const HomeCarousel = () => {
           </ul>
         </div>
 
-        <div className="w-1/2">
+        <div className="w-full md:w-1/2 ">
           <Carousel
             opts={{ loop: true }}
             plugins={[autoplay.current]}
@@ -68,13 +67,13 @@ const HomeCarousel = () => {
             <CarouselContent>
               {chemicalList.map((src, index) => (
                 <CarouselItem key={index}>
-                  <div className="p-2 w-full h-96">
+                  <div className="p-4 w-full h-96">
                     <Image
                       width={250}
                       height={250}
                       src={src}
                       alt={`chemical-${index}`}
-                      className="object-cover w-full h-full rounded-r-lg"
+                      className="object-contain w-full h-full rounded-r-lg"
                     />
                   </div>
                 </CarouselItem>
