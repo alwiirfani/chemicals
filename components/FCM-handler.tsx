@@ -105,7 +105,7 @@ export default function FCMHandler() {
           // Native browser notification
           new Notification(notificationTitle, {
             body: notificationBody,
-            icon: payload.notification?.icon || "/notification48.png",
+            icon: payload.notification?.icon || "/notification192.png",
             badge: "/notification48.png",
           });
         });
