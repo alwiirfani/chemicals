@@ -16,7 +16,7 @@ import { AlertModal } from "@/components/alert-modal";
 import { useSds } from "@/hooks/use-sds";
 import CardStats from "@/components/card-stats";
 import SdsFilter from "./sds-filter";
-import { exportSdsToExcel } from "@/helpers/sds/export-to-excel";
+import { exportSdsToExcel } from "@/helpers/sds/export-sds-to-excel";
 
 interface SDSClientProps {
   user: UserAuth;

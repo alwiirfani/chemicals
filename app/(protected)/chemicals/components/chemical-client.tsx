@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AlertModal } from "@/components/alert-modal";
-import { exportChemicalsToExcel } from "@/helpers/chemicals/export-to-excel";
+import { exportChemicalsToExcel } from "@/helpers/chemicals/export-chemicals-to-excel";
 import { ChemicalFilter } from "./chemical-filter";
 
 interface ChemicalsClientProps {

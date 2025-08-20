@@ -1,5 +1,5 @@
+import { generateQRCode } from "@/lib/services/qr-generator";
 import { type NextRequest, NextResponse } from "next/server";
-import { generateQRCode } from "@/lib/qr-generator";
 
 const FE_URL = process.env.NEXT_PUBLIC_APP_URL
   ? process.env.NEXT_PUBLIC_APP_URL

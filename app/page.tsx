@@ -12,7 +12,7 @@ export default async function HomePage() {
       <main
         className={cn(
           "flex-1 px-2 overflow-auto mb-4 sm:mb-8",
-          user ? "md:ml-64" : "ml-0"
+          user ? "md:ml-64" : "ml-0 md:px-12"
         )}>
         <HomeClient user={user} />
       </main>

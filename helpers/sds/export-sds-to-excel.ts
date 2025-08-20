@@ -62,8 +62,24 @@ export const exportSdsToExcel = async (sds: SDS[]) => {
       disposalInfo: sds.disposalInfo || "-",
       createdByName: sds.createdByName,
       updatedByName: sds.updatedByName || "-",
-      createdAt: sds.createdAt.toLocaleString(),
-      updatedAt: sds.updatedAt.toLocaleString(),
+      createdAt: sds.createdAt.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }),
+      updatedAt: sds.updatedAt
+        ? sds.updatedAt.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })
+        : "-",
     });
   });
 

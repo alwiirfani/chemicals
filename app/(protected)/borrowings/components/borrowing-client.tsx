@@ -15,6 +15,7 @@ import {
 import { UserAuth } from "@/types/auth";
 import useBorrowings from "@/hooks/use-borrowings";
 import BorrowingFilter from "./borrowing-filter";
+import { exportBorrowingsToExcel } from "@/helpers/borrowings/export-borrowings-to-excel";
 
 interface BorrowingsClientProps {
   user: UserAuth;
@@ -160,7 +161,7 @@ export function BorrowingClient({ user }: BorrowingsClientProps) {
         setFilterStatus={setFilterStatus}
         filterUser={filterUser}
         setFilterUser={setFilterUser}
-        onExport={() => {}}
+        onExport={() => exportBorrowingsToExcel(filteredBorrowings)}
         canManage={canManage}
       />
 

@@ -42,7 +42,14 @@ export const exportChemicalsToExcel = async (chemicals: Chemical[]) => {
       cabinet: item.cabinet ?? "-",
       room: item.room ?? "-",
       expirationDate: item.expirationDate
-        ? new Date(item.expirationDate).toLocaleDateString("id-ID")
+        ? new Date(item.expirationDate).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })
         : "-",
       createdBy: item.createdBy ?? "-",
     });
