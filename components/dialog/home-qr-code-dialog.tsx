@@ -25,7 +25,7 @@ const HomeQrCodeDialog: React.FC<HomeQrCodeDialogProps> = ({
     if (qrCodeUrl) {
       const link = document.createElement("a");
       link.href = qrCodeUrl;
-      link.download = `qr-chlab.png`;
+      link.download = `qr-code-chlab.png`;
       link.click();
     }
   };

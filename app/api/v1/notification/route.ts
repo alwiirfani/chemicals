@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     const devices = await db.device.findMany({
       where: { userId: { in: userIds } },
-      select: { fcmToken: true },
+      select: { id: true, fcmToken: true },
     });
 
     if (devices.length === 0) {
@@ -43,7 +43,24 @@ export async function POST(request: NextRequest) {
 
     console.log("Notification sent:", response);
 
-    return NextResponse.json({ success: true });
+    // Handle token invalid
+    await Promise.all(
+      response.responses.map(async (res, idx) => {
+        if (!res.success) {
+          const errorCode = res.error?.code;
+          if (errorCode === "messaging/registration-token-not-registered") {
+            const invalidToken = devices[idx].fcmToken;
+            await db.device.deleteMany({ where: { fcmToken: invalidToken } });
+            console.log("Deleted invalid token:", invalidToken);
+          }
+        }
+      })
+    );
+
+    return NextResponse.json({
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+    });
   } catch (error) {
     console.error("Error sending notification:", error);
     return NextResponse.json(
