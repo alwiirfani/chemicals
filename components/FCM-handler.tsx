@@ -39,10 +39,11 @@ export default function FCMHandler() {
         }
 
         // Register service worker
-        const registration = await navigator.serviceWorker.register(
-          "/firebase-messaging-sw.js",
-          { scope: "/firebase-cloud-messaging-push-scope/" }
-        );
+        await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+          scope: "/firebase-cloud-messaging-push-scope/",
+        });
+
+        const registration = await navigator.serviceWorker.ready;
 
         // Dapatkan FCM Token
         const tokens = await getToken(messaging, {
@@ -88,7 +89,7 @@ export default function FCMHandler() {
           // Native browser notification
           new Notification(notificationTitle, {
             body: notificationBody,
-            icon: "/notification48.png",
+            icon: payload.notification?.icon || "/notification48.png",
             badge: "/notification48.png",
           });
         });

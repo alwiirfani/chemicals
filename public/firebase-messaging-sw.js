@@ -26,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body } = payload.notification;
   self.registration.showNotification(title, {
     body,
-    icon: "/icon.svg",
+    icon: "/notification48.png",
     data: { url: payload.data?.url || "/" }, // Deep link
   });
 });
