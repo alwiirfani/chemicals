@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import admin from "firebase-admin";
 import db from "@/lib/db";
 
-const FE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const FE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 if (!admin.apps.length) {
   admin.initializeApp({
