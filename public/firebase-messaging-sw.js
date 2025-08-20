@@ -23,10 +23,10 @@ messaging.onBackgroundMessage((payload) => {
     "[firebase-messaging-sw.js] Received background message ",
     payload
   );
-  const { title, body } = payload.notification;
+  const { title, body, image, icon } = payload.notification;
   self.registration.showNotification(title, {
     body,
-    icon: payload.notification?.icon || "/notification192.png",
+    icon: icon || image || payload.notification?.icon || "/notification192.png",
     badge: "/notification48.png",
     data: { url: payload.data?.url || "/" }, // Deep link
   });

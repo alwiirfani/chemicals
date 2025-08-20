@@ -33,10 +33,21 @@ export async function POST(request: NextRequest) {
       tokens: devices.map((d) => d.fcmToken),
       notification: { title, body },
       webpush: {
-        notification: { icon: "/notification192.png" },
+        notification: {
+          icon: "/notification192.png",
+          badge: "/notification48.png",
+        },
         fcmOptions: {
           link:
             url || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+        },
+      },
+      data: { url: url || "/" },
+      android: {
+        notification: {
+          icon: "/notification192.png",
+          color: "#2196F3", // biru muda
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
         },
       },
     });
