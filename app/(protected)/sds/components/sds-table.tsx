@@ -271,7 +271,6 @@ export function SDSTable({
           sds={selectedSDS}
           open={!!selectedSDS}
           onOpenChange={(open) => !open && setSelectedSDS(null)}
-          userRole={userRole}
         />
       )}
 

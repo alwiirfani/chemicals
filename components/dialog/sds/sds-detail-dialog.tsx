@@ -30,7 +30,6 @@ interface SDSDetailDialogProps {
   sds: SDS;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  userRole: string;
 }
 
 export function SDSDetailDialog({

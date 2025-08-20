@@ -3,13 +3,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { ChemicalForm } from "@/types/chemicals";
-import { requireAuthOrNull, requireRoleOrNull } from "@/lib/auth";
+import { requireRoleOrNull } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const userAccess = await requireAuthOrNull();
-    if (userAccess instanceof NextResponse) return userAccess;
-
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
