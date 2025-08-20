@@ -101,10 +101,8 @@ export default function FCMHandler() {
             payload.notification?.title || "Notifikasi Baru";
           const notificationOptions = {
             body: payload.notification?.body || "Anda punya pesan baru",
-            icon:
-              payload.notification?.icon ||
-              `${window.location.origin}/notification192.png`,
-            badge: `${window.location.origin}/notification48.png`,
+            icon: payload.notification?.icon || "/notification192.png",
+            badge: "/notification48.png",
             data: { url: payload.data?.url || "/" },
           };
 

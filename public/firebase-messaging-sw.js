@@ -26,7 +26,8 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body } = payload.notification;
   self.registration.showNotification(title, {
     body,
-    icon: `${window.location.origin}/notification192.png`,
+    icon: "/notification192.png",
+    badge: "/notification48.png",
     data: { url: payload.data?.url || "/" }, // Deep link
   });
 });
