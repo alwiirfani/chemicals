@@ -26,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body } = payload.notification;
   self.registration.showNotification(title, {
     body,
-    icon: "/notification192.png",
+    icon: `${window.location.origin}/notification192.png`,
     data: { url: payload.data?.url || "/" }, // Deep link
   });
 });
@@ -34,5 +34,5 @@ messaging.onBackgroundMessage((payload) => {
 // Handle klik notifikasi
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow(event.notification.data.url));
+  event.waitUntil(clients.openWindow(event.notification.data.url || "/"));
 });

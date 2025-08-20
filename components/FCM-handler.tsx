@@ -99,14 +99,20 @@ export default function FCMHandler() {
 
           const notificationTitle =
             payload.notification?.title || "Notifikasi Baru";
-          const notificationBody =
-            payload.notification?.body || "Anda punya pesan baru";
+          const notificationOptions = {
+            body: payload.notification?.body || "Anda punya pesan baru",
+            icon:
+              payload.notification?.icon ||
+              `${window.location.origin}/notification192.png`,
+            badge: `${window.location.origin}/notification48.png`,
+            data: { url: payload.data?.url || "/" },
+          };
 
-          // Native browser notification
-          new Notification(notificationTitle, {
-            body: notificationBody,
-            icon: payload.notification?.icon || "/notification192.png",
-            badge: "/notification48.png",
+          navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification(
+              notificationTitle,
+              notificationOptions
+            );
           });
         });
       } catch (error) {
