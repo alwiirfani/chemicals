@@ -1,8 +1,8 @@
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"
 );
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"
 );
 
 firebase.initializeApp({
@@ -23,11 +23,12 @@ messaging.onBackgroundMessage((payload) => {
     "[firebase-messaging-sw.js] Received background message ",
     payload
   );
-  const { title, body } = payload.notification;
+  const { title, body, icon, badge } = payload.notification;
+  console.log("Icon:", icon, "Badge:", badge);
   self.registration.showNotification(title, {
     body,
-    icon: payload.notification?.icon || "/notification192.png",
-    badge: "/notification48.png",
+    icon: icon || "/notification192.png",
+    badge: badge || "/notification48.png",
     data: { url: payload.data?.url || "/" }, // Deep link
   });
 });
