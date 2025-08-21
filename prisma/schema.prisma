@@ -163,7 +163,6 @@ model SafetyDataSheet {
   firstAidIngestion      String?  @map("first_aid_ingestion") @db.Text // Tindakan pertolongan pertama jika tertelan
   storageConditions      String?  @map("storage_conditions") @db.Text // Kondisi penyimpanan yang aman
   disposalInfo           String?  @map("disposal_info") @db.Text // Informasi pembuangan yang aman
-  downloadCount          Int?     @default(0) @map("download_count") // Jumlah total download file SDS
 
   // Relations
   chemical    Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
@@ -173,10 +172,23 @@ model SafetyDataSheet {
   updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
   updatedById String?  @map("updated_by_id") @db.VarChar(255)
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  SDSDownloadHistory SDSDownloadHistory[]
 
   @@map("safety_data_sheets")
+}
+
+model SDSDownloadHistory {
+  id             String          @id @default(nanoid()) @db.VarChar(255)
+  sdsId          String          @map("sds_id") @db.VarChar(255)
+  sds            SafetyDataSheet @relation(fields: [sdsId], references: [id])
+  downloadedAt   DateTime        @default(now()) @map("downloaded_at")
+  downloadedById String?         @map("downloaded_by_id") @db.VarChar(255)
+
+  @@index([sdsId])
+  @@index([downloadedAt])
+  @@map("sds_download_history")
 }
 
 model Borrowing {
@@ -243,17 +255,26 @@ model UsageHistory {
 }
 
 model Report {
-  id          String   @id @default(nanoid()) @db.VarChar(255)
-  title       String   @db.VarChar(255)
-  description String?  @db.Text
-  type        String   @db.VarChar(100)
+  id          String     @id @default(nanoid()) @db.VarChar(255)
+  title       String     @db.VarChar(255)
+  description String?    @db.Text
+  type        ReportType
   data        Json
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  startDate   DateTime?  @map("start_date")
+  endDate     DateTime?  @map("end_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  createdBy String @map("created_by") @db.VarChar(255)
-  creator   User   @relation(fields: [createdBy], references: [id])
+  createdById String @map("created_by_id") @db.VarChar(255)
+  createdBy   User   @relation(fields: [createdById], references: [id])
 
   @@map("reports")
+}
+
+enum ReportType {
+  CHEMICAL
+  SDS
+  BORROWING
+  MIXED
 }

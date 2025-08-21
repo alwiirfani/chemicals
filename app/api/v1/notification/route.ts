@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
       notification: { title, body },
       webpush: {
         notification: {
-          icon: `${FE_URL}/notification192.png`,
-          badge: `${FE_URL}/notification48.png`,
+          icon: "/notification192.png",
+          badge: "/notification48.png",
         },
         fcmOptions: {
           link: url || FE_URL,

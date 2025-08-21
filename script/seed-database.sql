@@ -122,7 +122,7 @@ INSERT INTO usage_history (id, chemical_id, quantity, purpose, used_at, user_id,
 INSERT INTO safety_data_sheets (
     id, chemical_id, file_name, file_path, external_url, language, hazard_classification, precautionary_statement,
     first_aid_inhalation, first_aid_skin, first_aid_eye, first_aid_ingestion,
-    storage_conditions, disposal_info, download_count,
+    storage_conditions, disposal_info,
     created_by_id, updated_by_id, created_at, updated_at
 ) VALUES
 ('sds001', 'chem001', 'H2SO4_SDS.pdf', '/uploads/sds/H2SO4_SDS.pdf', NULL, 'English',
@@ -131,7 +131,7 @@ INSERT INTO safety_data_sheets (
  'Move to fresh air and keep at rest.', 'Remove contaminated clothing and wash with water.',
  'Rinse cautiously with water for several minutes.', 'Do not induce vomiting; rinse mouth.',
  'Store in a well-ventilated place away from incompatible materials.',
- 'Dispose of contents/container in accordance with local regulations.', 0,
+ 'Dispose of contents/container in accordance with local regulations.',
  'admin001', 'laboran001', NOW(), NOW()),
 
 ('sds002', 'chem002', 'NaOH_SDS.pdf', '/uploads/sds/NaOH_SDS.pdf', NULL, 'English',
@@ -140,7 +140,7 @@ INSERT INTO safety_data_sheets (
  'Move to fresh air.', 'Wash with plenty of soap and water.',
  'Rinse cautiously with water.', 'Rinse mouth, do not induce vomiting.',
  'Keep container tightly closed in a dry and well-ventilated place.',
- 'Dispose according to local environmental regulations.', 0,
+ 'Dispose according to local environmental regulations.',
  'admin001', 'laboran001', NOW(), NOW());
 
 
