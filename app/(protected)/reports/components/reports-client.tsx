@@ -147,7 +147,7 @@ export function ReportsClient() {
     },
     {
       title: "Peminjaman Aktif",
-      value: realTimeData.activeBorrowings,
+      value: reportData.borrowingStats.totalBorrowings,
       change: "-5%",
       trend: "down",
       icon: FileText,

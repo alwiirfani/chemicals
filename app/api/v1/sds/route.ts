@@ -98,7 +98,6 @@ export async function GET(request: NextRequest) {
         first_aid_ingestion: sds.firstAidIngestion,
         storage_conditions: sds.storageConditions,
         disposal_info: sds.disposalInfo,
-        download_count: sds.downloadCount,
         created_at: sds.createdAt.toISOString(),
         updated_at: sds.updatedAt.toISOString(),
         created_by: createdByName,
