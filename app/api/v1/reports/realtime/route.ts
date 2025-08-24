@@ -38,7 +38,7 @@ export async function GET() {
       // Low stock alerts (stock less than 10)
       db.chemical.count({
         where: {
-          stock: {
+          currentStock: {
             lt: 10,
           },
         },

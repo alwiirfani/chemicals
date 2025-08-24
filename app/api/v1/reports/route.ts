@@ -214,8 +214,10 @@ export async function GET(request: NextRequest) {
     const reportData = {
       chemicalStats: {
         totalChemicals: chemicals.length,
-        activeChemicals: chemicals.filter((chem) => chem.stock > 0).length,
-        lowStockChemicals: chemicals.filter((chem) => chem.stock < 10).length,
+        activeChemicals: chemicals.filter((chem) => chem.currentStock > 0)
+          .length,
+        lowStockChemicals: chemicals.filter((chem) => chem.currentStock < 10)
+          .length,
         expiredChemicals: expiredChemicals.length,
         expiringSoonChemicals: expiringSoonChemicals.length,
         byForm: chemicals.reduce((acc, chem) => {
