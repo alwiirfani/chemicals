@@ -45,15 +45,19 @@ INSERT INTO mahasiswa (nim, full_name, user_id) VALUES
 ('20210005', 'Doni Setiawan', 'mhs005');
 
 -- Insert sample chemicals
-INSERT INTO chemicals (id, name, formula, cas_number, form, stock, unit, purchase_date, expiration_date, location, cabinet, room, temperature, created_by_id, created_at, updated_at) VALUES
-('chem001', 'Asam Sulfat', 'H2SO4', '7664-93-9', 'LIQUID', 500.0, 'mL', '2024-01-15', '2025-01-15', 'Lemari Asam', 'A1', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem002', 'Natrium Hidroksida', 'NaOH', '1310-73-2', 'SOLID', 250.0, 'g', '2024-01-10', '2026-01-10', 'Lemari Basa', 'B2', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem003', 'Asam Klorida', 'HCl', '7647-01-0', 'LIQUID', 1000.0, 'mL', '2024-01-20', '2025-06-20', 'Lemari Asam', 'A2', 'Lab Kimia Analitik', 'Room Temperature', 'laboran002', NOW(), NOW()),
-('chem004', 'Etanol', 'C2H5OH', '64-17-5', 'LIQUID', 2000.0, 'mL', '2024-01-05', '2025-12-05', 'Lemari Pelarut', 'C1', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem005', 'Benzena', 'C6H6', '71-43-2', 'LIQUID', 500.0, 'mL', '2024-01-12', '2025-01-12', 'Lemari Pelarut', 'C2', 'Lab Kimia Organik', 'Room Temperature', 'laboran002', NOW(), NOW()),
-('chem006', 'Asam Asetat', 'CH3COOH', '64-19-7', 'LIQUID', 750.0, 'mL', '2024-02-01', '2025-08-01', 'Lemari Asam', 'A3', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem007', 'Kalium Permanganat', 'KMnO4', '7722-64-7', 'SOLID', 100.0, 'g', '2024-01-25', '2026-01-25', 'Lemari Oksidator', 'D1', 'Lab Kimia Analitik', 'Room Temperature', 'laboran002', NOW(), NOW()),
-('chem008', 'Metanol', 'CH3OH', '67-56-1', 'LIQUID', 1500.0, 'mL', '2024-02-10', '2025-11-10', 'Lemari Pelarut', 'C3', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW());
+INSERT INTO chemicals (
+  id, name, formula, cas_number, form, initial_stock, current_stock, unit, 
+  purchase_date, expiration_date, location, cabinet, room, temperature, 
+  created_by_id, created_at, updated_at
+) VALUES
+('chem001', 'Asam Sulfat', 'H2SO4', '7664-93-9', 'LIQUID', 500, 500, 'mL', '2024-01-15', '2025-01-15', 'Lemari Asam', 'A1', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
+('chem002', 'Natrium Hidroksida', 'NaOH', '1310-73-2', 'SOLID', 250, 250, 'g', '2024-01-10', '2026-01-10', 'Lemari Basa', 'B2', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
+('chem003', 'Asam Klorida', 'HCl', '7647-01-0', 'LIQUID', 1000, 1000, 'mL', '2024-01-20', '2025-06-20', 'Lemari Asam', 'A2', 'Lab Kimia Analitik', 'Room Temperature', 'laboran002', NOW(), NOW()),
+('chem004', 'Etanol', 'C2H5OH', '64-17-5', 'LIQUID', 2000, 2000, 'mL', '2024-01-05', '2025-12-05', 'Lemari Pelarut', 'C1', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW()),
+('chem005', 'Benzena', 'C6H6', '71-43-2', 'LIQUID', 500, 500, 'mL', '2024-01-12', '2025-01-12', 'Lemari Pelarut', 'C2', 'Lab Kimia Organik', 'Room Temperature', 'laboran002', NOW(), NOW()),
+('chem006', 'Asam Asetat', 'CH3COOH', '64-19-7', 'LIQUID', 750, 750, 'mL', '2024-02-01', '2025-08-01', 'Lemari Asam', 'A3', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
+('chem007', 'Kalium Permanganat', 'KMnO4', '7722-64-7', 'SOLID', 100, 100, 'g', '2024-01-25', '2026-01-25', 'Lemari Oksidator', 'D1', 'Lab Kimia Analitik', 'Room Temperature', 'laboran002', NOW(), NOW()),
+('chem008', 'Metanol', 'CH3OH', '67-56-1', 'LIQUID', 1500, 1500, 'mL', '2024-02-10', '2025-11-10', 'Lemari Pelarut', 'C3', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW());
 
 -- Insert sample borrowings
 -- Insert sample borrowings dengan informasi approved/rejected/returned
