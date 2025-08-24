@@ -202,6 +202,7 @@ export async function POST(request: NextRequest) {
         formula,
         casNumber,
         form,
+        initialStock: stock,
         currentStock: stock,
         unit,
         purchaseDate: new Date(purchaseDate),
