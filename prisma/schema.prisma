@@ -64,22 +64,24 @@ model User {
   updated_at    DateTime   @updatedAt
 
   // Relations
-  admin             Admin?
-  mahasiswa         Mahasiswa?
-  dosen             Dosen?
-  laboran           Laboran?
-  devices           Device[]
-  borrowings        Borrowing[]
-  reports           Report[]
-  createdChemicals  Chemical[]        @relation("CreatedBy")
-  updatedChemicals  Chemical[]        @relation("UpdatedBy")
-  createdSDS        SafetyDataSheet[] @relation("CreatedBy")
-  updatedSDS        SafetyDataSheet[] @relation("UpdatedBy")
-  approvedBorrowing Borrowing[]       @relation("approvedBy")
-  rejectedBorrowing Borrowing[]       @relation("rejectedBy")
-  returnedBorrowing Borrowing[]       @relation("returnedBy")
+  admin                Admin?
+  mahasiswa            Mahasiswa?
+  dosen                Dosen?
+  laboran              Laboran?
+  devices              Device[]
+  borrowings           Borrowing[]
+  reports              Report[]
+  createdChemicals     Chemical[]        @relation("CreatedBy")
+  updatedChemicals     Chemical[]        @relation("UpdatedBy")
+  createdSDS           SafetyDataSheet[] @relation("CreatedBy")
+  updatedSDS           SafetyDataSheet[] @relation("UpdatedBy")
+  approvedBorrowing    Borrowing[]       @relation("approvedBy")
+  rejectedBorrowing    Borrowing[]       @relation("rejectedBy")
+  returnedBorrowing    Borrowing[]       @relation("returnedBy")
+  createdStockMutation stockMutation[]   @relation("CreatedBy")
+  updatedStockMutation stockMutation[]   @relation("UpdatedBy")
 
-  @@index([username, email])
+  @@index([username, email, status, role])
   @@map("users")
 }
 
@@ -124,7 +126,8 @@ model Chemical {
   formula        String?      @db.VarChar(100) // Rumus kimia (contoh: H2O, NaCl)
   casNumber      String?      @map("cas_number") @db.VarChar(50) // Nomor CAS (Chemical Abstracts Service) untuk identifikasi unik bahan kimia
   form           ChemicalForm // Bentuk fisik bahan (contoh: padat, cair, gas)
-  stock          Int          @default(0) // Jumlah stok bahan yang tersedia
+  initialStock   Int          @default(0) // Jumlah stok bahan yang tersedia
+  currentStock   Int         @default(0) // Jumlah stok bahan saat ini
   unit           String       @db.VarChar(20) // Satuan stok (contoh: gram, liter, botol)
   purchaseDate   DateTime     @map("purchase_date") // Tanggal pembelian bahan
   expirationDate DateTime?    @map("expiration_date") // Tanggal kadaluarsa (jika ada)
@@ -142,11 +145,32 @@ model Chemical {
   updatedBy   User?   @relation("UpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id") @db.VarChar(255)
 
+  safetyDataSheet SafetyDataSheet?
   borrowings      BorrowingItem[]
   usageHistory    UsageHistory[]
-  safetyDataSheet SafetyDataSheet?
+  stockMutation   stockMutation[]
 
+  @@index([name, casNumber])
   @@map("chemicals")
+}
+
+model stockMutation {
+  id          String   @id @default(nanoid()) @db.VarChar(255)
+  quantity    Int // Jumlah perubahan stok (positif untuk penambahan, negatif untuk pengurangan)
+  description String?  @db.Text // Deskripsi perubahan stok
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  chemicalId  String   @map("chemical_id") @db.VarChar(255)
+  chemical    Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
+  createdById String   @map("created_by_id") @db.VarChar(255)
+  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
+  updatedById String?  @map("updated_by_id") @db.VarChar(255)
+  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
+
+  @@index([chemicalId])
+  @@map("stock_mutations")
 }
 
 model SafetyDataSheet {
@@ -216,6 +240,7 @@ model Borrowing {
   items        BorrowingItem[]
   UsageHistory UsageHistory[]
 
+  @@index([borrowerId, status])
   @@map("borrowings")
 }
 
@@ -233,13 +258,14 @@ model BorrowingItem {
   chemicalId  String    @map("chemical_id")
   chemical    Chemical  @relation(fields: [chemicalId], references: [id])
 
+  @@index([borrowingId, chemicalId])
   @@map("borrowing_items")
 }
 
 model UsageHistory {
   id        String   @id @default(nanoid()) @db.VarChar(255)
   quantity  Int
-  purpose   String   @db.Text
+  purpose   String   @db.Text // Tujuan penggunaan bahan kimia
   usedAt    DateTime @default(now()) @map("used_at")
   userId    String?  @map("user_id") @db.VarChar(255)
   createdAt DateTime @default(now()) @map("created_at")

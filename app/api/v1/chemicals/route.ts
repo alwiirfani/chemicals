@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       db.chemical.count({ where }),
       db.chemical.count(),
       db.chemical.count({
-        where: { stock: { lt: 10 } },
+        where: { currentStock: { lt: 10 } },
       }),
       db.chemical.count({
         where: {
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
         formula: chemical.formula,
         cas_number: chemical.casNumber,
         form: chemical.form,
-        stock: chemical.stock,
+        stock: chemical.currentStock,
         unit: chemical.unit,
         purchase_date: chemical.purchaseDate?.toISOString(),
         expiration_date: chemical.expirationDate?.toISOString(),
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
         formula,
         casNumber,
         form,
-        stock,
+        currentStock: stock,
         unit,
         purchaseDate: new Date(purchaseDate),
         expirationDate: expirationDate ? new Date(expirationDate) : null,

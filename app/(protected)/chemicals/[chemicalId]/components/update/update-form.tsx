@@ -103,17 +103,38 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   </SelectItem>
                 </FormSelect>
 
+                {/* Aksi Stok */}
+                <FormSelect
+                  htmlFor="type"
+                  label="Aksi Stok"
+                  value={formData.type}
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      type: value as "ADD" | "REDUCE",
+                    })
+                  }
+                  placeholder="Pilih aksi"
+                  required>
+                  <SelectItem value="ADD" className="hover:bg-blue-50">
+                    Tambah Stok
+                  </SelectItem>
+                  <SelectItem value="REDUCE" className="hover:bg-blue-50">
+                    Kurangi Stok
+                  </SelectItem>
+                </FormSelect>
+
                 <div className="grid grid-cols-2 gap-4">
                   {/* Stok */}
                   <FormInput
-                    id="stock"
-                    label="Stok"
+                    id="quantity"
+                    label="Jumlah"
                     type="number"
-                    value={formData.stock}
+                    value={formData.quantity}
                     onChange={(e) => {
                       setFormData({
                         ...formData,
-                        stock: Number(e.target.value),
+                        quantity: Number(e.target.value),
                       });
                     }}
                     placeholder="1000"
@@ -136,6 +157,19 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     required
                   />
                 </div>
+
+                {/* Deskripsi Mutasi Stok */}
+                <FormInput
+                  id="description"
+                  label="Deskripsi"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Misal: tambah untuk percobaan A"
+                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
+                />
               </div>
             </div>
 

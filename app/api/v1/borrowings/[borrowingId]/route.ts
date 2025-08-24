@@ -94,12 +94,12 @@ export async function PATCH(
       case "APPROVED":
         // Validasi stok
         for (const item of borrowing.items) {
-          if (item.quantity > item.chemical.stock) {
+          if (item.quantity > item.chemical.currentStock) {
             return NextResponse.json(
               {
                 error: `Stok ${item.chemical.name} tidak mencukupi`,
                 chemicalId: item.chemical.id,
-                availableStock: item.chemical.stock,
+                availableStock: item.chemical.currentStock,
                 requested: item.quantity,
               },
               { status: 400 }
@@ -112,7 +112,7 @@ export async function PATCH(
           for (const item of borrowing.items) {
             await tx.chemical.update({
               where: { id: item.chemical.id },
-              data: { stock: { decrement: item.quantity } },
+              data: { currentStock: { decrement: item.quantity } },
             });
 
             // Buat usage history untuk seluruh quantity
@@ -222,7 +222,7 @@ export async function PATCH(
             if (returnedQty > 0) {
               await tx.chemical.update({
                 where: { id: item.chemical.id },
-                data: { stock: { increment: returnedQty } },
+                data: { currentStock: { increment: returnedQty } },
               });
             }
 

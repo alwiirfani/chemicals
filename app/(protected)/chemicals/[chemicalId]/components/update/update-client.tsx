@@ -6,6 +6,7 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { formatDateToInput } from "@/helpers/format-date";
 import UpdateChemicalForm from "./update-form";
+import { ChemicalFormData } from "@/types/chemicals";
 
 export default function UpdateChemicalClient() {
   const [loading, setLoading] = useState(false);
@@ -13,12 +14,11 @@ export default function UpdateChemicalClient() {
   const router = useRouter();
   const params = useParams();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ChemicalFormData>({
     name: "",
     formula: "",
     casNumber: "",
     form: "",
-    stock: 0,
     unit: "",
     purchaseDate: "",
     expirationDate: "",
@@ -26,6 +26,11 @@ export default function UpdateChemicalClient() {
     cabinet: "",
     room: "",
     temperature: "",
+
+    // for stock update
+    type: "ADD",
+    quantity: 0,
+    description: "",
   });
 
   const fetchChemical = useCallback(async () => {
@@ -35,12 +40,12 @@ export default function UpdateChemicalClient() {
       );
       const { chemical } = response.data;
 
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         name: chemical.name,
         formula: chemical.formula,
         casNumber: chemical.casNumber || "",
         form: chemical.form,
-        stock: chemical.stock,
         unit: chemical.unit,
         purchaseDate: formatDateToInput(chemical.purchaseDate),
         expirationDate: chemical.expirationDate
@@ -50,7 +55,7 @@ export default function UpdateChemicalClient() {
         cabinet: chemical.cabinet || "",
         room: chemical.room || "",
         temperature: chemical.temperature || "",
-      });
+      }));
     } catch (error) {
       console.error("Error fetching chemical:", error);
       toast({

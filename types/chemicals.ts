@@ -22,7 +22,6 @@ export interface ChemicalFormData {
   formula: string;
   casNumber: string;
   form: string;
-  stock: number;
   unit: string;
   purchaseDate: string;
   expirationDate: string;
@@ -30,4 +29,9 @@ export interface ChemicalFormData {
   cabinet: string;
   room: string;
   temperature: string;
+
+  // for stock update
+  type: "ADD" | "REDUCE";
+  quantity: number;
+  description: string;
 }
