@@ -100,12 +100,6 @@ export function ReportsClient() {
     fetchRealTimeData();
   }, [selectedPeriod]);
 
-  // Poll for real-time data every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(fetchRealTimeData, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
   const handleRefresh = () => {
     setIsRefreshing(true);
     Promise.all([fetchReportData(selectedPeriod), fetchRealTimeData()]).finally(

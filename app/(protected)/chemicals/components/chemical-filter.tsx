@@ -60,6 +60,10 @@ export const ChemicalFilter = ({
               <SelectItem value="SOLID">Padat</SelectItem>
               <SelectItem value="LIQUID">Cair</SelectItem>
               <SelectItem value="GAS">Gas</SelectItem>
+              <SelectItem value="ACID">Asam</SelectItem>
+              <SelectItem value="BASE">Basa</SelectItem>
+              <SelectItem value="GENERAL">General</SelectItem>
+              <SelectItem value="OXIDANT">Oksidan</SelectItem>
             </SelectContent>
           </Select>
 

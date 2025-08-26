@@ -27,6 +27,10 @@ enum ChemicalForm {
   SOLID
   LIQUID
   GAS
+  ACID
+  BASE
+  GENERAL
+  OXIDANT
 }
 
 enum BorrowingStatus {

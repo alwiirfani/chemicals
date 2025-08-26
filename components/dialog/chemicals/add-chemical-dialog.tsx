@@ -112,7 +112,7 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
       // Refresh page to show new data
       setTimeout(() => {
         window.location.reload();
-      }, 200);
+      }, 100);
     } catch (error) {
       console.error("Error adding chemical:", error);
 
@@ -201,6 +201,10 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
               <SelectItem value="SOLID">Padat</SelectItem>
               <SelectItem value="LIQUID">Cair</SelectItem>
               <SelectItem value="GAS">Gas</SelectItem>
+              <SelectItem value="ACID">Asam</SelectItem>
+              <SelectItem value="BASE">Basa</SelectItem>
+              <SelectItem value="GENERAL">General</SelectItem>
+              <SelectItem value="OXIDANT">Oksidan</SelectItem>
             </FormSelect>
           </div>
 

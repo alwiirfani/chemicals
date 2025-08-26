@@ -44,6 +44,8 @@ const useChemicals = () => {
           data.formattedChemicals
         );
 
+        console.log("Fetched Chemicals:", chemicalsCamelCase);
+
         setChemicals(chemicalsCamelCase);
         setTotal(data.total);
         setPagination({

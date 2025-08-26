@@ -101,6 +101,18 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   <SelectItem value="GAS" className="hover:bg-blue-50">
                     Gas
                   </SelectItem>
+                  <SelectItem value="ACID" className="hover:bg-blue-50">
+                    Asam
+                  </SelectItem>
+                  <SelectItem value="BASE" className="hover:bg-blue-50">
+                    Basa
+                  </SelectItem>
+                  <SelectItem value="GENERAL" className="hover:bg-blue-50">
+                    General
+                  </SelectItem>
+                  <SelectItem value="OXIDANT" className="hover:bg-blue-50">
+                    Oksidan
+                  </SelectItem>
                 </FormSelect>
 
                 {/* Aksi Stok */}
