@@ -17,7 +17,6 @@ interface Chemical {
   id: string;
   name: string;
   formula: string;
-  location: string;
 }
 
 interface QRCodeDialogProps {
@@ -96,7 +95,7 @@ export function QRCodeDialog({
                 <div class="chemical-info">
                   <strong>${chemical.name}</strong><br/>
                   ${chemical.formula}<br/>
-                  ${chemical.location}
+                  ${chemical.id}
                 </div>
               </div>
             </body>
@@ -134,7 +133,7 @@ export function QRCodeDialog({
           <div className="text-center text-sm text-gray-600">
             <div className="font-medium">{chemical.name}</div>
             <div>{chemical.formula}</div>
-            <div>{chemical.location}</div>
+            <div>{chemical.id}</div>
           </div>
 
           <div className="flex gap-2">

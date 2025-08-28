@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     const search = searchParams.get("search") || "";
     const form = searchParams.get("form") || "";
-    const location = searchParams.get("location") || "";
+    const characteristic = searchParams.get("characteristic") || "";
 
     const skip = (page - 1) * limit;
 
@@ -31,13 +31,10 @@ export async function GET(request: NextRequest) {
               OR: [
                 { name: { contains: search, mode: "insensitive" } },
                 { formula: { contains: search, mode: "insensitive" } },
-                { casNumber: { contains: search, mode: "insensitive" } },
               ],
             }
           : null,
-        location
-          ? { location: { contains: location, mode: "insensitive" } }
-          : null,
+        characteristic ? { characteristic: { equals: characteristic } } : null,
         form ? { form: { equals: form as ChemicalForm } } : null,
       ].filter(Boolean) as Prisma.ChemicalWhereInput[],
     };
@@ -108,17 +105,11 @@ export async function GET(request: NextRequest) {
         id: chemical.id,
         name: chemical.name,
         formula: chemical.formula,
-        cas_number: chemical.casNumber,
         form: chemical.form,
         stock: chemical.currentStock,
         unit: chemical.unit,
         purchase_date: chemical.purchaseDate?.toISOString(),
         expiration_date: chemical.expirationDate?.toISOString(),
-        location: chemical.location,
-        cabinet: chemical.cabinet,
-        room: chemical.room,
-        temperature: chemical.temperature,
-        qr_code: chemical.qrCode,
         created_by: createdByName,
         updated_by: updatedByName,
         created_at: chemical.createdAt.toISOString(),
@@ -173,20 +164,16 @@ export async function POST(request: NextRequest) {
     const {
       name,
       formula = "",
-      casNumber,
       form,
+      characteristic,
       stock,
       unit,
       purchaseDate,
       expirationDate,
-      location,
-      cabinet,
-      room,
-      temperature,
     } = parsed.data;
 
     const chemicaExist = await db.chemical.findFirst({
-      where: { casNumber },
+      where: { name },
     });
     // Pengecekan duplikat CAS number
     if (chemicaExist) {
@@ -200,17 +187,13 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         formula,
-        casNumber,
         form,
+        characteristic,
         initialStock: stock,
         currentStock: stock,
         unit,
         purchaseDate: new Date(purchaseDate),
         expirationDate: expirationDate ? new Date(expirationDate) : null,
-        location,
-        cabinet,
-        room,
-        temperature,
         createdBy: { connect: { id: userAccess.userId } },
       },
     });

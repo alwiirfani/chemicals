@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ChemicalTable } from "./chemical-table";
 import { AddChemicalDialog } from "@/components/dialog/chemicals/add-chemical-dialog";
 import { Button } from "@/components/ui/button";
@@ -17,11 +17,14 @@ import {
 import { AlertModal } from "@/components/alert-modal";
 import { exportChemicalsToExcel } from "@/helpers/chemicals/export-chemicals-to-excel";
 import { ChemicalFilter } from "./chemical-filter";
+import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 interface ChemicalsClientProps {
   user: UserAuth;
 }
 export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
+  const [loadingImport, setLoadingImport] = useState(false);
   const {
     chemicals,
     pagination,
@@ -31,8 +34,8 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
     setSearchTerm,
     filterForm,
     setFilterForm,
-    filterLocation,
-    setFilterLocation,
+    filterCharacteristic,
+    setFilterCharacteristic,
 
     handlePageChange,
 
@@ -47,25 +50,61 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
   const filteredChemicals = chemicals.filter((chemical) => {
     const matchesSearch =
       chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chemical.formula.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (chemical.casNumber && chemical.casNumber.includes(searchTerm));
+      chemical.formula.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesForm = filterForm === "all" || chemical.form === filterForm;
 
     const matchesLocation =
-      filterLocation === "all" ||
-      (chemical.room &&
-        chemical.room.toLowerCase().includes(filterLocation.toLowerCase()));
+      filterCharacteristic === "all" ||
+      (chemical.characteristic &&
+        chemical.characteristic
+          .toLowerCase()
+          .includes(filterCharacteristic.toLowerCase()));
 
     return matchesSearch && matchesForm && matchesLocation;
   });
 
-  // Get unique locations for filter
-  const uniqueRooms = Array.from(
-    new Set(chemicals.map((c) => c.room).filter(Boolean))
-  );
+  const handleImport = async (form: string, file: File | null) => {
+    try {
+      setLoadingImport(true);
+      if (!file) return;
 
-  const canEdit = user.role === "ADMIN" || user.role === "LABORAN";
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("form", form);
+
+      const response = await axios.post("/api/v1/chemicals/import", formData, {
+        withCredentials: true,
+      });
+
+      console.log("Import response:", response.data);
+
+      toast({
+        title: "Import Selesai! 🎉",
+        description: `Berhasil mengimpor ${response.data.inserted} bahan kimia baru, memperbarui ${response.data.updated} bahan kimia.`,
+      });
+
+      // Refresh the chemical list after import
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      console.error("Error importing chemicals:", error);
+      toast({
+        title: "Error ❌",
+        description:
+          "Gagal mengimpor bahan kimia. Pastikan format file benar dan coba lagi.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingImport(false);
+    }
+  };
+
+  const canEdit =
+    user.role === "ADMIN" ||
+    user.role === "LABORAN" ||
+    user.role === "PETUGAS_GUDANG";
 
   return (
     <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
@@ -95,10 +134,12 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
         onSearchChange={setSearchTerm}
         filterForm={filterForm}
         onFilterFormChange={setFilterForm}
-        filterLocation={filterLocation}
-        onFilterLocationChange={setFilterLocation}
-        uniqueRooms={uniqueRooms}
+        filterCharacteristic={filterCharacteristic}
+        onFilterCharacteristicChange={setFilterCharacteristic}
         onExport={() => exportChemicalsToExcel(filteredChemicals)}
+        onImport={handleImport}
+        loadingImport={loadingImport}
+        userRole={user.role}
       />
 
       {/* Chemical Table */}

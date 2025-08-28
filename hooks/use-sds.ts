@@ -3,13 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useDebounce } from "./use-debounce";
 import { convertSnakeToCamel } from "@/helpers/case";
-import {
-  FirstAidMeasures,
-  SDS,
-  SDSData,
-  StorageInfo,
-  UploadType,
-} from "@/types/sds";
+import { SDS, SDSData, UploadType } from "@/types/sds";
 
 export const useSds = () => {
   const [open, setOpen] = useState(false);
@@ -38,38 +32,6 @@ export const useSds = () => {
     chemicalId: "",
     externalUrl: "",
     language: "ID",
-    firstAidMeasures: {
-      inhalation: "",
-      skinContact: "",
-      eyeContact: "",
-      ingestion: "",
-    },
-    storageInfo: {
-      conditions: "",
-      disposal: "",
-    },
-    hazardInfo: {
-      classifications: [""],
-      statements: [""],
-    },
-  });
-
-  // State untuk data array
-  const [hazardClassifications, setHazardClassifications] = useState<string[]>([
-    "",
-  ]);
-  const [precautionaryStatements, setPrecautionaryStatements] = useState<
-    string[]
-  >([""]);
-  const [firstAidMeasures, setFirstAidMeasures] = useState<FirstAidMeasures>({
-    inhalation: "",
-    skinContact: "",
-    eyeContact: "",
-    ingestion: "",
-  });
-  const [storageInfo, setStorageInfo] = useState<StorageInfo>({
-    conditions: "",
-    disposal: "",
   });
 
   const fetchSds = useCallback(
@@ -157,57 +119,6 @@ export const useSds = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Fungsi untuk update storage info
-  const updateStorageInfo = (field: keyof StorageInfo, value: string) => {
-    setStorageInfo((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Fungsi untuk klasifikasi bahaya
-  const addHazardClassification = () => {
-    setHazardClassifications((prev) => [...prev, ""]);
-  };
-
-  const removeHazardClassification = (index: number) => {
-    if (hazardClassifications.length > 1) {
-      setHazardClassifications((prev) => prev.filter((_, i) => i !== index));
-    }
-  };
-
-  const updateHazardClassification = (index: number, value: string) => {
-    setHazardClassifications((prev) => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
-  };
-
-  // Fungsi untuk pernyataan kehati-hatian
-  const addPrecautionaryStatement = () => {
-    setPrecautionaryStatements((prev) => [...prev, ""]);
-  };
-
-  const removePrecautionaryStatement = (index: number) => {
-    if (precautionaryStatements.length > 1) {
-      setPrecautionaryStatements((prev) => prev.filter((_, i) => i !== index));
-    }
-  };
-
-  const updatePrecautionaryStatement = (index: number, value: string) => {
-    setPrecautionaryStatements((prev) => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
-  };
-
-  // Fungsi untuk first aid measures
-  const updateFirstAidMeasure = (
-    field: keyof FirstAidMeasures,
-    value: string
-  ) => {
-    setFirstAidMeasures((prev) => ({ ...prev, [field]: value }));
-  };
-
   // Fungsi untuk handle file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -243,47 +154,6 @@ export const useSds = () => {
       chemicalId: sdsData.chemicalId,
       externalUrl: sdsData.externalUrl || "",
       language: sdsData.language,
-      firstAidMeasures: {
-        inhalation: "",
-        skinContact: "",
-        eyeContact: "",
-        ingestion: "",
-      },
-      storageInfo: {
-        conditions: "",
-        disposal: "",
-      },
-      hazardInfo: {
-        classifications: [""],
-        statements: [""],
-      },
-    });
-
-    // Update array states
-    setHazardClassifications(
-      sdsData.hazardClassifications.length > 0
-        ? sdsData.hazardClassifications
-        : [""]
-    );
-
-    setPrecautionaryStatements(
-      sdsData.precautionaryStatements.length > 0
-        ? sdsData.precautionaryStatements
-        : [""]
-    );
-
-    // Update first aid measures
-    setFirstAidMeasures({
-      inhalation: sdsData.firstAidMeasures.inhalation || "",
-      skinContact: sdsData.firstAidMeasures.skinContact || "",
-      eyeContact: sdsData.firstAidMeasures.eyeContact || "",
-      ingestion: sdsData.firstAidMeasures.ingestion || "",
-    });
-
-    // Update storage info
-    setStorageInfo({
-      conditions: sdsData.storageInfo.conditions || "",
-      disposal: sdsData.storageInfo.disposal || "",
     });
 
     // Reset file karena kita akan menggunakan existing file atau upload baru
@@ -305,24 +175,6 @@ export const useSds = () => {
       const fd = new FormData();
       fd.append("chemicalId", formData.chemicalId);
       fd.append("language", formData.language);
-
-      // Hazard classifications
-      hazardClassifications
-        .filter((h) => h.trim() !== "")
-        .forEach((h) => fd.append("hazardClassification", h));
-
-      // Precautionary statements
-      precautionaryStatements
-        .filter((s) => s.trim() !== "")
-        .forEach((s) => fd.append("precautionaryStatement", s));
-
-      fd.append("firstAidInhalation", firstAidMeasures.inhalation);
-      fd.append("firstAidSkin", firstAidMeasures.skinContact);
-      fd.append("firstAidEye", firstAidMeasures.eyeContact);
-      fd.append("firstAidIngestion", firstAidMeasures.ingestion);
-
-      fd.append("storageConditions", storageInfo.conditions || "");
-      fd.append("disposalInfo", storageInfo.disposal || "");
 
       // File atau URL
       if (uploadType === "file" && file) {
@@ -371,24 +223,6 @@ export const useSds = () => {
       fd.append("chemicalId", formData.chemicalId);
       fd.append("language", formData.language);
 
-      // Hazard classifications
-      hazardClassifications
-        .filter((h) => h.trim() !== "")
-        .forEach((h) => fd.append("hazardClassification", h));
-
-      // Precautionary statements
-      precautionaryStatements
-        .filter((s) => s.trim() !== "")
-        .forEach((s) => fd.append("precautionaryStatement", s));
-
-      fd.append("firstAidInhalation", firstAidMeasures.inhalation);
-      fd.append("firstAidSkin", firstAidMeasures.skinContact);
-      fd.append("firstAidEye", firstAidMeasures.eyeContact);
-      fd.append("firstAidIngestion", firstAidMeasures.ingestion);
-
-      fd.append("storageConditions", storageInfo.conditions || "");
-      fd.append("disposalInfo", storageInfo.disposal || "");
-
       // File atau URL
       if (uploadType === "file" && file) {
         // Hanya append file jika user memilih file baru
@@ -426,33 +260,8 @@ export const useSds = () => {
       chemicalId: "",
       externalUrl: "",
       language: "ID",
-      firstAidMeasures: {
-        inhalation: "",
-        skinContact: "",
-        eyeContact: "",
-        ingestion: "",
-      },
-      storageInfo: {
-        conditions: "",
-        disposal: "",
-      },
-      hazardInfo: {
-        classifications: [""],
-        statements: [""],
-      },
     });
-    setHazardClassifications([""]);
-    setPrecautionaryStatements([""]);
-    setFirstAidMeasures({
-      inhalation: "",
-      skinContact: "",
-      eyeContact: "",
-      ingestion: "",
-    });
-    setStorageInfo({
-      conditions: "",
-      disposal: "",
-    });
+
     setFile(null);
     setUploadType("file");
   };
@@ -490,21 +299,10 @@ export const useSds = () => {
     file,
     formData,
     setFormData,
-    hazardClassifications,
-    precautionaryStatements,
-    firstAidMeasures,
-    storageInfo,
 
     // Functions
-    updateStorageInfo,
     updateFormData,
-    addHazardClassification,
-    removeHazardClassification,
-    updateHazardClassification,
-    addPrecautionaryStatement,
-    removePrecautionaryStatement,
-    updatePrecautionaryStatement,
-    updateFirstAidMeasure,
+
     handleFileChange,
     uploadSds,
     updateSds,

@@ -161,9 +161,6 @@ export function SDSDetailDialog({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">CAS Number:</span>
-                      <span className="font-medium">
-                        {sds.chemical.casNumber}
-                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Bentuk:</span>

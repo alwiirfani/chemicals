@@ -65,19 +65,6 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   disabled={loading}
                   required
                 />
-
-                {/* CAS Number */}
-                <FormInput
-                  id="casNumber"
-                  label="CAS Number"
-                  value={formData.casNumber}
-                  onChange={(e) =>
-                    setFormData({ ...formData, casNumber: e.target.value })
-                  }
-                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                  disabled={loading}
-                  required
-                />
               </div>
 
               {/* Bentuk dan Stok */}
@@ -101,6 +88,18 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   <SelectItem value="GAS" className="hover:bg-blue-50">
                     Gas
                   </SelectItem>
+                </FormSelect>
+
+                {/* Sifat */}
+                <FormSelect
+                  htmlFor="characteristic"
+                  label="Sifat"
+                  value={formData.characteristic}
+                  onChange={(value) =>
+                    setFormData({ ...formData, form: value })
+                  }
+                  placeholder="Pilih sifat"
+                  required>
                   <SelectItem value="ACID" className="hover:bg-blue-50">
                     Asam
                   </SelectItem>
@@ -114,7 +113,6 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     Oksidan
                   </SelectItem>
                 </FormSelect>
-
                 {/* Aksi Stok */}
                 <FormSelect
                   htmlFor="type"
@@ -206,56 +204,6 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   value={formData.expirationDate}
                   onChange={(e) =>
                     setFormData({ ...formData, expirationDate: e.target.value })
-                  }
-                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {/* Penyimpanan */}
-            <div>
-              <Label className="text-gray-700">Lokasi Penyimpanan *</Label>
-              <Input
-                value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
-                className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                disabled={loading}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label className="text-gray-700">Kabinet</Label>
-                <Input
-                  value={formData.cabinet}
-                  onChange={(e) =>
-                    setFormData({ ...formData, cabinet: e.target.value })
-                  }
-                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                  disabled={loading}
-                />
-              </div>
-              <div>
-                <Label className="text-gray-700">Ruang</Label>
-                <Input
-                  value={formData.room}
-                  onChange={(e) =>
-                    setFormData({ ...formData, room: e.target.value })
-                  }
-                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                  disabled={loading}
-                />
-              </div>
-              <div>
-                <Label className="text-gray-700">Suhu</Label>
-                <Input
-                  value={formData.temperature}
-                  onChange={(e) =>
-                    setFormData({ ...formData, temperature: e.target.value })
                   }
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                   disabled={loading}

@@ -21,11 +21,9 @@ export const exportChemicalsToExcel = async (chemicals: Chemical[]) => {
     },
     { header: "Nama Bahan", key: "name", width: 20 },
     { header: "Rumus", key: "formula", width: 15 },
-    { header: "CAS Number", key: "casNumber", width: 15 },
     { header: "Stok", key: "stock", width: 15 },
-    { header: "Lokasi", key: "location", width: 15 },
-    { header: "Lemari", key: "cabinet", width: 15 },
-    { header: "Ruangan", key: "room", width: 25 },
+    { header: "Bentuk", key: "form", width: 15 },
+    { header: "Sifat", key: "characteristic", width: 15 },
     { header: "Kadaluwarsa", key: "expirationDate", width: 15 },
     { header: "Dibuat oleh", key: "createdBy", width: 25 },
   ];
@@ -36,11 +34,9 @@ export const exportChemicalsToExcel = async (chemicals: Chemical[]) => {
       no: index + 1,
       name: item.name,
       formula: item.formula,
-      casNumber: item.casNumber ?? "-",
       stock: `${item.stock} ${item.unit}`,
-      location: item.location,
-      cabinet: item.cabinet ?? "-",
-      room: item.room ?? "-",
+      form: item.form,
+      characteristic: item.characteristic,
       expirationDate: item.expirationDate
         ? new Date(item.expirationDate).toLocaleDateString("id-ID", {
             day: "2-digit",

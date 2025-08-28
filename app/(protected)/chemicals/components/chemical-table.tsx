@@ -43,7 +43,10 @@ export function ChemicalTable({
   );
   const router = useRouter();
 
-  const canAction = userRole === "ADMIN" || userRole === "LABORAN";
+  const canAction =
+    userRole === "ADMIN" ||
+    userRole === "LABORAN" ||
+    userRole === "PETUGAS_GUDANG";
 
   return (
     <>
@@ -58,7 +61,6 @@ export function ChemicalTable({
                 <TableHead className="whitespace-nowrap">Nama Bahan</TableHead>
                 <TableHead className="whitespace-nowrap">Rumus</TableHead>
                 <TableHead className="whitespace-nowrap">Stok</TableHead>
-                <TableHead className="whitespace-nowrap">Lokasi</TableHead>
                 <TableHead className="whitespace-nowrap">Kadaluwarsa</TableHead>
                 {canAction ? (
                   <TableHead className="whitespace-nowrap text-center sm:text-left">
@@ -76,11 +78,6 @@ export function ChemicalTable({
                   <TableCell>
                     <div>
                       <div className="font-medium">{chemical.name}</div>
-                      {chemical.casNumber && (
-                        <div className="text-sm text-gray-500">
-                          CAS: {chemical.casNumber}
-                        </div>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -95,14 +92,6 @@ export function ChemicalTable({
                       </span>
                       {chemical.stock < 10 && (
                         <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div>{chemical.location}</div>
-                      {chemical.cabinet && (
-                        <div className="text-gray-500">{chemical.cabinet}</div>
                       )}
                     </div>
                   </TableCell>

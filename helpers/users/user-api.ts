@@ -1,7 +1,12 @@
 import db from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
-export type Role = "ADMIN" | "MAHASISWA" | "DOSEN" | "LABORAN";
+export type Role =
+  | "ADMIN"
+  | "MAHASISWA"
+  | "DOSEN"
+  | "LABORAN"
+  | "PETUGAS_GUDANG";
 
 export function getRoleIdLabel(role: Role | string): string {
   switch (role) {
@@ -12,6 +17,8 @@ export function getRoleIdLabel(role: Role | string): string {
     case "DOSEN":
       return "NIDN";
     case "LABORAN":
+      return "NIP";
+    case "PETUGAS_GUDANG":
       return "NIP";
     default:
       return "ID";
@@ -28,6 +35,8 @@ export function getRoleIdPlaceholder(role: Role | string): string {
       return "1234567890";
     case "LABORAN":
       return "1234567890";
+    case "PETUGAS_GUDANG":
+      return "1234567890";
     default:
       return "ID";
   }
@@ -43,6 +52,8 @@ export async function isRoleIdTaken(role: string, roleId: string) {
     case "DOSEN":
       return await db.dosen.findUnique({ where: { nidn: roleId } });
     case "LABORAN":
+      return await db.laboran.findUnique({ where: { nip: roleId } });
+    case "PETUGAS_GUDANG":
       return await db.laboran.findUnique({ where: { nip: roleId } });
     default:
       return null;
@@ -85,6 +96,15 @@ export async function createUserRoleData(
       });
 
     case "LABORAN":
+      return tx.laboran.create({
+        data: {
+          nip: roleId,
+          full_name: name || "",
+          user_id: userId,
+        },
+      });
+
+    case "PETUGAS_GUDANG":
       return tx.laboran.create({
         data: {
           nip: roleId,

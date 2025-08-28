@@ -109,18 +109,6 @@ export function SDSTable({
       language: sds.language,
       uploadType: sds.filePath ? "file" : "link",
       externalUrl: sds.externalUrl || "",
-      hazardClassifications: sds.hazardClassification || [""],
-      precautionaryStatements: sds.precautionaryStatement || [""],
-      firstAidMeasures: {
-        inhalation: sds.firstAidInhalation || "",
-        skinContact: sds.firstAidSkin || "",
-        eyeContact: sds.firstAidEyes || "",
-        ingestion: sds.firstAidIngestion || "",
-      },
-      storageInfo: {
-        conditions: sds.storageConditions || "",
-        disposal: sds.disposalInfo || "",
-      },
     };
 
     setEditingSDS(sdsData);
@@ -153,9 +141,6 @@ export function SDSTable({
                       <div className="font-medium">{sds.chemical.name}</div>
                       <div className="text-sm text-gray-500">
                         {sds.chemical.formula}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        CAS: {sds.chemical.casNumber}
                       </div>
                     </div>
                   </TableCell>

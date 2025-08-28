@@ -17,6 +17,7 @@ enum UserStatus {
 }
 
 enum Role {
+  PETUGAS_GUDANG
   ADMIN
   MAHASISWA
   DOSEN
@@ -27,6 +28,9 @@ enum ChemicalForm {
   SOLID
   LIQUID
   GAS
+}
+
+enum ChemicalCharacteristic {
   ACID
   BASE
   GENERAL
@@ -125,23 +129,18 @@ model Laboran {
 }
 
 model Chemical {
-  id             String       @id @default(nanoid()) @db.VarChar(255)
-  name           String       @db.VarChar(255) // Nama bahan kimia
-  formula        String?      @db.VarChar(100) // Rumus kimia (contoh: H2O, NaCl)
-  casNumber      String?      @map("cas_number") @db.VarChar(50) // Nomor CAS (Chemical Abstracts Service) untuk identifikasi unik bahan kimia
+  id             String                 @id @default(nanoid()) @db.VarChar(255)
+  name           String                 @unique @db.VarChar(255) // Nama bahan kimia
+  formula        String?                @db.VarChar(255) // Rumus kimia (contoh: H2O, NaCl)
   form           ChemicalForm // Bentuk fisik bahan (contoh: padat, cair, gas)
-  initialStock   Int          @default(0) @map("initial_stock") // Jumlah stok bahan yang tersedia
-  currentStock   Int          @default(0) @map("current_stock") // Jumlah stok bahan saat ini
-  unit           String       @db.VarChar(20) // Satuan stok (contoh: gram, liter, botol)
-  purchaseDate   DateTime     @map("purchase_date") // Tanggal pembelian bahan
-  expirationDate DateTime?    @map("expiration_date") // Tanggal kadaluarsa (jika ada)
-  location       String       @db.VarChar(255) // Lokasi penyimpanan (misal: Gudang A, Laboratorium Kimia)
-  cabinet        String?      @db.VarChar(100) // Lemari penyimpanan (jika ada)
-  room           String?      @db.VarChar(100) // Ruangan tempat bahan disimpan
-  temperature    String?      @db.VarChar(50) // Suhu penyimpanan yang disarankan (contoh: 25°C, suhu ruang, suhu dingin)
-  qrCode         String?      @unique @map("qr_code") @db.VarChar(255)
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  characteristic ChemicalCharacteristic // Karakteristik bahan (contoh: asam, basa, oksidator, umum)
+  initialStock   Int                    @default(0) @map("initial_stock") // Jumlah stok bahan yang tersedia
+  currentStock   Int                    @default(0) @map("current_stock") // Jumlah stok bahan saat ini
+  unit           String                 @db.VarChar(20) // Satuan stok (contoh: gram, liter, botol)
+  purchaseDate   DateTime               @map("purchase_date") // Tanggal pembelian bahan
+  expirationDate DateTime?              @map("expiration_date") // Tanggal kadaluarsa (jika ada)
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @updatedAt @map("updated_at")
 
   // Relations
   createdBy   User    @relation("CreatedBy", fields: [createdById], references: [id])
@@ -154,7 +153,7 @@ model Chemical {
   usageHistory    UsageHistory[]
   stockMutation   stockMutation[]
 
-  @@index([name, casNumber])
+  @@index([name, formula, form, characteristic, expirationDate])
   @@map("chemicals")
 }
 
@@ -178,19 +177,11 @@ model stockMutation {
 }
 
 model SafetyDataSheet {
-  id                     String   @id @default(nanoid()) @db.VarChar(255)
-  fileName               String?  @map("file_name") @db.VarChar(255)
-  filePath               String?  @map("file_path") @db.VarChar(500)
-  externalUrl            String?  @map("external_url") @db.VarChar(500)
-  language               String   @db.VarChar(255)
-  hazardClassification   String[] @map("hazard_classification") @db.Text // Klasifikasi bahaya (contoh: Skin Corrosion/Irritation - Category 1A)
-  precautionaryStatement String[] @map("precautionary_statement") @db.Text // Pernyataan kehati-hatian (contoh: P280: Wear protective gloves...)
-  firstAidInhalation     String?  @map("first_aid_inhalation") @db.Text // Tindakan pertolongan pertama jika terhirup
-  firstAidSkin           String?  @map("first_aid_skin") @db.Text // Tindakan pertolongan pertama jika terkena kulit
-  firstAidEye            String?  @map("first_aid_eye") @db.Text // Tindakan pertolongan pertama jika terkena mata
-  firstAidIngestion      String?  @map("first_aid_ingestion") @db.Text // Tindakan pertolongan pertama jika tertelan
-  storageConditions      String?  @map("storage_conditions") @db.Text // Kondisi penyimpanan yang aman
-  disposalInfo           String?  @map("disposal_info") @db.Text // Informasi pembuangan yang aman
+  id          String  @id @default(nanoid()) @db.VarChar(255)
+  fileName    String? @map("file_name") @db.VarChar(255)
+  filePath    String? @map("file_path") @db.VarChar(500)
+  externalUrl String? @map("external_url") @db.VarChar(500)
+  language    String  @db.VarChar(255)
 
   // Relations
   chemical    Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)

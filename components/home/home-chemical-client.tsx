@@ -23,8 +23,8 @@ const HomeChemicalClient = () => {
     setSearchTerm,
     filterForm,
     setFilterForm,
-    filterLocation,
-    setFilterLocation,
+    filterCharacteristic,
+    setFilterCharacteristic,
 
     handlePageChange,
   } = useChemicals();
@@ -33,23 +33,13 @@ const HomeChemicalClient = () => {
   const filteredChemicals = chemicals.filter((chemical) => {
     const matchesSearch =
       chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chemical.formula.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (chemical.casNumber && chemical.casNumber.includes(searchTerm));
+      chemical.formula.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesForm = filterForm === "all" || chemical.form === filterForm;
 
-    const matchesLocation =
-      filterLocation === "all" ||
-      (chemical.room &&
-        chemical.room.toLowerCase().includes(filterLocation.toLowerCase()));
-
-    return matchesSearch && matchesForm && matchesLocation;
+    return matchesSearch && matchesForm;
   });
 
-  // Get unique locations for filter
-  const uniqueRooms = Array.from(
-    new Set(chemicals.map((c) => c.room).filter(Boolean))
-  );
   return (
     <>
       <HomeChemicalFilter
@@ -57,9 +47,8 @@ const HomeChemicalClient = () => {
         onSearchChange={setSearchTerm}
         filterForm={filterForm}
         onFilterFormChange={setFilterForm}
-        filterLocation={filterLocation}
-        onFilterLocationChange={setFilterLocation}
-        uniqueRooms={uniqueRooms}
+        filterCharacteristic={filterCharacteristic}
+        onFilterCharacteristicChange={setFilterCharacteristic}
       />
 
       {/* Chemical Table */}

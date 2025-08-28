@@ -19,14 +19,6 @@ export async function POST(
     const parsed = sdsCreateSchema.safeParse({
       externalUrl: formData.get("externalUrl") || undefined,
       language: formData.get("language"),
-      hazardClassification: formData.getAll("hazardClassification"),
-      precautionaryStatement: formData.getAll("precautionaryStatement"),
-      firstAidInhalation: formData.get("firstAidInhalation"),
-      firstAidSkin: formData.get("firstAidSkin"),
-      firstAidEye: formData.get("firstAidEye"),
-      firstAidIngestion: formData.get("firstAidIngestion"),
-      storageConditions: formData.get("storageConditions"),
-      disposalInfo: formData.get("disposalInfo"),
       sdsFile: formData.get("sdsFile") || undefined,
     });
 
@@ -37,19 +29,7 @@ export async function POST(
       );
     }
 
-    const {
-      externalUrl,
-      language,
-      hazardClassification,
-      precautionaryStatement,
-      firstAidInhalation,
-      firstAidSkin,
-      firstAidEye,
-      firstAidIngestion,
-      storageConditions,
-      disposalInfo,
-      sdsFile,
-    } = parsed.data;
+    const { externalUrl, language, sdsFile } = parsed.data;
 
     const chemicalExist = await db.chemical.findUnique({
       where: { id: chemicalId },
@@ -97,14 +77,6 @@ export async function POST(
         filePath: fileUrl || null,
         externalUrl,
         language,
-        hazardClassification,
-        precautionaryStatement,
-        firstAidInhalation,
-        firstAidSkin,
-        firstAidEye,
-        firstAidIngestion,
-        storageConditions,
-        disposalInfo,
         chemicalId: chemicalId,
         createdById: userAccess.userId,
       },

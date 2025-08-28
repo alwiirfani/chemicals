@@ -17,15 +17,11 @@ export default function UpdateChemicalClient() {
   const [formData, setFormData] = useState<ChemicalFormData>({
     name: "",
     formula: "",
-    casNumber: "",
     form: "",
+    characteristic: "",
     unit: "",
     purchaseDate: "",
     expirationDate: "",
-    location: "",
-    cabinet: "",
-    room: "",
-    temperature: "",
 
     // for stock update
     type: "ADD",
@@ -44,17 +40,13 @@ export default function UpdateChemicalClient() {
         ...prev,
         name: chemical.name,
         formula: chemical.formula,
-        casNumber: chemical.casNumber || "",
         form: chemical.form,
+        characteristic: chemical.characteristic,
         unit: chemical.unit,
         purchaseDate: formatDateToInput(chemical.purchaseDate),
         expirationDate: chemical.expirationDate
           ? formatDateToInput(chemical.expirationDate)
           : "",
-        location: chemical.location,
-        cabinet: chemical.cabinet || "",
-        room: chemical.room || "",
-        temperature: chemical.temperature || "",
       }));
     } catch (error) {
       console.error("Error fetching chemical:", error);

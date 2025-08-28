@@ -10,7 +10,7 @@ const useChemicals = () => {
   const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterForm, setFilterForm] = useState("all");
-  const [filterLocation, setFilterLocation] = useState("all");
+  const [filterCharacteristic, setFilterCharacteristic] = useState("all");
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -35,7 +35,9 @@ const useChemicals = () => {
           limit: 10,
           ...(debouncedSearch && { search: debouncedSearch }),
           ...(filterForm !== "all" && { form: filterForm }),
-          ...(filterLocation !== "all" && { room: filterLocation }),
+          ...(filterCharacteristic !== "all" && {
+            characteristic: filterCharacteristic,
+          }),
         };
 
         const { data } = await axios.get("/api/v1/chemicals", { params });
@@ -64,7 +66,7 @@ const useChemicals = () => {
         setLoading(false);
       }
     },
-    [debouncedSearch, filterForm, filterLocation, toast]
+    [debouncedSearch, filterForm, filterCharacteristic, toast]
   );
 
   useEffect(() => {
@@ -72,7 +74,7 @@ const useChemicals = () => {
   }, [
     debouncedSearch,
     filterForm,
-    filterLocation,
+    filterCharacteristic,
     pagination.currentPage,
     fetchChemicals,
   ]);
@@ -128,8 +130,8 @@ const useChemicals = () => {
     setSearchTerm,
     filterForm,
     setFilterForm,
-    filterLocation,
-    setFilterLocation,
+    filterCharacteristic,
+    setFilterCharacteristic,
 
     // Actions
     fetchChemicals,

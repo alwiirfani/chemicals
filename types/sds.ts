@@ -4,14 +4,6 @@ export interface SDS {
   filePath: string | null;
   externalUrl: string;
   language: string;
-  hazardClassification: string[];
-  precautionaryStatement: string[];
-  firstAidInhalation: string;
-  firstAidSkin: string;
-  firstAidEyes: string;
-  firstAidIngestion: string;
-  storageConditions: string;
-  disposalInfo: string;
   downloadCount: number;
   createdByName: string;
   updatedByName: string;
@@ -21,8 +13,8 @@ export interface SDS {
     id: string;
     name: string;
     formula: string;
-    casNumber: string;
     form: string;
+    characteristic: string;
   };
 }
 
@@ -31,28 +23,7 @@ export interface SDSFormData {
   chemicalId: string;
   externalUrl: string;
   language: "ID" | "EN";
-  firstAidMeasures: FirstAidMeasures;
-  storageInfo: StorageInfo;
-  hazardInfo: HazardInfo;
   fileInfo?: FileInfo;
-}
-
-// Sub-interfaces
-export interface FirstAidMeasures {
-  inhalation: string;
-  skinContact: string;
-  eyeContact: string;
-  ingestion: string;
-}
-
-export interface StorageInfo {
-  conditions: string;
-  disposal: string;
-}
-
-interface HazardInfo {
-  classifications: string[];
-  statements: string[];
 }
 
 interface FileInfo {
@@ -69,16 +40,4 @@ export interface SDSData {
   language: string;
   uploadType: "file" | "link";
   externalUrl?: string;
-  hazardClassifications: string[];
-  precautionaryStatements: string[];
-  firstAidMeasures: {
-    inhalation: string;
-    skinContact: string;
-    eyeContact: string;
-    ingestion: string;
-  };
-  storageInfo: {
-    conditions: string;
-    disposal: string;
-  };
 }

@@ -17,6 +17,7 @@ INSERT INTO users (id, username, email, password, role, created_at, updated_at) 
 ('admin001', 'admin', 'admin@chemlab.com', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'ADMIN', NOW(), NOW()),
 ('laboran001', 'laboran1', 'laboran1@chemlab.com', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'LABORAN', NOW(), NOW()),
 ('laboran002', 'laboran2', 'laboran2@chemlab.com', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'LABORAN', NOW(), NOW()),
+('gudang001', 'petugas_gudang1', 'gudang1@chemlab.com', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'PETUGAS_GUDANG', NOW(), NOW()),
 ('dosen001', 'dosen1', 'dosen1@chemlab.com', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'DOSEN', NOW(), NOW()),
 ('dosen002', 'dosen2', 'dosen2@chemlab.com', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'DOSEN', NOW(), NOW()),
 ('mhs001', 'mahasiswa1', 'mhs1@student.ac.id', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'MAHASISWA', NOW(), NOW()),
@@ -24,14 +25,14 @@ INSERT INTO users (id, username, email, password, role, created_at, updated_at) 
 ('mhs003', 'mahasiswa3', 'mhs3@student.ac.id', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'MAHASISWA', NOW(), NOW()),
 ('mhs004', 'mahasiswa4', 'mhs4@student.ac.id', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'MAHASISWA', NOW(), NOW()),
 ('mhs005', 'mahasiswa5', 'mhs5@student.ac.id', '$2a$12$xEcdWrmpwDwje2AkneNs9.m9ZhWKHgQN3Fo3XusYnapW01h.Nv2Ki', 'MAHASISWA', NOW(), NOW());
-
 -- Insert role-specific data
 INSERT INTO admin (pin, user_id) VALUES
 ('12345', 'admin001');
 
 INSERT INTO laboran (nip, full_name, user_id) VALUES
 ('1234567890', 'Dr. Siti Aminah, M.Si', 'laboran001'),
-('1234567891', 'Ahmad Fauzi, S.Si', 'laboran002');
+('1234567891', 'Ahmad Fauzi, S.Si', 'laboran002'),
+('1234567892', 'Budi Santoso, S.Kom', 'gudang001');
 
 INSERT INTO dosen (nidn, full_name, user_id) VALUES
 ('0123456789', 'Prof. Dr. Budi Santoso, M.Sc', 'dosen001'),
@@ -44,21 +45,19 @@ INSERT INTO mahasiswa (nim, full_name, user_id) VALUES
 ('20210004', 'Maya Sari', 'mhs004'),
 ('20210005', 'Doni Setiawan', 'mhs005');
 
--- Insert sample chemicals
+-- Insert sample chemicals sesuai schema
 INSERT INTO chemicals (
-  id, name, formula, cas_number, form, initial_stock, current_stock, unit, 
-  purchase_date, expiration_date, location, cabinet, room, temperature, 
-  created_by_id, created_at, updated_at
+  id, name, formula, form, characteristic, initial_stock, current_stock, unit,
+  purchase_date, expiration_date, created_by_id, created_at, updated_at
 ) VALUES
-('chem001', 'Asam Sulfat', 'H2SO4', '7664-93-9', 'LIQUID', 500, 500, 'mL', '2024-01-15', '2025-01-15', 'Lemari Asam', 'A1', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem002', 'Natrium Hidroksida', 'NaOH', '1310-73-2', 'SOLID', 250, 250, 'g', '2024-01-10', '2026-01-10', 'Lemari Basa', 'B2', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem003', 'Asam Klorida', 'HCl', '7647-01-0', 'LIQUID', 1000, 1000, 'mL', '2024-01-20', '2025-06-20', 'Lemari Asam', 'A2', 'Lab Kimia Analitik', 'Room Temperature', 'laboran002', NOW(), NOW()),
-('chem004', 'Etanol', 'C2H5OH', '64-17-5', 'LIQUID', 2000, 2000, 'mL', '2024-01-05', '2025-12-05', 'Lemari Pelarut', 'C1', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem005', 'Benzena', 'C6H6', '71-43-2', 'LIQUID', 500, 500, 'mL', '2024-01-12', '2025-01-12', 'Lemari Pelarut', 'C2', 'Lab Kimia Organik', 'Room Temperature', 'laboran002', NOW(), NOW()),
-('chem006', 'Asam Asetat', 'CH3COOH', '64-19-7', 'LIQUID', 750, 750, 'mL', '2024-02-01', '2025-08-01', 'Lemari Asam', 'A3', 'Lab Kimia Analitik', 'Room Temperature', 'laboran001', NOW(), NOW()),
-('chem007', 'Kalium Permanganat', 'KMnO4', '7722-64-7', 'SOLID', 100, 100, 'g', '2024-01-25', '2026-01-25', 'Lemari Oksidator', 'D1', 'Lab Kimia Analitik', 'Room Temperature', 'laboran002', NOW(), NOW()),
-('chem008', 'Metanol', 'CH3OH', '67-56-1', 'LIQUID', 1500, 1500, 'mL', '2024-02-10', '2025-11-10', 'Lemari Pelarut', 'C3', 'Lab Kimia Organik', 'Room Temperature', 'laboran001', NOW(), NOW());
-
+('chem001', 'Asam Sulfat', 'H2SO4', 'LIQUID', 'ACID', 500, 500, 'mL', '2024-01-15', '2025-01-15', 'laboran001', NOW(), NOW()),
+('chem002', 'Natrium Hidroksida', 'NaOH', 'SOLID', 'BASE', 250, 250, 'g', '2024-01-10', '2026-01-10', 'laboran001', NOW(), NOW()),
+('chem003', 'Asam Klorida', 'HCl', 'LIQUID', 'ACID', 1000, 1000, 'mL', '2024-01-20', '2025-06-20', 'laboran002', NOW(), NOW()),
+('chem004', 'Etanol', 'C2H5OH', 'LIQUID', 'GENERAL', 2000, 2000, 'mL', '2024-01-05', '2025-12-05', 'laboran001', NOW(), NOW()),
+('chem005', 'Benzena', 'C6H6', 'LIQUID', 'GENERAL', 500, 500, 'mL', '2024-01-12', '2025-01-12', 'laboran002', NOW(), NOW()),
+('chem006', 'Asam Asetat', 'CH3COOH', 'LIQUID', 'ACID', 750, 750, 'mL', '2024-02-01', '2025-08-01', 'laboran001', NOW(), NOW()),
+('chem007', 'Kalium Permanganat', 'KMnO4', 'SOLID', 'OXIDANT', 100, 100, 'g', '2024-01-25', '2026-01-25', 'laboran002', NOW(), NOW()),
+('chem008', 'Metanol', 'CH3OH', 'LIQUID', 'GENERAL', 1500, 1500, 'mL', '2024-02-10', '2025-11-10', 'laboran001', NOW(), NOW());
 -- Insert sample borrowings
 -- Insert sample borrowings dengan informasi approved/rejected/returned
 INSERT INTO borrowings (
@@ -122,29 +121,14 @@ INSERT INTO usage_history (id, chemical_id, quantity, purpose, used_at, user_id,
 ('usage005', 'chem007', 5.0, 'Analisis Permanganometri', '2024-01-24 11:00:00', 'dosen002', NOW(), NOW()),
 ('usage006', 'chem006', 30.0, 'Preparasi Buffer', '2024-01-26 15:00:00', 'mhs004', NOW(), NOW());
 
--- Insert sample SDS records
+-- Insert sample SDS records sesuai schema
 INSERT INTO safety_data_sheets (
-    id, chemical_id, file_name, file_path, external_url, language, hazard_classification, precautionary_statement,
-    first_aid_inhalation, first_aid_skin, first_aid_eye, first_aid_ingestion,
-    storage_conditions, disposal_info,
+    id, chemical_id, file_name, file_path, external_url, language,
     created_by_id, updated_by_id, created_at, updated_at
 ) VALUES
 ('sds001', 'chem001', 'H2SO4_SDS.pdf', '/uploads/sds/H2SO4_SDS.pdf', NULL, 'English',
- '{"Skin Corrosion/Irritation - Category 1A"}',
- '{"P280: Wear protective gloves/protective clothing/eye protection/face protection."}',
- 'Move to fresh air and keep at rest.', 'Remove contaminated clothing and wash with water.',
- 'Rinse cautiously with water for several minutes.', 'Do not induce vomiting; rinse mouth.',
- 'Store in a well-ventilated place away from incompatible materials.',
- 'Dispose of contents/container in accordance with local regulations.',
  'admin001', 'laboran001', NOW(), NOW()),
-
 ('sds002', 'chem002', 'NaOH_SDS.pdf', '/uploads/sds/NaOH_SDS.pdf', NULL, 'English',
- '{"Skin Corrosion/Irritation - Category 1A"}',
- '{"P264: Wash hands thoroughly after handling."}',
- 'Move to fresh air.', 'Wash with plenty of soap and water.',
- 'Rinse cautiously with water.', 'Rinse mouth, do not induce vomiting.',
- 'Keep container tightly closed in a dry and well-ventilated place.',
- 'Dispose according to local environmental regulations.',
  'admin001', 'laboran001', NOW(), NOW());
 
 

@@ -4,30 +4,23 @@ import { z } from "zod";
 export const chemicalsCreateSchema = z.object({
   name: z.string().min(1),
   form: z.enum(["LIQUID", "SOLID", "GAS"]),
+  characteristic: z.enum(["ACID", "BASE", "OXIDANT", "GENERAL"]),
   formula: z.string().min(1).optional(),
   casNumber: z.string().optional(),
   stock: z.number().min(0),
   unit: z.string().min(1),
-  location: z.string().min(1),
   purchaseDate: z.string(),
   expirationDate: z.string().optional(),
-  cabinet: z.string().optional(),
-  room: z.string().optional(),
-  temperature: z.string().optional(),
 });
 
 export const chemicalUpdateSchema = z.object({
   name: z.string().min(1),
   form: z.enum(["LIQUID", "SOLID", "GAS"]),
+  characteristic: z.enum(["ACID", "BASE", "OXIDANT", "GENERAL"]),
   formula: z.string().min(1).optional(),
-  casNumber: z.string().optional(),
   unit: z.string().min(1),
-  location: z.string().min(1),
   purchaseDate: z.string(),
   expirationDate: z.string().optional(),
-  cabinet: z.string().optional(),
-  room: z.string().optional(),
-  temperature: z.string().optional(),
 });
 
 export const stockUpdateSchema = z.object({

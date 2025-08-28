@@ -55,7 +55,12 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           chemical: {
-            select: { name: true, formula: true, casNumber: true, form: true },
+            select: {
+              name: true,
+              formula: true,
+              form: true,
+              characteristic: true,
+            },
           },
           createdBy: { include: { admin: true, laboran: true } },
           updatedBy: { include: { admin: true, laboran: true } },
@@ -90,14 +95,6 @@ export async function GET(request: NextRequest) {
         file_path: sds.filePath,
         external_url: sds.externalUrl,
         language: sds.language,
-        hazard_classification: sds.hazardClassification,
-        precautionary_statement: sds.precautionaryStatement,
-        first_aid_inhalation: sds.firstAidInhalation,
-        first_aid_skin: sds.firstAidSkin,
-        first_aid_eyes: sds.firstAidEye,
-        first_aid_ingestion: sds.firstAidIngestion,
-        storage_conditions: sds.storageConditions,
-        disposal_info: sds.disposalInfo,
         created_at: sds.createdAt.toISOString(),
         updated_at: sds.updatedAt.toISOString(),
         created_by: createdByName,
@@ -105,8 +102,8 @@ export async function GET(request: NextRequest) {
         chemical: {
           name: sds.chemical.name,
           formula: sds.chemical.formula,
-          cas_number: sds.chemical.casNumber,
           form: sds.chemical.form,
+          characteristic: sds.chemical.characteristic,
         },
       };
     });

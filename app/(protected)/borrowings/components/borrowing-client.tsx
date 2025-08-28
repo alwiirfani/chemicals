@@ -87,7 +87,7 @@ export function BorrowingClient({ user }: BorrowingsClientProps) {
         <CreateBorrowingDialog user={user}>
           <Button className="w-full sm:py-[20px] sm:w-48">
             <Plus className="mr-2 h-4 w-4" />
-            Ajukan Peminjaman
+            Ajukan Permintaan
           </Button>
         </CreateBorrowingDialog>
       </div>

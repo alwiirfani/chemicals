@@ -38,9 +38,9 @@ const HomeChemicalTable = ({
   );
   return (
     <>
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border">
         <div className="w-full overflow-x-auto">
-          <Table className="min-w-[800px]">
+          <Table className="table-auto min-w-[800px]">
             <TableHeader>
               <TableRow className="bg-blue-50 hover:bg-blue-100">
                 <TableHead className="whitespace-nowrap pl-4 w-[60px]">
@@ -49,7 +49,6 @@ const HomeChemicalTable = ({
                 <TableHead className="whitespace-nowrap">Nama Bahan</TableHead>
                 <TableHead className="whitespace-nowrap">Rumus</TableHead>
                 <TableHead className="whitespace-nowrap">Stok</TableHead>
-                <TableHead className="whitespace-nowrap">Lokasi</TableHead>
                 <TableHead className="whitespace-nowrap">Kadaluwarsa</TableHead>
               </TableRow>
             </TableHeader>
@@ -58,14 +57,7 @@ const HomeChemicalTable = ({
                 <TableRow key={chemical.id}>
                   <TableCell className="pl-4 w-[60px]">{index + 1}</TableCell>
                   <TableCell>
-                    <div>
-                      <div className="font-medium">{chemical.name}</div>
-                      {chemical.casNumber && (
-                        <div className="text-sm text-gray-500">
-                          CAS: {chemical.casNumber}
-                        </div>
-                      )}
-                    </div>
+                    <div className="font-medium">{chemical.name}</div>
                   </TableCell>
                   <TableCell>
                     <code className="bg-gray-100 px-2 py-1 rounded text-sm">
@@ -79,14 +71,6 @@ const HomeChemicalTable = ({
                       </span>
                       {chemical.stock < 10 && (
                         <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div>{chemical.location}</div>
-                      {chemical.cabinet && (
-                        <div className="text-gray-500">{chemical.cabinet}</div>
                       )}
                     </div>
                   </TableCell>

@@ -32,14 +32,6 @@ export async function PUT(
       chemicalId: formData.get("chemicalId") || undefined,
       externalUrl: formData.get("externalUrl") || undefined,
       language: formData.get("language"),
-      hazardClassification: formData.getAll("hazardClassification"),
-      precautionaryStatement: formData.getAll("precautionaryStatement"),
-      firstAidInhalation: formData.get("firstAidInhalation"),
-      firstAidSkin: formData.get("firstAidSkin"),
-      firstAidEye: formData.get("firstAidEye"),
-      firstAidIngestion: formData.get("firstAidIngestion"),
-      storageConditions: formData.get("storageConditions"),
-      disposalInfo: formData.get("disposalInfo"),
       sdsFile: formData.get("sdsFile") || undefined,
     });
 
@@ -50,20 +42,7 @@ export async function PUT(
       );
     }
 
-    const {
-      chemicalId,
-      externalUrl,
-      language,
-      hazardClassification,
-      precautionaryStatement,
-      firstAidInhalation,
-      firstAidSkin,
-      firstAidEye,
-      firstAidIngestion,
-      storageConditions,
-      disposalInfo,
-      sdsFile,
-    } = parsed.data;
+    const { chemicalId, externalUrl, language, sdsFile } = parsed.data;
 
     // Kalau user mau ganti chemical
     if (chemicalId) {
@@ -151,15 +130,6 @@ export async function PUT(
         filePath: fileUrl,
         externalUrl,
         language,
-        hazardClassification,
-        precautionaryStatement,
-        firstAidInhalation,
-        firstAidSkin,
-        firstAidEye,
-        firstAidIngestion,
-        storageConditions,
-        disposalInfo,
-        updatedById: userAccess.userId,
       },
     });
 

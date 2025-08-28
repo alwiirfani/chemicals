@@ -184,9 +184,9 @@ export function CreateBorrowingDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Ajukan Peminjaman Bahan Kimia</DialogTitle>
+          <DialogTitle>Ajukan Permintaan Bahan Kimia</DialogTitle>
           <DialogDescription>
-            Isi form berikut untuk mengajukan peminjaman bahan kimia
+            Isi form berikut untuk mengajukan permintaan bahan kimia
           </DialogDescription>
         </DialogHeader>
 

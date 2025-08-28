@@ -224,8 +224,8 @@ export async function GET(request: NextRequest) {
           acc[chem.form] = (acc[chem.form] || 0) + 1;
           return acc;
         }, {} as Record<string, number>),
-        byLocation: chemicals.reduce((acc, chem) => {
-          acc[chem.location] = (acc[chem.location] || 0) + 1;
+        byCharacteristic: chemicals.reduce((acc, chem) => {
+          acc[chem.characteristic] = (acc[chem.characteristic] || 0) + 1;
           return acc;
         }, {} as Record<string, number>),
         monthlyUsage,

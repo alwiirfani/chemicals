@@ -52,7 +52,6 @@ export function SDSClient({ user }: SDSClientProps) {
     const matchesSearch =
       sds.chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sds.chemical.formula.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sds.chemical.casNumber.includes(searchTerm) ||
       (sds.fileName &&
         sds.fileName.toLowerCase().includes(searchTerm.toLowerCase()));
 

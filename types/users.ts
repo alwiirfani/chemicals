@@ -1,6 +1,5 @@
 import { UserAuth } from "./auth";
 
-// types/users.ts
 export interface UserPagination {
   currentPage: number;
   total: number;

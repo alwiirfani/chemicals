@@ -16,7 +16,7 @@ export function ChemicalSelect({ formData, setFormData }: ChemicalSelectProps) {
   // Memetakan data bahan kimia ke format yang dibutuhkan Combobox
   const chemicalOptions = chemicals.map((chemical) => ({
     value: chemical.id,
-    label: `${chemical.name} - ${chemical.formula} (CAS: ${chemical.casNumber})`,
+    label: `${chemical.name} - ${chemical.formula} (CAS: ${chemical.characteristic})`,
   }));
 
   return (

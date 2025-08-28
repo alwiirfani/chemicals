@@ -1,3 +1,5 @@
+import { ChemicalCharacteristic } from "@/types/chemicals";
+
 export const isExpired = (date: Date | null) => {
   if (!date) return false;
   return new Date() > date;
@@ -8,4 +10,21 @@ export const isExpiringSoon = (date: Date | null) => {
   const thirtyDaysFromNow = new Date();
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
   return date <= thirtyDaysFromNow && date > new Date();
+};
+
+export const mapCharacteristic = (value: string): ChemicalCharacteristic => {
+  const normalized = value.trim().toLowerCase();
+
+  switch (normalized) {
+    case "asam":
+      return "ACID";
+    case "basa":
+      return "BASE";
+    case "oksidan":
+      return "OXIDANT";
+    case "general":
+      return "GENERAL";
+    default:
+      throw new Error(`Invalid characteristic value: ${value}`);
+  }
 };

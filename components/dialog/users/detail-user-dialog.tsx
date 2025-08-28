@@ -33,6 +33,8 @@ export const DetailUserDialog: React.FC<DetaiUserlDialogProps> = ({
         return "Mahasiswa";
       case "DOSEN":
         return "Dosen";
+      case "PETUGAS_GUDANG":
+        return "Petugas Gudang";
       default:
         return role;
     }

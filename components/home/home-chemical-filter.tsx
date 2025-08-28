@@ -15,9 +15,8 @@ interface ChemicalFilterProps {
   onSearchChange: (value: string) => void;
   filterForm: string;
   onFilterFormChange: (value: string) => void;
-  filterLocation: string;
-  onFilterLocationChange: (value: string) => void;
-  uniqueRooms: (string | null)[];
+  filterCharacteristic: string;
+  onFilterCharacteristicChange: (value: string) => void;
 }
 
 const HomeChemicalFilter = ({
@@ -25,9 +24,8 @@ const HomeChemicalFilter = ({
   onSearchChange,
   filterForm,
   onFilterFormChange,
-  filterLocation,
-  onFilterLocationChange,
-  uniqueRooms,
+  filterCharacteristic,
+  onFilterCharacteristicChange,
 }: ChemicalFilterProps) => {
   return (
     <div className="bg-white rounded-xl border">
@@ -60,17 +58,18 @@ const HomeChemicalFilter = ({
             </SelectContent>
           </Select>
 
-          <Select value={filterLocation} onValueChange={onFilterLocationChange}>
+          <Select
+            value={filterCharacteristic}
+            onValueChange={onFilterCharacteristicChange}>
             <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Ruang" />
+              <SelectValue placeholder="Sifat" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Ruang</SelectItem>
-              {uniqueRooms.map((room) => (
-                <SelectItem key={room} value={room ?? "unknown"}>
-                  {room ?? "-"}
-                </SelectItem>
-              ))}
+              <SelectItem value="all">Semua Sifat</SelectItem>
+              <SelectItem value="ACID">Asam</SelectItem>
+              <SelectItem value="BASE">Basa</SelectItem>
+              <SelectItem value="GENERAL">General</SelectItem>
+              <SelectItem value="OXIDANT">Oksidan</SelectItem>
             </SelectContent>
           </Select>
         </div>

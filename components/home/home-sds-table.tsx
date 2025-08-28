@@ -91,9 +91,9 @@ const HomeSdsTable = ({
 
   return (
     <>
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border">
         <div className="w-full overflow-x-auto">
-          <Table className="min-w-[800px]">
+          <Table className="table-fixed min-w-[800px]">
             <TableHeader>
               <TableRow className="bg-blue-50 hover:bg-blue-100">
                 <TableHead className="whitespace-nowrap pl-4 w-[60px]">
@@ -114,9 +114,6 @@ const HomeSdsTable = ({
                       <div className="font-medium">{sds.chemical.name}</div>
                       <div className="text-sm text-gray-500">
                         {sds.chemical.formula}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        CAS: {sds.chemical.casNumber}
                       </div>
                     </div>
                   </TableCell>

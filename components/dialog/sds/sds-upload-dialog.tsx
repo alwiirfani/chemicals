@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -22,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Link, Plus, Trash2 } from "lucide-react";
+import { Upload, FileText, Link } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChemicalSelect } from "@/components/sds/chemical-select";
 import useChemicals from "@/hooks/use-chemicals";
@@ -43,19 +42,7 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
     setUploadType,
     file,
     formData,
-    hazardClassifications,
-    precautionaryStatements,
-    firstAidMeasures,
-    storageInfo,
-    updateStorageInfo,
     updateFormData,
-    addHazardClassification,
-    removeHazardClassification,
-    updateHazardClassification,
-    addPrecautionaryStatement,
-    removePrecautionaryStatement,
-    updatePrecautionaryStatement,
-    updateFirstAidMeasure,
     handleFileChange,
     uploadSds,
     resetForm,
@@ -189,182 +176,6 @@ export function UploadSDSDialog({ children }: UploadSDSDialogProps) {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
-
-          {/* Hazard Classifications */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>Klasifikasi Bahaya *</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addHazardClassification}>
-                <Plus className="h-4 w-4 mr-2" />
-                Tambah
-              </Button>
-            </div>
-
-            <div className="space-y-3">
-              {hazardClassifications.map((hazard, index) => (
-                <div key={index} className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      value={hazard}
-                      onChange={(e) =>
-                        updateHazardClassification(index, e.target.value)
-                      }
-                      placeholder="Contoh: Skin Corrosion/Irritation - Category 1A"
-                      required
-                    />
-                  </div>
-                  {hazardClassifications.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeHazardClassification(index)}
-                      className="text-red-600 hover:text-red-700">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Precautionary Statements */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>Pernyataan Kehati-hatian *</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addPrecautionaryStatement}>
-                <Plus className="h-4 w-4 mr-2" />
-                Tambah
-              </Button>
-            </div>
-
-            <div className="space-y-3">
-              {precautionaryStatements.map((statement, index) => (
-                <div key={index} className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      value={statement}
-                      onChange={(e) =>
-                        updatePrecautionaryStatement(index, e.target.value)
-                      }
-                      placeholder="Contoh: P280: Wear protective gloves/protective clothing"
-                      required
-                    />
-                  </div>
-                  {precautionaryStatements.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removePrecautionaryStatement(index)}
-                      className="text-red-600 hover:text-red-700">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* First Aid Measures */}
-          <div className="space-y-4">
-            <Label>Tindakan Pertolongan Pertama *</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="inhalation">Terhirup</Label>
-                <Textarea
-                  id="inhalation"
-                  value={firstAidMeasures.inhalation}
-                  onChange={(e) =>
-                    updateFirstAidMeasure("inhalation", e.target.value)
-                  }
-                  required
-                  placeholder="Tindakan jika terhirup..."
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="skinContact">Kontak Kulit</Label>
-                <Textarea
-                  id="skinContact"
-                  value={firstAidMeasures.skinContact}
-                  onChange={(e) =>
-                    updateFirstAidMeasure("skinContact", e.target.value)
-                  }
-                  required
-                  placeholder="Tindakan jika terkena kulit..."
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="eyeContact">Kontak Mata</Label>
-                <Textarea
-                  id="eyeContact"
-                  value={firstAidMeasures.eyeContact}
-                  onChange={(e) =>
-                    updateFirstAidMeasure("eyeContact", e.target.value)
-                  }
-                  required
-                  placeholder="Tindakan jika terkena mata..."
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="ingestion">Tertelan</Label>
-                <Textarea
-                  id="ingestion"
-                  value={firstAidMeasures.ingestion}
-                  onChange={(e) =>
-                    updateFirstAidMeasure("ingestion", e.target.value)
-                  }
-                  required
-                  placeholder="Tindakan jika tertelan..."
-                  rows={3}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Storage and Disposal */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Storage Conditions */}
-            <div>
-              <Label htmlFor="conditions">Kondisi Penyimpanan *</Label>
-              <Textarea
-                id="conditions"
-                value={storageInfo.conditions}
-                onChange={(e) =>
-                  updateStorageInfo("conditions", e.target.value)
-                }
-                required
-                placeholder="Kondisi penyimpanan yang aman..."
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="disposal">Informasi Pembuangan *</Label>
-              <Textarea
-                id="disposal"
-                value={storageInfo.disposal}
-                onChange={(e) => updateStorageInfo("disposal", e.target.value)}
-                required
-                placeholder="Cara pembuangan yang aman..."
-                rows={3}
-              />
-            </div>
           </div>
 
           {/* Submit */}

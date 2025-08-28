@@ -76,15 +76,11 @@ export async function PUT(
     const {
       name,
       formula,
-      casNumber,
       form,
+      characteristic,
       unit,
       purchaseDate,
       expirationDate,
-      location,
-      cabinet,
-      room,
-      temperature,
     } = parsedChemical.data;
 
     const { type, quantity, description } = parsedStock.data;
@@ -119,18 +115,14 @@ export async function PUT(
       data: {
         name,
         formula,
-        casNumber,
         form,
+        characteristic,
         currentStock: newStock,
         unit,
         purchaseDate: new Date(purchaseDate).toISOString(),
         expirationDate: expirationDate
           ? new Date(expirationDate).toISOString()
           : null,
-        location,
-        cabinet,
-        room,
-        temperature,
         updatedBy: { connect: { id: userAccess.userId } },
       },
     });
@@ -192,7 +184,11 @@ export async function DELETE(
   { params }: { params: Promise<{ chemicalId: string }> }
 ) {
   try {
-    const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
+    const userAccess = await requireRoleOrNull([
+      "ADMIN",
+      "LABORAN",
+      "PETUGAS_GUDANG",
+    ]);
     if (userAccess instanceof NextResponse) return userAccess;
 
     const { chemicalId } = await params;

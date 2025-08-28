@@ -37,16 +37,12 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
   const [formData, setFormData] = useState({
     name: "",
     formula: "",
-    casNumber: "",
     form: "SOLID",
+    characteristic: "GENERAL",
     stock: 0,
     unit: "",
     purchaseDate: "",
     expirationDate: "",
-    location: "",
-    room: "",
-    cabinet: "",
-    temperature: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,27 +81,23 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
         }
       );
 
-      console.log("Response:", response.data);
-
       toast({
         title: "Berhasil! 🎉",
         description: "Bahan kimia berhasil ditambahkan ke inventaris",
       });
 
+      console.log("Response:", response.data);
+
       setOpen(false);
       setFormData({
         name: "",
         formula: "",
-        casNumber: "",
         form: "SOLID",
+        characteristic: "GENERAL",
         stock: 0,
         unit: "",
         purchaseDate: "",
         expirationDate: "",
-        location: "",
-        room: "",
-        cabinet: "",
-        temperature: "",
       });
 
       setOpen(false);
@@ -173,17 +165,25 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {/* CAS Number */}
-            <FormInput
-              id="casNumber"
-              label="CAS Number"
-              value={formData.casNumber}
-              onChange={(e) =>
-                setFormData({ ...formData, casNumber: e.target.value })
+            {/* Sifat Bahan */}
+            <FormSelect
+              htmlFor="characteristic"
+              label="Sifat"
+              value={formData.characteristic}
+              onChange={(value) =>
+                setFormData({
+                  ...formData,
+                  characteristic:
+                    value as ChemicalCreateSchemaFormData["characteristic"],
+                })
               }
-              placeholder="7664-93-9"
-              error={errors.casNumber}
-            />
+              required
+              error={errors.characteristic}>
+              <SelectItem value="ACID">Asam</SelectItem>
+              <SelectItem value="BASE">Basa</SelectItem>
+              <SelectItem value="GENERAL">General</SelectItem>
+              <SelectItem value="OXIDANT">Oksidan</SelectItem>
+            </FormSelect>
 
             {/* Bentuk Bahan */}
             <FormSelect
@@ -201,10 +201,6 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
               <SelectItem value="SOLID">Padat</SelectItem>
               <SelectItem value="LIQUID">Cair</SelectItem>
               <SelectItem value="GAS">Gas</SelectItem>
-              <SelectItem value="ACID">Asam</SelectItem>
-              <SelectItem value="BASE">Basa</SelectItem>
-              <SelectItem value="GENERAL">General</SelectItem>
-              <SelectItem value="OXIDANT">Oksidan</SelectItem>
             </FormSelect>
           </div>
 
@@ -218,7 +214,7 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  stock: e.target.value === "" ? 0 : Number(e.target.value),
+                  stock: Number(e.target.value),
                 })
               }
               placeholder="Contoh: 500"
@@ -265,60 +261,6 @@ export function AddChemicalDialog({ children }: AddChemicalDialogProps) {
               }
               required
               error={errors.expirationDate}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* Lokasi Penyimpanan */}
-            <FormInput
-              id="location"
-              label="Lokasi Penyimpanan"
-              value={formData.location}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
-              }
-              placeholder="Lemari Asam"
-              required
-              error={errors.location}
-            />
-
-            {/* Cabinet/Rak */}
-            <FormInput
-              id="cabinet"
-              label="Cabinet/Rak"
-              value={formData.cabinet}
-              onChange={(e) =>
-                setFormData({ ...formData, cabinet: e.target.value })
-              }
-              placeholder="A1"
-              required
-              error={errors.cabinet}
-            />
-
-            {/* Ruang Laboratorium */}
-            <FormInput
-              id="room"
-              label="Ruang Laboratorium"
-              value={formData.room}
-              onChange={(e) =>
-                setFormData({ ...formData, room: e.target.value })
-              }
-              placeholder="Lab Kimia-1"
-              required
-              error={errors.room}
-            />
-
-            {/* Suhu Penyimpanan */}
-            <FormInput
-              id="temperature"
-              label="Suhu Penyimpanan"
-              value={formData.temperature}
-              onChange={(e) =>
-                setFormData({ ...formData, temperature: e.target.value })
-              }
-              placeholder="4°C"
-              required
-              error={errors.temperature}
             />
           </div>
 

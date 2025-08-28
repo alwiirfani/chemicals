@@ -9,17 +9,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Download } from "lucide-react";
+import { Search, Download, Upload } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 interface ChemicalFilterProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   filterForm: string;
   onFilterFormChange: (value: string) => void;
-  filterLocation: string;
-  onFilterLocationChange: (value: string) => void;
-  uniqueRooms: (string | null)[];
+  filterCharacteristic: string;
+  onFilterCharacteristicChange: (value: string) => void;
   onExport: () => void;
+  onImport: (form: string, file: File | null) => void;
+  loadingImport?: boolean;
+  userRole: string;
 }
 
 export const ChemicalFilter = ({
@@ -27,11 +38,26 @@ export const ChemicalFilter = ({
   onSearchChange,
   filterForm,
   onFilterFormChange,
-  filterLocation,
-  onFilterLocationChange,
-  uniqueRooms,
+  filterCharacteristic,
+  onFilterCharacteristicChange,
   onExport,
+  onImport,
+  loadingImport,
+  userRole,
 }: ChemicalFilterProps) => {
+  const [importOpen, setImportOpen] = useState(false);
+  const [importForm, setImportForm] = useState("SOLID");
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const canAction =
+    userRole === "ADMIN" ||
+    userRole === "LABORAN" ||
+    userRole === "PETUGAS_GUDANG";
+
+  const handleImportSubmit = () => {
+    onImport(importForm, importFile);
+    setImportOpen(false);
+    setImportFile(null);
+  };
   return (
     <div className="bg-white rounded-xl border">
       <div className="p-6 space-y-2">
@@ -60,6 +86,17 @@ export const ChemicalFilter = ({
               <SelectItem value="SOLID">Padat</SelectItem>
               <SelectItem value="LIQUID">Cair</SelectItem>
               <SelectItem value="GAS">Gas</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filterCharacteristic}
+            onValueChange={onFilterCharacteristicChange}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Sifat" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Sifat</SelectItem>
               <SelectItem value="ACID">Asam</SelectItem>
               <SelectItem value="BASE">Basa</SelectItem>
               <SelectItem value="GENERAL">General</SelectItem>
@@ -67,20 +104,51 @@ export const ChemicalFilter = ({
             </SelectContent>
           </Select>
 
-          <Select value={filterLocation} onValueChange={onFilterLocationChange}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Ruang" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Ruang</SelectItem>
-              {uniqueRooms.map((room) => (
-                <SelectItem key={room} value={room ?? "unknown"}>
-                  {room ?? "-"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Import & Export */}
+          {canAction && (
+            <Dialog open={importOpen} onOpenChange={setImportOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-blue-700 hover:bg-blue-400 text-white">
+                  <Upload className="mr-2 h-4 w-4" />
+                  {loadingImport ? "Mengimpor..." : "Import Data"}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Import Data Bahan Kimia</DialogTitle>
+                </DialogHeader>
 
+                <div className="space-y-4">
+                  <Select
+                    value={importForm}
+                    onValueChange={(v) => setImportForm(v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Bentuk" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SOLID">Padat</SelectItem>
+                      <SelectItem value="LIQUID">Cair</SelectItem>
+                      <SelectItem value="GAS">Gas</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+
+                <DialogFooter>
+                  <Button disabled={!importFile} onClick={handleImportSubmit}>
+                    Import Data
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
           <Button
             variant="outline"
             className="bg-green-700 hover:bg-green-400 text-white"
