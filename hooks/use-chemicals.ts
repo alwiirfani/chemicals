@@ -42,14 +42,14 @@ const useChemicals = () => {
 
         const { data } = await axios.get("/api/v1/chemicals", { params });
 
-        const chemicalsCamelCase = convertSnakeToCamel<Chemical[]>(
+        const chemicalsFormattedCamelCase = convertSnakeToCamel<Chemical[]>(
           data.formattedChemicals
         );
 
-        console.log("Fetched Chemicals:", chemicalsCamelCase);
+        console.log("Fetched Chemicals:", chemicalsFormattedCamelCase);
 
-        setChemicals(chemicalsCamelCase);
-        setTotal(data.total);
+        setChemicals(chemicalsFormattedCamelCase);
+        setTotal(data.stats.totalChemicals);
         setPagination({
           currentPage: data.pagination.page,
           total: data.pagination.total,
