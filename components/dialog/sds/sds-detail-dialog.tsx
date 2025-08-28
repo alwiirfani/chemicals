@@ -25,6 +25,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
 import Link from "next/link";
+import axios from "axios";
 
 interface SDSDetailDialogProps {
   sds: SDS;
@@ -42,13 +43,21 @@ export function SDSDetailDialog({
   const handleDownload = async (path: string) => {
     try {
       if (path) {
+        const response = await axios.get(path, { responseType: "blob" });
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
         const link = document.createElement("a");
-        link.href = path;
+        link.href = url;
         link.download = `from-sds-${sds.chemical.name.replace(
           /\s+/g,
           "-"
         )}.pdf`;
+        document.body.appendChild(link);
+
         link.click();
+        link.remove();
 
         toast({
           title: "Download Started! 📥",
@@ -158,9 +167,6 @@ export function SDSDetailDialog({
                       <span className="font-medium">
                         {sds.chemical.formula}
                       </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">CAS Number:</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Bentuk:</span>

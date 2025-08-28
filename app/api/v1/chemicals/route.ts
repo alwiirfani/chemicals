@@ -96,6 +96,12 @@ export async function GET(request: NextRequest) {
             ? chemical.updatedBy.laboran?.full_name
             : "";
           break;
+        case "PETUGAS_GUDANG":
+          createdByName = chemical.createdBy.laboran?.full_name || "";
+          updatedByName = chemical.updatedBy
+            ? chemical.updatedBy.laboran?.full_name
+            : "";
+          break;
         default:
           createdByName = "Tidak diketahui";
           break;
@@ -106,6 +112,7 @@ export async function GET(request: NextRequest) {
         name: chemical.name,
         formula: chemical.formula,
         form: chemical.form,
+        characteristic: chemical.characteristic,
         stock: chemical.currentStock,
         unit: chemical.unit,
         purchase_date: chemical.purchaseDate?.toISOString(),

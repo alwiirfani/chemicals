@@ -48,9 +48,9 @@ export const UserTable: React.FC<UserTableProps> = ({
 }) => {
   return (
     <>
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border">
         <div className="w-full overflow-x-auto">
-          <Table className="min-w-[800px]">
+          <Table className="table-auto min-w-[800px]">
             <TableHeader>
               <TableRow className="bg-blue-50 hover:bg-blue-100">
                 <TableHead className="whitespace-nowrap">Nama</TableHead>

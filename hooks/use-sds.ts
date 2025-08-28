@@ -182,6 +182,7 @@ export const useSds = () => {
       } else if (uploadType === "link") {
         fd.append("externalUrl", formData.externalUrl || "");
       }
+
       // Debugging - log isi FormData
       console.log("=== ISI FORM DATA ===");
       for (const [key, value] of fd.entries()) {

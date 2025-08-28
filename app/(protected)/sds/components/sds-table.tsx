@@ -27,6 +27,7 @@ import { UpdateSDSDialog } from "@/components/dialog/sds/sds-update-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
 import type { SDSData } from "@/hooks/use-sds";
+import axios from "axios";
 
 interface SDSPaginationProps {
   currentPage: number;
@@ -72,13 +73,23 @@ export function SDSTable({
   const handleDownload = async (sds: SDS) => {
     try {
       if (sds.filePath) {
+        const response = await axios.get(sds.filePath, {
+          responseType: "blob",
+        });
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
         const link = document.createElement("a");
-        link.href = sds.filePath;
+        link.href = url;
         link.download = `from-sds-${sds.chemical.name.replace(
           /\s+/g,
           "-"
         )}.pdf`;
+        document.body.appendChild(link);
+
         link.click();
+        link.remove();
 
         toast({
           title: "Download Started! 📥",
@@ -118,9 +129,9 @@ export function SDSTable({
 
   return (
     <>
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border">
         <div className="w-full overflow-x-auto">
-          <Table className="min-w-[800px]">
+          <Table className="table-auto min-w-[800px]">
             <TableHeader>
               <TableRow className="bg-blue-50 hover:bg-blue-100">
                 <TableHead className="whitespace-nowrap pl-4 w-[60px]">

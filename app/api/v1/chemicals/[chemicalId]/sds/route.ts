@@ -2,15 +2,18 @@ import { requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { sdsCreateSchema } from "@/lib/validation/sds";
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import fs from "fs/promises";
+import { put } from "@vercel/blob";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ chemicalId: string }> }
 ) {
   try {
-    const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
+    const userAccess = await requireRoleOrNull([
+      "ADMIN",
+      "LABORAN",
+      "PETUGAS_GUDANG",
+    ]);
     if (userAccess instanceof NextResponse) return userAccess;
 
     const { chemicalId } = await params;
@@ -41,34 +44,22 @@ export async function POST(
       );
     }
 
-    //! Validasi hanya salah satu
-    if (!externalUrl && !sdsFile) {
-      return NextResponse.json(
-        { error: "Harus mengirim file SDS atau link eksternal" },
-        { status: 400 }
-      );
-    }
-    if (externalUrl && sdsFile) {
-      return NextResponse.json(
-        { error: "Pilih salah satu: file SDS atau link eksternal" },
-        { status: 400 }
-      );
-    }
-
-    // Simpan file ke folder public/uploads/sds
-    let fileUrl = null;
+    // Simpan file ke @vercel/blob storage
+    let fileUrl: string | null = null;
     if (sdsFile) {
       const bytes = await sdsFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const uploadsDir = path.join(process.cwd(), "public/uploads/sds");
-      await fs.mkdir(uploadsDir, { recursive: true });
 
       const fileName = `${Date.now()}-${sdsFile.name}`;
-      const filePath = path.join(uploadsDir, fileName);
-      await fs.writeFile(filePath, buffer);
+
+      const { url } = await put(fileName, buffer, {
+        access: "public",
+        contentType: sdsFile.type,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
 
       // Path yang akan disimpan ke DB (akses dari FE)
-      fileUrl = `/uploads/sds/${fileName}`;
+      fileUrl = url;
     }
 
     const sds = await db.safetyDataSheet.create({

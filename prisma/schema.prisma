@@ -195,6 +195,7 @@ model SafetyDataSheet {
   updatedAt          DateTime             @updatedAt @map("updated_at")
   SDSDownloadHistory SDSDownloadHistory[]
 
+  @@index([chemicalId, language])
   @@map("safety_data_sheets")
 }
 

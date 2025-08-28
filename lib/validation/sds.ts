@@ -29,18 +29,6 @@ export const sdsUpdateSchema = z
     chemicalId: z.string().min(1, { message: "Tidak boleh kosong" }),
     externalUrl: z.string().optional(),
     language: z.enum(["ID", "EN"]),
-    hazardClassification: z
-      .array(z.string().min(1, { message: "Tidak boleh kosong" }))
-      .min(1, { message: "Minimal 1 klasifikasi bahayag" }),
-    precautionaryStatement: z
-      .array(z.string().min(1, { message: "Tidak boleh kosong" }))
-      .min(1, { message: "Minimal 1 pernyataan kehati-hatian" }),
-    firstAidInhalation: z.string().optional(),
-    firstAidSkin: z.string().optional(),
-    firstAidEye: z.string().optional(),
-    firstAidIngestion: z.string().optional(),
-    storageConditions: z.string().optional(),
-    disposalInfo: z.string().optional(),
     sdsFile: z
       .instanceof(File)
       .optional()

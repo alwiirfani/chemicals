@@ -52,7 +52,7 @@ const SdsFilter = ({
               <SelectValue placeholder="Bahasa" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="all">Semua Bahasa</SelectItem>
               {uniqueLanguages.map((language) => (
                 <SelectItem key={language} value={language || "unknown"}>
                   {language === "ID"

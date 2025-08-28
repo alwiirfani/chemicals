@@ -50,9 +50,9 @@ export function ChemicalTable({
 
   return (
     <>
-      <div className="rounded-md border overflow-hidden">
-        <div className="w-full overflow-x-auto">
-          <Table className="min-w-[800px]">
+      <div className="rounded-md border">
+        <div className="w-full overflow0-x-auto">
+          <Table className="table-auto min-w-[800px]">
             <TableHeader>
               <TableRow className="bg-blue-50 hover:bg-blue-100">
                 <TableHead className="whitespace-nowrap pl-4 w-[60px]">

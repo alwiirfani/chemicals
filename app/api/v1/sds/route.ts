@@ -84,6 +84,10 @@ export async function GET(request: NextRequest) {
           createdByName = sds.createdBy.laboran?.full_name || "";
           updatedByName = sds.updatedBy ? sds.updatedBy.laboran?.full_name : "";
           break;
+        case "PETUGAS_GUDANG":
+          createdByName = sds.createdBy.laboran?.full_name || "";
+          updatedByName = sds.updatedBy ? sds.updatedBy.laboran?.full_name : "";
+          break;
         default:
           createdByName = "Tidak diketahui";
           break;
