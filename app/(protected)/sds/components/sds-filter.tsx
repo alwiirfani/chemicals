@@ -48,7 +48,7 @@ const SdsFilter = ({
           </div>
 
           <Select value={filterLanguage} onValueChange={setFilterLanguage}>
-            <SelectTrigger className="w-full sm:w-[120px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Bahasa" />
             </SelectTrigger>
             <SelectContent>
