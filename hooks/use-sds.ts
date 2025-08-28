@@ -90,9 +90,6 @@ export const useSds = () => {
       setIsDeleting(true);
       await axios.delete(`/api/v1/sds/${deletingSdsId}`, {
         withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
       setSdsRecords((prev) => prev.filter((s) => s.id !== deletingSdsId));
       toast({ title: "Berhasil", description: "SDS dihapus" });
@@ -308,7 +305,7 @@ export const useSds = () => {
     uploadSds,
     updateSds,
     resetForm,
-    populateFormData, // ADDED: Fungsi untuk populate form data
+    populateFormData, //? Fungsi untuk populate form data
   };
 };
 

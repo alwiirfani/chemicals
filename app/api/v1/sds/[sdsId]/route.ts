@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { sdsUpdateSchema } from "@/lib/validation/sds";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { del } from "@vercel/blob";
 
 export async function PUT(
   request: NextRequest,
@@ -158,10 +159,35 @@ export async function DELETE(
   { params }: { params: Promise<{ sdsId: string }> }
 ) {
   try {
-    const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
+    const userAccess = await requireRoleOrNull([
+      "ADMIN",
+      "LABORAN",
+      "PETUGAS_GUDANG",
+    ]);
     if (userAccess instanceof NextResponse) return userAccess;
 
     const { sdsId } = await params;
+
+    const existingSds = await db.safetyDataSheet.findUnique({
+      where: { id: sdsId },
+    });
+
+    if (!existingSds) {
+      return NextResponse.json(
+        { error: "Safety Data Sheet tidak ditemukan" },
+        { status: 404 }
+      );
+    }
+
+    if (existingSds?.filePath) {
+      try {
+        await del(existingSds.filePath, {
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+      } catch (error) {
+        console.warn("Gagal menghapus file SDS:", error);
+      }
+    }
 
     await db.safetyDataSheet.delete({
       where: { id: sdsId },
