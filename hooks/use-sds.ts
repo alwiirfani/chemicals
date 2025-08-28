@@ -160,7 +160,7 @@ export const useSds = () => {
     setUploadType(sdsData.uploadType);
   }, []);
 
-  // Fungsi utama untuk upload SDS
+  // Fungsi untuk upload SDS
   const uploadSds = async () => {
     setLoading(true);
 

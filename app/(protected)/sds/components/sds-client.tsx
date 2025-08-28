@@ -115,9 +115,9 @@ export function SDSClient({ user }: SDSClientProps) {
       {/* SDS Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Data Bahan Kimia</CardTitle>
+          <CardTitle className="text-lg">Data Safety Data Sheet</CardTitle>
           <CardDescription>
-            Menampilkan {filteredSDS.length} dari {total} bahan kimia
+            Menampilkan {filteredSDS.length} dari {total} Safety Data Sheet
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

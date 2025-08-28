@@ -55,7 +55,6 @@ export const ChemicalFilter = ({
 
   const handleImportSubmit = () => {
     onImport(importForm, importFile);
-    setImportOpen(false);
     setImportFile(null);
   };
   return (
@@ -110,7 +109,8 @@ export const ChemicalFilter = ({
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="bg-blue-700 hover:bg-blue-400 text-white">
+                  className="bg-blue-700 hover:bg-blue-400 text-white"
+                  disabled={loadingImport}>
                   <Upload className="mr-2 h-4 w-4" />
                   {loadingImport ? "Mengimpor..." : "Import Data"}
                 </Button>
@@ -143,7 +143,7 @@ export const ChemicalFilter = ({
 
                 <DialogFooter>
                   <Button disabled={!importFile} onClick={handleImportSubmit}>
-                    Import Data
+                    {loadingImport ? "Mengimpor..." : "Import Data"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
