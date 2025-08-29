@@ -39,6 +39,10 @@ export async function GET(request: NextRequest) {
       ].filter(Boolean) as Prisma.ChemicalWhereInput[],
     };
 
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
     const [
       chemicals,
       total,
@@ -71,12 +75,8 @@ export async function GET(request: NextRequest) {
       db.chemical.count({
         where: {
           expirationDate: {
-            gte: new Date(),
-            lte: new Date(
-              new Date().getFullYear(),
-              new Date().getMonth() + 1,
-              0
-            ),
+            gte: startOfMonth,
+            lte: endOfMonth,
           },
         },
       }),

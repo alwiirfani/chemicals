@@ -67,7 +67,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                 />
               </div>
 
-              {/* Bentuk dan Stok */}
+              {/* Bentuk dan Sifat */}
               <div className="space-y-4">
                 {/* Bentuk */}
                 <FormSelect
@@ -96,7 +96,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   label="Sifat"
                   value={formData.characteristic}
                   onChange={(value) =>
-                    setFormData({ ...formData, form: value })
+                    setFormData({ ...formData, characteristic: value })
                   }
                   placeholder="Pilih sifat"
                   required>
@@ -113,6 +113,9 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                     Oksidan
                   </SelectItem>
                 </FormSelect>
+              </div>
+
+              <div className="space-y-4">
                 {/* Aksi Stok */}
                 <FormSelect
                   htmlFor="type"
@@ -134,40 +137,6 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   </SelectItem>
                 </FormSelect>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Stok */}
-                  <FormInput
-                    id="quantity"
-                    label="Jumlah"
-                    type="number"
-                    value={formData.quantity}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        quantity: Number(e.target.value),
-                      });
-                    }}
-                    placeholder="1000"
-                    className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                    disabled={loading}
-                    required
-                  />
-
-                  {/* Satuan */}
-                  <FormInput
-                    id="unit"
-                    label="Satuan"
-                    value={formData.unit}
-                    onChange={(e) =>
-                      setFormData({ ...formData, unit: e.target.value })
-                    }
-                    className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
-                    placeholder="gram, ml, kg"
-                    disabled={loading}
-                    required
-                  />
-                </div>
-
                 {/* Deskripsi Mutasi Stok */}
                 <FormInput
                   id="description"
@@ -179,6 +148,40 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   placeholder="Misal: tambah untuk percobaan A"
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                   disabled={loading}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Jumlah */}
+                <FormInput
+                  id="quantity"
+                  label="Jumlah"
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      quantity: Number(e.target.value),
+                    });
+                  }}
+                  placeholder="1000"
+                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={loading}
+                  required
+                />
+
+                {/* Satuan */}
+                <FormInput
+                  id="unit"
+                  label="Satuan"
+                  value={formData.unit}
+                  onChange={(e) =>
+                    setFormData({ ...formData, unit: e.target.value })
+                  }
+                  className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  placeholder="gram, ml, kg"
+                  disabled={loading}
+                  required
                 />
               </div>
             </div>
