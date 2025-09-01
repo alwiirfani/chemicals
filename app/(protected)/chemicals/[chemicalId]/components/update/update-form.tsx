@@ -124,11 +124,14 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   onChange={(value) =>
                     setFormData({
                       ...formData,
-                      type: value as "ADD" | "REDUCE",
+                      type: value as "ADD" | "REDUCE" | "NOTHING",
                     })
                   }
                   placeholder="Pilih aksi"
                   required>
+                  <SelectItem value="NOTHING" className="hover:bg-blue-50">
+                    Tidak Ada Aksi
+                  </SelectItem>
                   <SelectItem value="ADD" className="hover:bg-blue-50">
                     Tambah Stok
                   </SelectItem>
@@ -157,7 +160,7 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   id="quantity"
                   label="Jumlah"
                   type="number"
-                  value={formData.quantity}
+                  value={formData.quantity || ""}
                   onChange={(e) => {
                     setFormData({
                       ...formData,
@@ -167,7 +170,6 @@ const UpdateChemicalForm: React.FC<ChemicalFormDataProps> = ({
                   placeholder="1000"
                   className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                   disabled={loading}
-                  required
                 />
 
                 {/* Satuan */}

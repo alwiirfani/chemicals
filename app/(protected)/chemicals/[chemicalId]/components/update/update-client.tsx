@@ -24,7 +24,7 @@ export default function UpdateChemicalClient() {
     expirationDate: "",
 
     // for stock update
-    type: "ADD",
+    type: "NOTHING",
     quantity: 0,
     description: "",
   });

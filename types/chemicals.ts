@@ -24,7 +24,7 @@ export interface ChemicalFormData {
   expirationDate: string;
 
   // for stock update
-  type: "ADD" | "REDUCE";
+  type: "ADD" | "REDUCE" | "NOTHING";
   quantity: number;
   description: string;
 }
