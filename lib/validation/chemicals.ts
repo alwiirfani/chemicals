@@ -23,7 +23,7 @@ export const chemicalUpdateSchema = z
     purchaseDate: z.string(),
     expirationDate: z.string().optional(),
     type: z.enum(["ADD", "REDUCE", "NOTHING"]).default("NOTHING"), // jenis perubahan stok
-    quantity: z.number().nonnegative().optional(), // jumlah perubahan stok
+    quantity: z.number().optional(), // jumlah perubahan stok
     description: z.string().optional(),
   })
   .refine(
