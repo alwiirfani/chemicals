@@ -33,7 +33,10 @@ const HomeSdsClient = () => {
   const filteredSDS = sdsRecords.filter((sds) => {
     const matchesSearch =
       sds.chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sds.chemical.formula.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (sds.chemical.formula &&
+        sds.chemical.formula
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())) ||
       (sds.fileName &&
         sds.fileName.toLowerCase().includes(searchTerm.toLowerCase()));
 

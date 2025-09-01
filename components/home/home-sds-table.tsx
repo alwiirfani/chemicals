@@ -139,7 +139,7 @@ const HomeSdsTable = ({
                           {format(sds.createdAt, "dd/MM/yyyy", { locale: id })}
                         </div>
                         <div className="text-xs text-gray-400">
-                          {sds.downloadCount} downloads • {sds.createdByName}
+                          downloads • {sds.createdByName}
                         </div>
                       </div>
                     </div>

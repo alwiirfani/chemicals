@@ -215,10 +215,10 @@ export function SDSDetailDialog({
                     {format(sds.createdAt, "dd/MM/yyyy", { locale: id })}
                   </p>
                 </div>
-                <div>
+                {/* <div>
                   <span className="text-gray-600">Diunduh:</span>
                   <p className="font-medium">{sds.downloadCount} kali</p>
-                </div>
+                </div> */}
               </div>
             </div>
 
