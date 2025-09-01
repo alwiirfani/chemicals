@@ -4,6 +4,7 @@ import { SDS } from "@/types/sds";
 import { put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 import JSZip from "jszip";
+import pLimit from "p-limit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,93 +34,102 @@ export async function POST(request: NextRequest) {
       ([path, entry]) => !entry.dir && path.toLowerCase().endsWith(".pdf")
     );
 
-    const failed: { file: string; reason: string }[] = [];
+    // Ambil semua chemical sekaligus dari DB
+    const allChemicals = await db.chemical.findMany();
+    const chemicalMap = new Map(
+      allChemicals.map((c) => [c.name.toLowerCase(), c])
+    );
 
-    // Proses paralel dengan Promise.all
+    const failed: { file: string; reason: string }[] = [];
+    const limit = pLimit(10); // maksimal 5 file bersamaan
+
+    // Fungsi untuk proses satu file
+    const processFile = async ([path, entry]: [string, JSZip.JSZipObject]) => {
+      try {
+        const pdfBuffer = await entry.async("nodebuffer");
+        const originalName = path.split("/").pop() || path;
+        const baseName = originalName.replace(/\.pdf$/i, "").toLowerCase();
+
+        const existingChemical = chemicalMap.get(baseName);
+        if (!existingChemical) {
+          failed.push({ file: originalName, reason: "Chemical not found" });
+          return null;
+        }
+
+        // Upload ke Vercel Blob
+        const fileName = `${Date.now()}-${originalName}`;
+        const { url } = await put(fileName, pdfBuffer, {
+          access: "public",
+          contentType: "application/pdf",
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+
+        // Upsert SDS
+        const record = await db.safetyDataSheet.upsert({
+          where: { chemicalId: existingChemical.id },
+          update: {
+            fileName: originalName,
+            filePath: url,
+            language: "ID",
+            updatedById: userAccess.userId,
+          },
+          create: {
+            chemicalId: existingChemical.id,
+            fileName: originalName,
+            filePath: url,
+            language: "ID",
+            createdById: userAccess.userId,
+          },
+        });
+
+        return {
+          id: record.id,
+          fileName: record.fileName,
+          filePath: record.filePath,
+          externalUrl: record.externalUrl ?? null,
+          language: record.language,
+          createdByName:
+            userAccess.role === "ADMIN"
+              ? "Administrator"
+              : userAccess.name || "Unknown",
+          updatedByName:
+            userAccess.role === "ADMIN"
+              ? "Administrator"
+              : userAccess.name || "Unknown",
+          createdAt: record.createdAt,
+          updatedAt: record.updatedAt,
+          chemical: {
+            id: existingChemical.id,
+            name: existingChemical.name,
+            formula: existingChemical.formula,
+            form: existingChemical.form,
+            characteristic: existingChemical.characteristic,
+          },
+        } as SDS;
+      } catch (err) {
+        failed.push({ file: path, reason: String(err) });
+        return null;
+      }
+    };
+
+    // Proses semua file dengan concurrency limit
     const records: SDS[] = (
       await Promise.all(
-        pdfEntries.map(async ([path, entry]) => {
-          try {
-            const pdfBuffer = await entry.async("nodebuffer");
-
-            const originalName = path.split("/").pop() || path;
-            const baseName = originalName.replace(/\.pdf$/i, "").toLowerCase();
-
-            const existingChemical = await db.chemical.findFirst({
-              where: {
-                name: { equals: baseName, mode: "insensitive" },
-              },
-            });
-
-            if (!existingChemical) {
-              console.warn(`No chemical found for ${baseName}`);
-              failed.push({ file: originalName, reason: "Chemical not found" });
-              return null; // skip
-            }
-
-            // Upload ke Vercel Blob
-            const fileName = `${Date.now()}-${originalName}`;
-            const { url } = await put(fileName, pdfBuffer, {
-              access: "public",
-              contentType: "application/pdf",
-              token: process.env.BLOB_READ_WRITE_TOKEN,
-            });
-
-            // Upsert SDS
-            const record = await db.safetyDataSheet.upsert({
-              where: { chemicalId: existingChemical.id },
-              update: {
-                fileName: originalName,
-                filePath: url,
-                language: "ID",
-                updatedById: userAccess.userId,
-              },
-              create: {
-                chemicalId: existingChemical.id,
-                fileName: originalName,
-                filePath: url,
-                language: "ID",
-                createdById: userAccess.userId,
-              },
-            });
-
-            return {
-              id: record.id,
-              fileName: record.fileName,
-              filePath: record.filePath,
-              externalUrl: record.externalUrl ?? null,
-              language: record.language,
-              createdByName:
-                userAccess.role === "ADMIN"
-                  ? "Administrator"
-                  : userAccess.name || "Unknown",
-              updatedByName:
-                userAccess.role === "ADMIN"
-                  ? "Administrator"
-                  : userAccess.name || "Unknown",
-              createdAt: record.createdAt,
-              updatedAt: record.updatedAt,
-              chemical: {
-                id: existingChemical.id,
-                name: existingChemical.name,
-                formula: existingChemical.formula,
-                form: existingChemical.form,
-                characteristic: existingChemical.characteristic,
-              },
-            } as SDS;
-          } catch (err) {
-            console.error("Error processing file:", path, err);
-            failed.push({ file: path, reason: String(err) });
-            return null;
-          }
-        })
+        pdfEntries.map((entry) => limit(() => processFile(entry)))
       )
     ).filter((r): r is SDS => r !== null);
 
+    console.log(
+      `\n📊 Import selesai. Berhasil: ${records.length}, Gagal: ${failed.length}`
+    );
+    if (failed.length > 0) console.table(failed);
+
     return NextResponse.json({
       message: "Import SDS selesai",
-      count: records.length,
+      success: records.length,
+      failed: failed.length,
       records,
+      errors: failed,
     });
   } catch (error) {
     console.error("Error importing SDS:", error);
