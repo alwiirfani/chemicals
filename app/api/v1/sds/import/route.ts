@@ -24,90 +24,102 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Load ZIP
     const buffer = Buffer.from(await file.arrayBuffer());
     const zip = await JSZip.loadAsync(buffer);
 
-    const createRecords: SDS[] = [];
+    // Ambil semua entry PDF valid
+    const pdfEntries = Object.entries(zip.files).filter(
+      ([path, entry]) => !entry.dir && path.toLowerCase().endsWith(".pdf")
+    );
 
-    for (const [path, entry] of Object.entries(zip.files)) {
-      if (entry.dir || !path.toLowerCase().endsWith(".pdf")) continue; // skip folder & non-PDF file
+    const failed: { file: string; reason: string }[] = [];
 
-      const pdfBuffer = await entry.async("nodebuffer");
+    // Proses paralel dengan Promise.all
+    const records: SDS[] = (
+      await Promise.all(
+        pdfEntries.map(async ([path, entry]) => {
+          try {
+            const pdfBuffer = await entry.async("nodebuffer");
 
-      // ambil nama file asli tanpa folder
-      const originalName = path.split("/").pop() || path;
-      const fileName = `${Date.now()}-${originalName}`;
+            const originalName = path.split("/").pop() || path;
+            const baseName = originalName.replace(/\.pdf$/i, "").toLowerCase();
 
-      const baseName = originalName.replace(/\.pdf$/i, "").toLowerCase(); // Remove .pdf extension
+            const existingChemical = await db.chemical.findFirst({
+              where: {
+                name: { equals: baseName, mode: "insensitive" },
+              },
+            });
 
-      const existingChemical = await db.chemical.findFirst({
-        where: {
-          name: {
-            equals: baseName,
-            mode: "insensitive",
-          },
-        },
-      });
+            if (!existingChemical) {
+              console.warn(`No chemical found for ${baseName}`);
+              failed.push({ file: originalName, reason: "Chemical not found" });
+              return null; // skip
+            }
 
-      if (!existingChemical) {
-        console.warn(`No chemical found for ${baseName}`);
-        continue; // Skip if no matching chemical found
-      }
+            // Upload ke Vercel Blob
+            const fileName = `${Date.now()}-${originalName}`;
+            const { url } = await put(fileName, pdfBuffer, {
+              access: "public",
+              contentType: "application/pdf",
+              token: process.env.BLOB_READ_WRITE_TOKEN,
+            });
 
-      const { url } = await put(fileName, pdfBuffer, {
-        access: "public",
-        contentType: "application/pdf",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-      });
+            // Upsert SDS
+            const record = await db.safetyDataSheet.upsert({
+              where: { chemicalId: existingChemical.id },
+              update: {
+                fileName: originalName,
+                filePath: url,
+                language: "ID",
+                updatedById: userAccess.userId,
+              },
+              create: {
+                chemicalId: existingChemical.id,
+                fileName: originalName,
+                filePath: url,
+                language: "ID",
+                createdById: userAccess.userId,
+              },
+            });
 
-      const record = await db.safetyDataSheet.upsert({
-        where: { chemicalId: existingChemical.id },
-        update: {
-          chemicalId: existingChemical.id,
-          fileName: originalName,
-          filePath: url,
-          language: "ID",
-          updatedById: userAccess.userId,
-        },
-        create: {
-          chemicalId: existingChemical.id,
-          fileName: originalName,
-          filePath: url,
-          language: "ID",
-          createdById: userAccess.userId,
-        },
-      });
-
-      createRecords.push({
-        id: record.id,
-        fileName: record.fileName,
-        filePath: record.filePath,
-        externalUrl: record.externalUrl ? record.externalUrl : null,
-        language: record.language,
-        createdByName:
-          userAccess.role === "ADMIN"
-            ? "Administrator"
-            : userAccess.name || "Unknown",
-        updatedByName:
-          userAccess.role === "ADMIN"
-            ? "Administrator"
-            : userAccess.name || "Unknown",
-        createdAt: record.createdAt,
-        updatedAt: record.updatedAt,
-        chemical: {
-          id: existingChemical.id,
-          name: existingChemical.name,
-          formula: existingChemical.formula,
-          form: existingChemical.form,
-          characteristic: existingChemical.characteristic,
-        },
-      });
-    }
+            return {
+              id: record.id,
+              fileName: record.fileName,
+              filePath: record.filePath,
+              externalUrl: record.externalUrl ?? null,
+              language: record.language,
+              createdByName:
+                userAccess.role === "ADMIN"
+                  ? "Administrator"
+                  : userAccess.name || "Unknown",
+              updatedByName:
+                userAccess.role === "ADMIN"
+                  ? "Administrator"
+                  : userAccess.name || "Unknown",
+              createdAt: record.createdAt,
+              updatedAt: record.updatedAt,
+              chemical: {
+                id: existingChemical.id,
+                name: existingChemical.name,
+                formula: existingChemical.formula,
+                form: existingChemical.form,
+                characteristic: existingChemical.characteristic,
+              },
+            } as SDS;
+          } catch (err) {
+            console.error("Error processing file:", path, err);
+            failed.push({ file: path, reason: String(err) });
+            return null;
+          }
+        })
+      )
+    ).filter((r): r is SDS => r !== null);
 
     return NextResponse.json({
-      message: "import berhasil",
-      count: createRecords.length,
-      records: createRecords,
+      message: "Import SDS selesai",
+      count: records.length,
+      records,
     });
   } catch (error) {
     console.error("Error importing SDS:", error);
