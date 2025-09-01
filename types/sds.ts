@@ -2,9 +2,8 @@ export interface SDS {
   id: string;
   fileName: string | null;
   filePath: string | null;
-  externalUrl: string;
+  externalUrl: string | null;
   language: string;
-  downloadCount: number;
   createdByName: string;
   updatedByName: string;
   createdAt: Date;
@@ -12,7 +11,7 @@ export interface SDS {
   chemical: {
     id: string;
     name: string;
-    formula: string;
+    formula: string | null;
     form: string;
     characteristic: string;
   };

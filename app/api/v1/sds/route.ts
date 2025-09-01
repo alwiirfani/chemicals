@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       ].filter(Boolean) as Prisma.SafetyDataSheetWhereInput[],
     };
 
-    const [sdsRecords, total] = await Promise.all([
+    const [sdsRecords, totalConditional, totalAllSds] = await Promise.all([
       db.safetyDataSheet.findMany({
         where,
         include: {
@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
       }),
       db.safetyDataSheet.count({ where }),
+      db.safetyDataSheet.count(),
     ]);
 
     const formattedSdsRecords = sdsRecords.map((sds) => {
@@ -117,10 +118,11 @@ export async function GET(request: NextRequest) {
         message: "SDS fetched successfully",
         sds: sdsRecords,
         formattedSdsRecords: formattedSdsRecords,
+        totalConditional,
         pagination: {
           page,
-          total,
-          pages: Math.ceil(total / limit),
+          totalAllSds,
+          pages: Math.ceil(totalAllSds / limit),
         },
       },
       { status: 200 }

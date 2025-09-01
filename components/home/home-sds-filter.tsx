@@ -45,11 +45,11 @@ const HomeSdsFilter = ({
           </div>
 
           <Select value={filterLanguage} onValueChange={setFilterLanguage}>
-            <SelectTrigger className="w-full sm:w-[120px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Bahasa" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="all">Semua Bahasa</SelectItem>
               {uniqueLanguages.map((language) => (
                 <SelectItem key={language} value={language || "unknown"}>
                   {language === "ID"

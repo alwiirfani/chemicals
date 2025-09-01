@@ -155,7 +155,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
+    const userAccess = await requireRoleOrNull([
+      "ADMIN",
+      "LABORAN",
+      "PETUGAS_GUDANG",
+    ]);
     if (userAccess instanceof NextResponse) return userAccess;
 
     const body = await request.json();

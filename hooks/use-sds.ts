@@ -53,10 +53,10 @@ export const useSds = () => {
         console.log("Data safety documents: ", sdsCamelCase);
 
         setSdsRecords(sdsCamelCase);
-        setTotal(data.total);
+        setTotal(data.pagination.totalAllSds);
         setPagination({
           currentPage: data.pagination.page,
-          total: data.total,
+          total: data.pagination.totalAllSds,
           totalPages: data.pagination.pages,
         });
         setLoadingTable(false);

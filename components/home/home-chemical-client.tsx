@@ -18,6 +18,7 @@ const HomeChemicalClient = () => {
     chemicals,
     pagination,
     loading,
+    total,
 
     searchTerm,
     setSearchTerm,
@@ -56,8 +57,7 @@ const HomeChemicalClient = () => {
         <CardHeader>
           <CardTitle className="text-lg">Data Bahan Kimia</CardTitle>
           <CardDescription>
-            Menampilkan {filteredChemicals.length} dari {chemicals.length} bahan
-            kimia
+            Menampilkan {filteredChemicals.length} dari {total} bahan kimia
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

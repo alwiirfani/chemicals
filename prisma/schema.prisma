@@ -211,17 +211,24 @@ model SDSDownloadHistory {
   @@map("sds_download_history")
 }
 
+enum SarjanaLevel {
+  S1
+  S2
+  S3
+}
+
 model Borrowing {
-  id          String          @id @default(nanoid()) @db.VarChar(255)
-  purpose     String          @db.Text
-  status      BorrowingStatus @default(PENDING)
-  requestDate DateTime        @default(now()) @map("request_date")
-  approvedAt  DateTime?       @map("approved_at")
-  rejectedAt  DateTime?       @map("rejected_at")
-  returnedAt  DateTime?       @map("returned_at")
-  notes       String?         @db.Text
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
+  id           String          @id @default(nanoid()) @db.VarChar(255)
+  purpose      String          @db.Text
+  sarjanaLevel SarjanaLevel?   @map("sarjana_level")
+  status       BorrowingStatus @default(PENDING)
+  requestDate  DateTime        @default(now()) @map("request_date")
+  approvedAt   DateTime?       @map("approved_at")
+  rejectedAt   DateTime?       @map("rejected_at")
+  returnedAt   DateTime?       @map("returned_at")
+  notes        String?         @db.Text
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
 
   // Relations
   approvedById String? @map("approved_by_id") @db.VarChar(255)

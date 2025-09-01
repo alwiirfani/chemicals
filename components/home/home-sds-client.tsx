@@ -17,6 +17,7 @@ const HomeSdsClient = () => {
     sdsRecords,
     pagination,
     loadingTable,
+    total,
 
     // Filter
     searchTerm,
@@ -62,8 +63,7 @@ const HomeSdsClient = () => {
         <CardHeader>
           <CardTitle className="text-lg">Data Safety Data Sheet</CardTitle>
           <CardDescription>
-            Menampilkan {filteredSDS.length} dari {filteredSDS.length} Safety
-            Data Sheet
+            Menampilkan {filteredSDS.length} dari {total} Safety Data Sheet
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

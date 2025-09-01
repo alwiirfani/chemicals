@@ -17,12 +17,17 @@ import { useSds } from "@/hooks/use-sds";
 import CardStats from "@/components/card-stats";
 import SdsFilter from "./sds-filter";
 import { exportSdsToExcel } from "@/helpers/sds/export-sds-to-excel";
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 interface SDSClientProps {
   user: UserAuth;
 }
 
 export function SDSClient({ user }: SDSClientProps) {
+  const [loadingImport, setLoadingImport] = useState(false);
+
   const {
     // Data
     sdsRecords,
@@ -51,7 +56,7 @@ export function SDSClient({ user }: SDSClientProps) {
   const filteredSDS = sdsRecords.filter((sds) => {
     const matchesSearch =
       sds.chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sds.chemical.formula.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sds.chemical.formula?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (sds.fileName &&
         sds.fileName.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -61,12 +66,49 @@ export function SDSClient({ user }: SDSClientProps) {
     return matchesSearch && matchesLanguage;
   });
 
+  const handleImport = async (file: File | null) => {
+    try {
+      setLoadingImport(true);
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post("/api/v1/sds/import", formData, {
+        withCredentials: true,
+      });
+
+      console.log("Import response:", response.data);
+
+      toast({
+        title: "Import Selesai! 🎉",
+        description: "Data SDS berhasil diimpor.",
+      });
+
+      // Refresh data after import
+      // Refresh the chemical list after import
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      console.error("Error importing SDS:", error);
+      toast({
+        title: "Error saat mengimpor SDS",
+        description: "Terjadi kesalahan saat mengimpor data SDS.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Get unique values for filters
   const uniqueLanguages = Array.from(
     new Set(sdsRecords.map((s) => s.language))
   );
 
-  const canManage = user.role === "ADMIN" || user.role === "LABORAN";
+  const canManage =
+    user.role === "ADMIN" ||
+    user.role === "LABORAN" ||
+    user.role === "PETUGAS_GUDANG";
 
   return (
     <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
@@ -110,6 +152,9 @@ export function SDSClient({ user }: SDSClientProps) {
         setFilterLanguage={setFilterLanguage}
         filterLanguage={filterLanguage}
         onExport={() => exportSdsToExcel(filteredSDS)}
+        onImport={handleImport}
+        loadingImport={loadingImport}
+        userRole={user.role}
       />
 
       {/* SDS Table */}

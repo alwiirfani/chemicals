@@ -32,7 +32,7 @@ const HomeChemicalFilter = ({
       <div className="p-6 space-y-2">
         <span className="text-lg font-semibold">Filter & Pencarian</span>
         <p className="text-sm sm:text-base text-muted-foreground">
-          Cari bahan kimia berdasarkan nama bahan, rumus, atau CAS number.
+          Cari bahan kimia berdasarkan nama bahan, rumus.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
