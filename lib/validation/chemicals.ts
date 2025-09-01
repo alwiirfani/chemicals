@@ -24,8 +24,8 @@ export const chemicalUpdateSchema = z.object({
 });
 
 export const stockUpdateSchema = z.object({
-  type: z.enum(["ADD", "REDUCE"]), // jenis perubahan stok
-  quantity: z.number().positive(), // jumlah perubahan stok
+  type: z.enum(["ADD", "REDUCE"]).optional(), // jenis perubahan stok
+  quantity: z.number().positive().optional(), // jumlah perubahan stok
   description: z.string().optional(),
 });
 
