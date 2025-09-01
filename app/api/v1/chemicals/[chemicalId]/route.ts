@@ -1,9 +1,6 @@
 import { requireAuthOrNull, requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
-import {
-  chemicalUpdateSchema,
-  stockUpdateSchema,
-} from "@/lib/validation/chemicals";
+import { chemicalUpdateSchema } from "@/lib/validation/chemicals";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -78,6 +75,9 @@ export async function PUT(
       unit,
       purchaseDate,
       expirationDate,
+      type,
+      quantity,
+      description,
     } = parsedChemical.data;
 
     const existingChemical = await db.chemical.findUnique({
@@ -93,22 +93,12 @@ export async function PUT(
     // default: stok lama dipakai
     let newStock = existingChemical.currentStock;
 
-    // kalau ada field stok → validasi & update
-    if ("type" in body && "quantity" in body) {
-      const parsedStock = stockUpdateSchema.safeParse(body);
-      if (!parsedStock.success) {
-        return NextResponse.json(
-          { error: "Data stok tidak valid", issues: parsedStock.error.issues },
-          { status: 400 }
-        );
-      }
-
-      const { type, quantity, description } = parsedStock.data;
-
+    // hanya kalau ada mutasi stok
+    if (type && quantity !== undefined) {
       if (type === "ADD") {
-        newStock += quantity ?? 0;
+        newStock += quantity;
       } else if (type === "REDUCE") {
-        newStock -= quantity ?? 0;
+        newStock -= quantity;
         if (newStock < 0) {
           return NextResponse.json(
             { error: "Stok tidak boleh negatif" },
@@ -116,43 +106,43 @@ export async function PUT(
           );
         }
       }
+    }
 
-      // cek mutasi stok hari ini
-      const startOfToday = new Date();
-      startOfToday.setHours(0, 0, 0, 0);
+    // cek mutasi stok hari ini
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
-      const endOfToday = new Date();
-      endOfToday.setHours(23, 59, 59, 999);
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
 
-      const existingMutation = await db.stockMutation.findFirst({
-        where: {
-          chemicalId,
-          createdAt: { gte: startOfToday, lte: endOfToday },
+    const existingMutation = await db.stockMutation.findFirst({
+      where: {
+        chemicalId,
+        createdAt: { gte: startOfToday, lte: endOfToday },
+      },
+    });
+
+    const safeQuantity = quantity ?? 0;
+    const quantityChange = type === "ADD" ? safeQuantity : -safeQuantity;
+
+    if (existingMutation) {
+      await db.stockMutation.update({
+        where: { id: existingMutation.id },
+        data: {
+          quantity: existingMutation.quantity + quantityChange,
+          description: description || "Perubahan stok (otomatis)",
+          updatedById: userAccess.userId,
         },
       });
-
-      const safeQuantity = quantity ?? 0;
-      const quantityChange = type === "ADD" ? safeQuantity : -safeQuantity;
-
-      if (existingMutation) {
-        await db.stockMutation.update({
-          where: { id: existingMutation.id },
-          data: {
-            quantity: existingMutation.quantity + quantityChange,
-            description: description || "Perubahan stok (otomatis)",
-            updatedById: userAccess.userId,
-          },
-        });
-      } else {
-        await db.stockMutation.create({
-          data: {
-            chemicalId,
-            quantity: quantityChange,
-            description: description || "Perubahan stok (otomatis)",
-            createdById: userAccess.userId,
-          },
-        });
-      }
+    } else {
+      await db.stockMutation.create({
+        data: {
+          chemicalId,
+          quantity: quantityChange,
+          description: description || "Perubahan stok (otomatis)",
+          createdById: userAccess.userId,
+        },
+      });
     }
 
     // update data kimia (stok ikut diupdate jika ada mutasi)

@@ -21,9 +21,6 @@ export const chemicalUpdateSchema = z.object({
   unit: z.string().min(1),
   purchaseDate: z.string(),
   expirationDate: z.string().optional(),
-});
-
-export const stockUpdateSchema = z.object({
   type: z.enum(["ADD", "REDUCE"]).optional(), // jenis perubahan stok
   quantity: z.number().positive().optional(), // jumlah perubahan stok
   description: z.string().optional(),
