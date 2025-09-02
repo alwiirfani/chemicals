@@ -17,9 +17,12 @@ import { useSds } from "@/hooks/use-sds";
 import CardStats from "@/components/card-stats";
 import SdsFilter from "./sds-filter";
 import { exportSdsToExcel } from "@/helpers/sds/export-sds-to-excel";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
+import JSZip from "jszip";
+import pLimit from "p-limit";
+import { UploadedFile } from "@/types/sds";
 
 interface SDSClientProps {
   user: UserAuth;
@@ -66,6 +69,7 @@ export function SDSClient({ user }: SDSClientProps) {
     return matchesSearch && matchesLanguage;
   });
 
+  const limit = pLimit(5);
   const MAX_ZIP_SIZE = 50 * 1024 * 1024; // 50MB
   const handleImport = async (file: File | null) => {
     try {
@@ -85,26 +89,70 @@ export function SDSClient({ user }: SDSClientProps) {
 
       setLoadingImport(true);
 
-      const formData = new FormData();
-      formData.append("file", file);
+      const zip = new JSZip();
+      const zipData = await zip.loadAsync(file);
 
-      const response = await axios.post("/api/v1/sds/import", formData, {
-        withCredentials: true,
-        timeout: 180000, // 3 minutes
-      });
+      // bikin array task upload tapi dibungkus dengan limit
+      const uploadTasks = Object.keys(zipData.files).map((fileName) =>
+        limit(async () => {
+          const entry = zipData.files[fileName];
+          if (entry.dir || !fileName.toLowerCase().endsWith(".pdf"))
+            return null;
 
-      console.log("Import response:", response.data);
+          try {
+            const blobContent = await entry.async("blob");
 
-      if (response.data.failed > 0) {
+            // ambil nama asli tanpa folder
+            const baseName = fileName.split("/").pop() || fileName;
+
+            const formData = new FormData();
+            formData.append("file", blobContent, baseName);
+
+            const resUpload = await axios.post("/api/v1/sds/upload", formData, {
+              withCredentials: true,
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            const { url } = resUpload.data;
+
+            console.log("Nama file:", fileName);
+            console.log("URL:", url);
+
+            return { fileName: baseName, filePath: url };
+          } catch (err) {
+            console.error(`Upload gagal untuk ${fileName}`, err);
+            return null;
+          }
+        })
+      );
+
+      // eksekusi semua upload dengan concurrency limit
+      const uploadedFiles = (await Promise.all(uploadTasks)).filter(
+        Boolean
+      ) as UploadedFile[];
+
+      console.log("Files uploaded:", uploadedFiles);
+
+      try {
+        // kirim metadata ke backend untuk matching
+        const response = await axios.post(
+          "/api/v1/sds/import",
+          { files: uploadedFiles },
+          { withCredentials: true }
+        );
+
+        console.log("Import response:", response.data);
+
         toast({
-          title: "Import selesai dengan error",
-          description: `${response.data.failed} file gagal diimpor`,
-          variant: "destructive",
+          title: "Import selesai 🎉",
+          description: `${response.data.results?.length} file diproses`,
         });
-      } else {
+      } catch (error) {
+        console.error("Error importing SDS:", error);
         toast({
-          title: "Import Selesai! 🎉",
-          description: "Semua data SDS berhasil diimpor.",
+          title: "Error",
+          description: "Terjadi kesalahan saat mengimpor",
+          variant: "destructive",
         });
       }
 
@@ -114,36 +162,11 @@ export function SDSClient({ user }: SDSClientProps) {
       }, 100);
     } catch (error) {
       console.error("Error importing SDS:", error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 413) {
-          toast({
-            title: "File terlalu besar",
-            description:
-              error.response.data?.error || "Ukuran file melebihi batas 50MB",
-            variant: "destructive",
-          });
-        } else if (error.code === "ECONNABORTED") {
-          toast({
-            title: "Timeout",
-            description:
-              "Proses import terlalu lama. Coba dengan file yang lebih kecil atau hubungi administrator.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error mengimpor SDS",
-            description:
-              error.response?.data?.error || "Terjadi kesalahan saat mengimpor",
-            variant: "destructive",
-          });
-        }
-      } else {
-        toast({
-          title: "Error tidak diketahui",
-          description: "Terjadi kesalahan saat mengimpor",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat mengimpor",
+        variant: "destructive",
+      });
     } finally {
       setLoadingImport(false);
     }
@@ -187,7 +210,7 @@ export function SDSClient({ user }: SDSClientProps) {
           title="Total SDS"
           icon={<File className="h-4 w-4 text-green-600" />}>
           <div className="text-xl sm:text-2xl text-green-600 font-bold pt-4 sm:pt-7">
-            {sdsRecords.length}
+            {total}
           </div>
           <p className="text-xs text-muted-foreground">dokumen</p>
         </CardStats>

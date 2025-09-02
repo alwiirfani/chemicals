@@ -109,7 +109,7 @@ const SdsFilter = ({
                 <div className="space-y-4">
                   <Input
                     type="file"
-                    accept=".xlsx,.xls"
+                    accept=".zip"
                     onChange={(e) => setImportFile(e.target.files?.[0] || null)}
                   />
                 </div>

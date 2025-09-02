@@ -40,3 +40,8 @@ export interface SDSData {
   uploadType: "file" | "link";
   externalUrl?: string;
 }
+
+export interface UploadedFile {
+  fileName: string;
+  filePath: string; // url dari vercel blob
+}
