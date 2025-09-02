@@ -2,8 +2,7 @@
   "functions": {
     "app/api/v1/sds/import/route.ts": {
       "maxDuration": 180,
-      "memory": 3008,
-      "maxRequestBodySize": 52428800
+      "memory": 3008
     }
   },
   "headers": [
