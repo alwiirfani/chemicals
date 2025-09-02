@@ -6,6 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 import JSZip from "jszip";
 import pLimit from "p-limit";
 
+// ukuran maksimal file ZIP (50MB)
+const MAX_ZIP_FILE_SIZE = 50 * 1024 * 1024;
+// ukuran maksimal file PDF individual (10MB)
+const MAX_PDF_SIZE = 10 * 1024 * 1024;
+
 export async function POST(request: NextRequest) {
   try {
     const userAccess = await requireRoleOrNull([
@@ -25,6 +30,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validasi ukuran file ZIP
+    if (file.size > MAX_ZIP_FILE_SIZE) {
+      return NextResponse.json(
+        {
+          error: `Ukuran file ZIP terlalu besar. Maksimum ${
+            MAX_ZIP_FILE_SIZE / 1024 / 1024
+          }MB`,
+        },
+        { status: 413 }
+      );
+    }
+
+    console.log(
+      `📦 Memproses file ZIP: ${(file.size / 1024 / 1024).toFixed(2)}MB`
+    );
+
     // Load ZIP
     const buffer = Buffer.from(await file.arrayBuffer());
     const zip = await JSZip.loadAsync(buffer);
@@ -34,6 +55,15 @@ export async function POST(request: NextRequest) {
       ([path, entry]) => !entry.dir && path.toLowerCase().endsWith(".pdf")
     );
 
+    if (pdfEntries.length === 0) {
+      return NextResponse.json(
+        { error: "File ZIP tidak mengandung file PDF" },
+        { status: 400 }
+      );
+    }
+
+    console.log(`📄 Ditemukan ${pdfEntries.length} file PDF dalam ZIP`);
+
     // Ambil semua chemical sekaligus dari DB
     const allChemicals = await db.chemical.findMany();
     const chemicalMap = new Map(
@@ -41,12 +71,26 @@ export async function POST(request: NextRequest) {
     );
 
     const failed: { file: string; reason: string }[] = [];
-    const limit = pLimit(20); // maksimal 20 file bersamaan
+    const limit = pLimit(10); // maksimal 10 file bersamaan
 
     // Fungsi untuk proses satu file
     const processFile = async ([path, entry]: [string, JSZip.JSZipObject]) => {
       try {
         const pdfBuffer = await entry.async("nodebuffer");
+
+        // Validasi ukuran file PDF individual
+        if (pdfBuffer.length > MAX_PDF_SIZE) {
+          failed.push({
+            file: path,
+            reason: `File PDF terlalu besar (${(
+              pdfBuffer.length /
+              1024 /
+              1024
+            ).toFixed(2)}MB, maksimum ${MAX_PDF_SIZE / 1024 / 1024}MB)`,
+          });
+          return null;
+        }
+
         const originalName = path.split("/").pop() || path;
         const baseName = originalName.replace(/\.pdf$/i, "").toLowerCase();
 
@@ -81,6 +125,8 @@ export async function POST(request: NextRequest) {
             createdById: userAccess.userId,
           },
         });
+
+        console.log(`✅ Berhasil memproses: ${originalName}`);
 
         return {
           id: record.id,
@@ -139,3 +185,10 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Konfigurasi untuk App Router - Nonaktifkan bodyParser default
+export const config = {
+  api: {
+    bodyParser: false, // Nonaktifkan bodyParser default untuk handle FormData
+  },
+};

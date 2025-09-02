@@ -67,16 +67,31 @@ export function SDSClient({ user }: SDSClientProps) {
     return matchesSearch && matchesLanguage;
   });
 
+  const MAX_ZIP_SIZE = 50 * 1024 * 1024; // 50MB
   const handleImport = async (file: File | null) => {
     try {
-      setLoadingImport(true);
       if (!file) return;
+
+      // Validasi ukuran file
+      if (file.size > MAX_ZIP_SIZE) {
+        toast({
+          title: "File terlalu besar",
+          description: `Ukuran file maksimum adalah ${
+            MAX_ZIP_SIZE / 1024 / 1024
+          }MB`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setLoadingImport(true);
 
       const formData = new FormData();
       formData.append("file", file);
 
       const response = await axios.post("/api/v1/sds/import", formData, {
         withCredentials: true,
+        timeout: 180000, // 3 minutes
       });
 
       console.log("Import response:", response.data);
@@ -100,11 +115,36 @@ export function SDSClient({ user }: SDSClientProps) {
       }
     } catch (error) {
       console.error("Error importing SDS:", error);
-      toast({
-        title: "Error saat mengimpor SDS",
-        description: "Terjadi kesalahan saat mengimpor data SDS.",
-        variant: "destructive",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 413) {
+          toast({
+            title: "File terlalu besar",
+            description:
+              error.response.data?.error || "Ukuran file melebihi batas 50MB",
+            variant: "destructive",
+          });
+        } else if (error.code === "ECONNABORTED") {
+          toast({
+            title: "Timeout",
+            description:
+              "Proses import terlalu lama. Coba dengan file yang lebih kecil atau hubungi administrator.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error mengimpor SDS",
+            description:
+              error.response?.data?.error || "Terjadi kesalahan saat mengimpor",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Error tidak diketahui",
+          description: "Terjadi kesalahan saat mengimpor",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoadingImport(false);
     }
