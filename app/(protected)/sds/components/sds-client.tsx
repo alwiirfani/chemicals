@@ -80,10 +80,18 @@ export function SDSClient({ user }: SDSClientProps) {
 
       console.log("Import response:", response.data);
 
-      toast({
-        title: "Import Selesai! 🎉",
-        description: "Data SDS berhasil diimpor.",
-      });
+      if (response.data.failed > 0) {
+        toast({
+          title: "Import selesai dengan error",
+          description: `${response.data.failed} file gagal diimpor`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Import Selesai! 🎉",
+          description: "Semua data SDS berhasil diimpor.",
+        });
+      }
 
       // Refresh data after import
       // Refresh the chemical list after import
@@ -97,6 +105,8 @@ export function SDSClient({ user }: SDSClientProps) {
         description: "Terjadi kesalahan saat mengimpor data SDS.",
         variant: "destructive",
       });
+    } finally {
+      setLoadingImport(false);
     }
   };
 
