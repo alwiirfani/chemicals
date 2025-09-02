@@ -267,7 +267,6 @@ export const useSds = () => {
   return {
     // Data
     sdsRecords,
-    setSdsRecords,
     total,
     pagination,
     loadingTable,

@@ -185,10 +185,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// Konfigurasi untuk App Router - Nonaktifkan bodyParser default
-export const config = {
-  api: {
-    bodyParser: false, // Nonaktifkan bodyParser default untuk handle FormData
-  },
-};
