@@ -31,6 +31,7 @@ export function SDSClient({ user }: SDSClientProps) {
   const {
     // Data
     sdsRecords,
+    setSdsRecords,
     total,
     pagination,
     loadingTable,
@@ -93,11 +94,10 @@ export function SDSClient({ user }: SDSClientProps) {
         });
       }
 
-      // Refresh data after import
-      // Refresh the chemical list after import
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      // Update state tabel SDS tanpa reload
+      if (response.data.records?.length) {
+        setSdsRecords((prev) => [...response.data.records, ...prev]);
+      }
     } catch (error) {
       console.error("Error importing SDS:", error);
       toast({

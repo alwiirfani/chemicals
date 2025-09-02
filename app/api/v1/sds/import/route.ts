@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     );
 
     const failed: { file: string; reason: string }[] = [];
-    const limit = pLimit(10); // maksimal 5 file bersamaan
+    const limit = pLimit(20); // maksimal 20 file bersamaan
 
     // Fungsi untuk proses satu file
     const processFile = async ([path, entry]: [string, JSZip.JSZipObject]) => {
