@@ -103,7 +103,7 @@ const SdsFilter = ({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Import Data Bahan Kimia</DialogTitle>
+                  <DialogTitle>Import Data Safety Data Sheet</DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4">
