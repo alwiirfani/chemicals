@@ -105,7 +105,15 @@ export function SDSClient({ user }: SDSClientProps) {
             // ambil nama asli tanpa folder
             const baseName = fileName.split("/").pop() || fileName;
 
-            const safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
+            // Bersihkan karakter aneh
+            let safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+            // paksa jadi lowercase
+            safeName = safeName.toLowerCase();
+
+            // paksa ekstensi jadi .pdf (lowercase)
+            safeName = safeName.replace(/\.[^.]+$/, ".pdf");
+
             const fileObj = new globalThis.File([blobContent], safeName, {
               type: "application/pdf",
             });
