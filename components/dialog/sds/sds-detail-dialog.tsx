@@ -117,7 +117,7 @@ export function SDSDetailDialog({
                     <Button
                       variant="destructive"
                       className="flex items-center gap-2 px-4 py-2"
-                      onClick={() => handleDownload(sds.filePath || "")}>
+                      onClick={() => `${sds.filePath}?download=1`}>
                       <Download className="h-4 w-4" />
                       <span>Download PDF</span>
                     </Button>
