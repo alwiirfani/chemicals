@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     const { url } = await put(file.name, file, {
       access: "public",
-      contentType: file.type,
+      contentType: "application/pdf",
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
