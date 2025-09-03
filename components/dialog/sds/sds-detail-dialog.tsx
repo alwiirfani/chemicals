@@ -99,14 +99,18 @@ export function SDSDetailDialog({
               </div>
               <div className="flex items-center gap-2">
                 {sds.filePath && (
-                  <Button variant="destructive">
-                    <Link
-                      className="flex items-center gap-2"
+                  <Button
+                    className="flex items-center gap-2 px-4 py-2"
+                    variant="destructive"
+                    asChild>
+                    <a
                       href={sds.filePath || ""}
-                      target="_blank">
+                      target="_blank"
+                      download
+                      rel="noopener noreferrer">
                       <Download className="h-4 w-4" />
                       <span>Download PDF</span>
-                    </Link>
+                    </a>
                   </Button>
                 )}
                 {sds.externalUrl && (
