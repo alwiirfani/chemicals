@@ -105,8 +105,13 @@ export function SDSClient({ user }: SDSClientProps) {
             // ambil nama asli tanpa folder
             const baseName = fileName.split("/").pop() || fileName;
 
+            const safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const fileObj = new globalThis.File([blobContent], safeName, {
+              type: "application/pdf",
+            });
+
             const formData = new FormData();
-            formData.append("file", blobContent, baseName);
+            formData.append("file", fileObj);
 
             const resUpload = await axios.post("/api/v1/sds/upload", formData, {
               withCredentials: true,
