@@ -1,9 +1,13 @@
 export function normalizeFileName(baseName: string) {
-  // bersihkan karakter aneh
-  let safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
-  // lowercase semua
+  let safeName = baseName.replace(/[\\/#?%&:*<>|{}\[\]]/g, "_");
+
+  safeName = safeName.replace(/\s+/g, "-");
+
   safeName = safeName.toLowerCase();
-  // paksa ekstensi jadi .pdf
-  safeName = safeName.replace(/\.[^.]+$/, ".pdf");
+
+  if (!safeName.toLowerCase().endsWith(".pdf")) {
+    safeName += ".pdf";
+  }
+
   return safeName;
 }
