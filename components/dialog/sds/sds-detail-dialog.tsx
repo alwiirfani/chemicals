@@ -19,7 +19,6 @@ import {
   ExternalLink,
   Package,
   Globe,
-  Calendar,
   User,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +42,7 @@ export function SDSDetailDialog({
   const handleDownload = async (path: string) => {
     try {
       if (path) {
-        const response = await axios.get(path, { responseType: "blob" });
+        const response = await axios.get(path, { responseType: "arraybuffer" });
 
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
@@ -86,11 +85,6 @@ export function SDSDetailDialog({
     }
   };
 
-  const viewPdf = (fileUrl: string) => {
-    const fullUrl = `${window.location.origin}${fileUrl}`;
-    window.open(fullUrl, "_blank");
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
@@ -118,7 +112,7 @@ export function SDSDetailDialog({
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
-                {sds.filePath ? (
+                {sds.filePath && (
                   <div className="flex items-center gap-4">
                     <Button
                       variant="destructive"
@@ -127,15 +121,9 @@ export function SDSDetailDialog({
                       <Download className="h-4 w-4" />
                       <span>Download PDF</span>
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="px-4 py-2"
-                      onClick={() => viewPdf(sds.filePath || "")}>
-                      <FileText className="h-4 w-4" />
-                      Baca Dokumen
-                    </Button>
                   </div>
-                ) : (
+                )}
+                {sds.externalUrl && (
                   <Button variant="outline">
                     <Link
                       href={sds.externalUrl || ""}
@@ -150,7 +138,7 @@ export function SDSDetailDialog({
             </div>
 
             {/* Chemical Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div className="space-y-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h4 className="font-medium mb-3 flex items-center gap-2">
@@ -178,16 +166,19 @@ export function SDSDetailDialog({
                           : "Gas"}
                       </span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Sifat:</span>
+                      <span className="font-medium">
+                        {sds.chemical.characteristic === "ACID"
+                          ? "Asam"
+                          : sds.chemical.characteristic === "BASE"
+                          ? "Basa"
+                          : sds.chemical.characteristic === "OXIDANT"
+                          ? "Oksidan"
+                          : "General"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Informasi Dokumen
-                  </h4>
                 </div>
               </div>
             </div>

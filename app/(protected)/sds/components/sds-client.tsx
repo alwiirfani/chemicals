@@ -115,7 +115,7 @@ export function SDSClient({ user }: SDSClientProps) {
 
             const { url } = resUpload.data;
 
-            console.log("Nama file:", fileName);
+            console.log("Nama file:", baseName);
             console.log("URL:", url);
 
             return { fileName: baseName, filePath: url };
