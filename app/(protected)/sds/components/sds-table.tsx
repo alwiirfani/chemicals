@@ -27,6 +27,7 @@ import { UpdateSDSDialog } from "@/components/dialog/sds/sds-update-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
 import type { SDSData } from "@/hooks/use-sds";
+import axios from "axios";
 
 interface SDSPaginationProps {
   currentPage: number;
@@ -72,8 +73,17 @@ export function SDSTable({
   const handleDownload = async (sds: SDS) => {
     try {
       if (sds.filePath) {
+        const response = await axios.get(sds.filePath, {
+          responseType: "blob", // penting supaya tidak corrupt
+        });
+
+        console.log("response.data: ", response.data);
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
         const link = document.createElement("a");
-        link.href = sds.filePath;
+        link.href = url;
         link.download = `from-sds-${sds.chemical.name.replace(
           /\s+/g,
           "-"
