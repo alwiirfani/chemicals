@@ -179,15 +179,6 @@ import { NextRequest, NextResponse } from "next/server";
 // }
 
 export async function POST(request: NextRequest) {
-  // Inisialisasi results array di luar try block untuk scope yang lebih luas
-  const results: {
-    fileName: string;
-    status: string;
-    message?: string;
-    chemical?: string;
-    sdsId?: string;
-  }[] = [];
-
   try {
     const userAccess = await requireRoleOrNull([
       "ADMIN",
@@ -199,150 +190,92 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const files: UploadedFile[] = body.files;
 
-    if (!files || !Array.isArray(files) || files.length === 0) {
+    if (!files || files.length === 0) {
       return NextResponse.json(
-        { error: "Tidak ada file yang dikirim atau format data salah" },
+        { error: "Tidak ada file yang dikirim" },
         { status: 400 }
       );
     }
 
-    console.log(`📦 Memulai proses impor untuk ${files.length} file`);
+    const results: {
+      fileName: string;
+      status: string;
+      message?: string;
+      chemical?: string;
+      sdsId?: string;
+    }[] = [];
 
-    for (const [index, file] of files.entries()) {
-      // Gunakan block try-catch terpisah untuk SETIAP file
-      try {
-        console.log(
-          `\n🔍 Memproses file ${index + 1}/${files.length}:`,
-          file?.fileName || "Unknown"
-        );
+    console.log("Files:", files);
 
-        if (!file || !file.fileName || !file.filePath) {
-          throw new Error("Data file tidak valid atau null");
-        }
-
-        const { fileName, filePath } = file;
-
-        // Validasi dasar nama file dan path
-        if (typeof fileName !== "string" || typeof filePath !== "string") {
-          throw new Error("Nama file atau path tidak valid");
-        }
-
-        // ambil nama bahan kimia dari nama file (misal "Butanol.pdf" → "Butanol")
-        const baseName = fileName.replace(/\.pdf$/i, "").trim();
-
-        if (!baseName) {
-          throw new Error("Nama file tidak valid (setelah menghapus ekstensi)");
-        }
-
-        console.log(`Mencari chemical untuk: '${baseName}'`);
-
-        // coba cari chemical di database
-        const chemical = await db.chemical.findFirst({
-          where: {
-            name: {
-              equals: baseName,
-              mode: "insensitive", // case-insensitive match
-            },
-          },
+    for (const file of files) {
+      if (!file || !file.fileName || !file.filePath) {
+        results.push({
+          fileName: file?.fileName ?? "Unknown",
+          status: "error",
+          message: "File tidak valid atau null",
         });
+        continue;
+      }
 
-        if (!chemical) {
-          results.push({
-            fileName,
-            status: "not_found",
-            message: `Bahan kimia '${baseName}' tidak ditemukan dalam database`,
-          });
-          console.warn(`❌ Chemical tidak ditemukan: ${baseName}`);
-          continue; // Lanjut ke file berikutnya
-        }
+      const { fileName, filePath } = file;
 
-        console.log(
-          `✅ Chemical ditemukan: ${chemical.name} (ID: ${chemical.id})`
-        );
+      // ambil nama bahan kimia dari nama file (misal "Butanol.pdf" → "Butanol")
+      const baseName = fileName.replace(/\.pdf$/i, "").trim();
 
-        // simpan atau update SDS record
-        const sds = await db.safetyDataSheet.upsert({
-          where: {
-            chemicalId: chemical.id,
+      // coba cari chemical di database
+      const chemical = await db.chemical.findFirst({
+        where: {
+          name: {
+            equals: baseName,
+            mode: "insensitive", // case-insensitive match
           },
-          update: {
-            fileName,
-            filePath,
-            language: "ID",
-            updatedAt: new Date(),
-            updatedById: userAccess.userId,
-          },
-          create: {
-            chemicalId: chemical.id,
-            fileName,
-            filePath,
-            language: "ID",
-            createdAt: new Date(),
-            createdById: userAccess.userId,
-          },
-        });
+        },
+      });
 
-        console.log(`✅ Berhasil menyimpan SDS: ${sds.id}`);
-
+      if (!chemical) {
         results.push({
           fileName,
-          status: "success",
-          chemical: chemical.name,
-          sdsId: sds.id,
-          message: "Berhasil diimpor",
+          status: "not_found",
+          message: `Bahan kimia '${baseName}' tidak ditemukan`,
         });
-      } catch (error) {
-        // Error handling untuk file spesifik ini
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error occurred";
-        console.error(
-          `❌ Error memproses file ${file?.fileName || "Unknown"}:`,
-          errorMessage
-        );
-
-        results.push({
-          fileName: file?.fileName || "Unknown",
-          status: "error",
-          message: `Gagal memproses: ${errorMessage}`,
-        });
+        continue;
       }
+
+      // simpan atau update SDS record
+      const sds = await db.safetyDataSheet.upsert({
+        where: {
+          chemicalId: chemical.id,
+        },
+        update: {
+          fileName,
+          filePath,
+          language: "ID",
+          updatedAt: new Date(),
+          updatedById: userAccess.userId,
+        },
+        create: {
+          chemicalId: chemical.id,
+          fileName,
+          filePath,
+          language: "ID",
+          createdAt: new Date(),
+          createdById: userAccess.userId,
+        },
+      });
+
+      results.push({
+        fileName,
+        status: "success",
+        chemical: chemical.name,
+        sdsId: sds.id,
+      });
     }
 
-    // Hitung statistik hasil proses
-    const successCount = results.filter((r) => r.status === "success").length;
-    const notFoundCount = results.filter(
-      (r) => r.status === "not_found"
-    ).length;
-    const errorCount = results.filter((r) => r.status === "error").length;
-
-    console.log(`\n📊 Hasil akhir impor:
-    ✅ Sukses: ${successCount}
-    🔍 Tidak ditemukan: ${notFoundCount}
-    ❌ Error: ${errorCount}
-    📋 Total diproses: ${results.length}`);
-
-    return NextResponse.json({
-      results,
-      summary: {
-        total: results.length,
-        success: successCount,
-        not_found: notFoundCount,
-        error: errorCount,
-      },
-    });
+    return NextResponse.json({ results });
   } catch (error) {
-    // Error global yang menangkap exception di luar loop
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown global error";
-    console.error("❌ Error global dalam proses import SDS:", error);
-
-    // Kembalikan results yang sudah berhasil dikumpulkan + error global
+    console.error("Error import SDS:", error);
     return NextResponse.json(
-      {
-        error: "Terjadi kesalahan dalam proses import",
-        detail: errorMessage,
-        results, // Hasil yang sudah berhasil diproses sebelum error global terjadi
-      },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
