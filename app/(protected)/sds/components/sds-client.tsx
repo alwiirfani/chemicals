@@ -23,6 +23,7 @@ import { toast } from "@/hooks/use-toast";
 import JSZip from "jszip";
 import pLimit from "p-limit";
 import { UploadedFile } from "@/types/sds";
+import { normalizeFileName } from "@/helpers/sds/normalization-pdf";
 
 interface SDSClientProps {
   user: UserAuth;
@@ -105,14 +106,7 @@ export function SDSClient({ user }: SDSClientProps) {
             // ambil nama asli tanpa folder
             const baseName = fileName.split("/").pop() || fileName;
 
-            // Bersihkan karakter aneh
-            let safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-            // paksa jadi lowercase
-            safeName = safeName.toLowerCase();
-
-            // paksa ekstensi jadi .pdf (lowercase)
-            safeName = safeName.replace(/\.[^.]+$/, ".pdf");
+            const safeName = normalizeFileName(baseName);
 
             const fileObj = new globalThis.File([blobContent], safeName, {
               type: "application/pdf",
@@ -128,10 +122,10 @@ export function SDSClient({ user }: SDSClientProps) {
 
             const { url } = resUpload.data;
 
-            console.log("Nama file:", baseName);
+            console.log("Nama file:", safeName);
             console.log("URL:", url);
 
-            return { fileName: baseName, filePath: url };
+            return { fileName: safeName, filePath: url };
           } catch (err) {
             console.error(`Upload gagal untuk ${fileName}`, err);
             return null;

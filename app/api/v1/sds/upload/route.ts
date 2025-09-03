@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { normalizeFileName } from "@/helpers/sds/normalization-pdf";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const { url } = await put(file.name, file, {
+    const safeName = normalizeFileName(file.name);
+
+    const { url } = await put(safeName, file, {
       access: "public",
       contentType: "application/pdf",
       token: process.env.BLOB_READ_WRITE_TOKEN,
