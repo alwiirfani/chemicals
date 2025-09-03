@@ -82,12 +82,13 @@ export function SDSTable({
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
 
+        const safeName = sanitizeFileName(
+          `from-sds-${sds.fileName}` || "file.pdf"
+        );
+
         const link = document.createElement("a");
         link.href = url;
-        link.download = `from-sds-${sds.chemical.name.replace(
-          /\s+/g,
-          "-"
-        )}.pdf`;
+        link.download = safeName;
         document.body.appendChild(link);
 
         link.click();
@@ -282,4 +283,13 @@ export function SDSTable({
       )}
     </>
   );
+}
+
+function sanitizeFileName(filename: string): string {
+  return (
+    filename
+      .replace(/\.pdf$/i, "") // hapus .pdf di akhir dulu
+      .replace(/\./g, "") + // hapus semua titik lain
+    ".pdf"
+  ); // tambahkan kembali .pdf
 }

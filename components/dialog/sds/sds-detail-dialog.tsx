@@ -24,6 +24,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
 import Link from "next/link";
+import axios from "axios";
 
 interface SDSDetailDialogProps {
   sds: SDS;
@@ -38,11 +39,24 @@ export function SDSDetailDialog({
 }: SDSDetailDialogProps) {
   const { toast } = useToast();
 
-  const handleDownload = async (filePath?: string) => {
+  const handleDownload = async (path: string) => {
     try {
-      if (filePath) {
-        const fullUrl = `${filePath}`;
-        window.open(fullUrl, "_blank");
+      if (path) {
+        const response = await axios.get(path, { responseType: "blob" });
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `from-sds-${sds.chemical.name.replace(
+          /\s+/g,
+          "-"
+        )}.pdf`;
+        document.body.appendChild(link);
+
+        link.click();
+        link.remove();
 
         toast({
           title: "Download Started! 📥",
@@ -99,19 +113,15 @@ export function SDSDetailDialog({
               </div>
               <div className="flex items-center gap-2">
                 {sds.filePath && (
-                  <Button
-                    className="flex items-center gap-2 px-4 py-2"
-                    variant="destructive"
-                    asChild>
-                    <a
-                      href={sds.filePath || ""}
-                      target="_blank"
-                      download
-                      rel="noopener noreferrer">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="destructive"
+                      className="flex items-center gap-2 px-4 py-2"
+                      onClick={() => handleDownload(sds.filePath || "")}>
                       <Download className="h-4 w-4" />
                       <span>Download PDF</span>
-                    </a>
-                  </Button>
+                    </Button>
+                  </div>
                 )}
                 {sds.externalUrl && (
                   <Button variant="outline">
