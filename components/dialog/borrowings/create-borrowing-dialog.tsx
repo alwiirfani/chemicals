@@ -44,6 +44,7 @@ interface BorrowingItem {
 
 export function CreateBorrowingDialog({
   children,
+  user,
 }: CreateBorrowingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,7 @@ export function CreateBorrowingDialog({
   >({});
 
   const [formData, setFormData] = useState({
+    nrp: "",
     purpose: "",
     notes: "",
     items: [{ chemicalId: "", quantity: 0 }] as BorrowingItem[],
@@ -152,6 +154,7 @@ export function CreateBorrowingDialog({
       // Reset form
       setOpen(false);
       setFormData({
+        nrp: "",
         purpose: "",
         notes: "",
         items: [{ chemicalId: "", quantity: 0 }],
@@ -191,9 +194,33 @@ export function CreateBorrowingDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Nama dan NRP */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nama</Label>
+              <Input
+                id="name"
+                value={user?.name || ""}
+                disabled
+                className="cursor-not-allowed"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nrp">NRP</Label>
+              <Input
+                id="nrp"
+                value={formData.nrp}
+                onChange={(e) =>
+                  setFormData({ ...formData, nrp: e.target.value })
+                }
+                className="cursor-not-allowed"
+              />
+            </div>
+          </div>
+
           {/* Purpose */}
           <div className="space-y-2">
-            <Label htmlFor="purpose">Tujuan Peminjaman *</Label>
+            <Label htmlFor="purpose">Judul Penelitian/Kegiatan *</Label>
             <Textarea
               id="purpose"
               value={formData.purpose}
@@ -212,7 +239,7 @@ export function CreateBorrowingDialog({
           {/* Items */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label>Bahan Kimia yang Dipinjam *</Label>
+              <Label>Bahan Kimia yang Diminta *</Label>
               <Button
                 type="button"
                 variant="outline"
@@ -334,7 +361,7 @@ export function CreateBorrowingDialog({
                   Mengajukan...
                 </div>
               ) : (
-                "Ajukan Peminjaman"
+                "Ajukan Permintaan"
               )}
             </Button>
           </div>

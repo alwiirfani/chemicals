@@ -24,7 +24,7 @@ const navigation = [
   { name: "Beranda", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Inventaris Bahan", href: "/chemicals", icon: Package },
-  { name: "Peminjaman/Bon", href: "/borrowings", icon: FileText },
+  { name: "Permintaan/Bon", href: "/borrowings", icon: FileText },
   { name: "SDS", href: "/sds", icon: FileText },
   { name: "Laporan", href: "/reports", icon: BarChart3 },
   { name: "Pengguna", href: "/users", icon: Users, adminOnly: true },

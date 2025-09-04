@@ -10,12 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
 import { QRCodeDialog } from "@/components/dialog/chemicals/qr-code-dialog";
 import { Chemical } from "@/types/chemicals";
-import { isExpired, isExpiringSoon } from "@/helpers/chemicals/chemical-table";
-import { formatDateToString } from "@/helpers/format-date";
 
 interface ChemicalPaginationProps {
   currentPage: number;
@@ -75,7 +72,7 @@ const HomeChemicalTable = ({
                     </div>
                   </TableCell>
                   <TableCell>
-                    {chemical.expirationDate ? (
+                    {/* {chemical.expirationDate ? (
                       <div className="flex items-center gap-2">
                         <span
                           className={
@@ -105,7 +102,7 @@ const HomeChemicalTable = ({
                       </div>
                     ) : (
                       <span className="text-gray-400">-</span>
-                    )}
+                    )} */}
                   </TableCell>
                 </TableRow>
               ))}

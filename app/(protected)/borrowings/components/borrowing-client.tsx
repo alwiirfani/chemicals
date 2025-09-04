@@ -75,8 +75,8 @@ export function BorrowingClient({ user }: BorrowingsClientProps) {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             {user.role === "MAHASISWA" || user.role === "DOSEN"
-              ? "Peminjaman Saya"
-              : "Kelola Peminjaman"}
+              ? "Permintaan Saya"
+              : "Kelola Pemintaan"}
           </h1>
           <p className="text-gray-600">
             {user.role === "MAHASISWA" || user.role === "DOSEN"
@@ -100,7 +100,7 @@ export function BorrowingClient({ user }: BorrowingsClientProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">peminjaman</p>
+            <p className="text-xs text-muted-foreground">permintaan</p>
           </CardContent>
         </Card>
 
@@ -168,10 +168,10 @@ export function BorrowingClient({ user }: BorrowingsClientProps) {
       {/* Borrowing Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Daftar Peminjaman</CardTitle>
+          <CardTitle className="text-lg">Daftar Permintaan</CardTitle>
           <CardDescription>
             Menampilkan {filteredBorrowings.length} dari {userBorrowings.length}{" "}
-            data peminjaman
+            data permintaan
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

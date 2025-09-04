@@ -166,11 +166,9 @@ export function ReportsClient() {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Laporan & Analitik
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900">Laporan</h1>
               <p className="text-gray-600">
-                Dashboard analitik dan laporan sistem inventaris bahan kimia
+                Dashboard laporan sistem inventaris bahan kimia
               </p>
             </div>
             <div className="flex items-center gap-4">

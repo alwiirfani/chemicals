@@ -10,12 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { QrCode, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { Edit, Trash2, AlertTriangle } from "lucide-react";
 import { QRCodeDialog } from "@/components/dialog/chemicals/qr-code-dialog";
 import { Chemical } from "@/types/chemicals";
-import { isExpired, isExpiringSoon } from "@/helpers/chemicals/chemical-table";
-import { formatDateToString } from "@/helpers/format-date";
 import { useRouter } from "next/navigation";
 
 interface ChemicalPaginationProps {
@@ -96,7 +93,7 @@ export function ChemicalTable({
                     </div>
                   </TableCell>
                   <TableCell>
-                    {chemical.expirationDate ? (
+                    {/* {chemical.expirationDate ? (
                       <div className="flex items-center gap-2">
                         <span
                           className={
@@ -126,20 +123,20 @@ export function ChemicalTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">-</span>
-                    )}
+                    )} */}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {canAction && (
                         <>
-                          <Button
+                          {/* <Button
                             title="QR Code"
                             variant="outline"
                             size="sm"
                             className="bg-white hover:bg-gray-100 text-gray-800 border-gray-300 hover:border-gray-400 transition-all duration-200 hover:scale-105"
                             onClick={() => setSelectedChemical(chemical)}>
                             <QrCode className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                           <Button
                             title="Edit"
                             variant="outline"
