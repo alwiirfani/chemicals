@@ -115,6 +115,7 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
 
       {/* Search and Filter */}
       <ChemicalFilter
+        mode="management"
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         filterForm={filterForm}
@@ -147,6 +148,7 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
               userRole={user.role}
               onPageChange={handlePageChange}
               onDelete={handleRequestDelete}
+              mode="management"
               currentPage={currentPage}
               totalPages={totalPages}
             />

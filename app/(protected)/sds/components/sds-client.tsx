@@ -213,6 +213,7 @@ export function SDSClient({ user }: SDSClientProps) {
 
       {/* Search and Filter */}
       <SdsFilter
+        mode="management"
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         uniqueLanguages={uniqueLanguages}
@@ -240,6 +241,7 @@ export function SDSClient({ user }: SDSClientProps) {
             </div>
           ) : (
             <SDSTable
+              mode="management"
               sdsRecords={paginatedSds}
               currentPage={currentPage}
               totalPages={totalPages}

@@ -2,7 +2,6 @@
 
 import useChemicals from "@/hooks/use-chemicals";
 import React from "react";
-import HomeChemicalFilter from "./home-chemical-filter";
 import {
   Card,
   CardContent,
@@ -10,7 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import HomeChemicalTable from "./home-chemical-table";
+import { ChemicalTable } from "@/app/(protected)/chemicals/components/chemical-table";
+import { ChemicalFilter } from "@/app/(protected)/chemicals/components/chemical-filter";
 
 const HomeChemicalClient = () => {
   // chemicals hook
@@ -33,7 +33,7 @@ const HomeChemicalClient = () => {
 
   return (
     <>
-      <HomeChemicalFilter
+      <ChemicalFilter
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         filterForm={filterForm}
@@ -57,7 +57,7 @@ const HomeChemicalClient = () => {
               Memuat data...
             </div>
           ) : (
-            <HomeChemicalTable
+            <ChemicalTable
               chemicals={paginatedChemicals}
               onPageChange={handlePageChange}
               currentPage={currentPage}

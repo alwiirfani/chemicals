@@ -8,8 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useSds } from "@/hooks/use-sds";
-import HomeSdsFilter from "./home-sds-filter";
-import HomeSdsTable from "./home-sds-table";
+import { SDSTable } from "@/app/(protected)/sds/components/sds-table";
+import SdsFilter from "@/app/(protected)/sds/components/sds-filter";
 
 const HomeSdsClient = () => {
   const {
@@ -38,7 +38,7 @@ const HomeSdsClient = () => {
 
   return (
     <>
-      <HomeSdsFilter
+      <SdsFilter
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         filterLanguage={filterLanguage}
@@ -61,7 +61,7 @@ const HomeSdsClient = () => {
               Memuat data...
             </div>
           ) : (
-            <HomeSdsTable
+            <SDSTable
               sdsRecords={paginatedSds}
               onPageChange={handlePageChange}
               currentPage={currentPage}
