@@ -92,9 +92,7 @@ export function SDSTable({
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
 
-        const safeName = sanitizeFileName(
-          `from-sds-${sds.fileName}` || "file.pdf"
-        );
+        const safeName = `from-sds-${sds.fileName}` || "file.pdf";
 
         const link = document.createElement("a");
         link.href = url;
@@ -330,8 +328,4 @@ export function SDSTable({
       )}
     </>
   );
-}
-
-function sanitizeFileName(filename: string): string {
-  return filename.replace(/\.pdf$/i, "").replace(/\./g, "") + ".pdf";
 }
