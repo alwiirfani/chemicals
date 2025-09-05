@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const chemicalsCreateSchema = z.object({
   name: z.string().min(1),
-  form: z.enum(["LIQUID", "SOLID", "GAS"]),
+  form: z.enum(["LIQUID", "SOLID"]),
   characteristic: z.enum(["ACID", "BASE", "OXIDANT", "GENERAL"]),
   formula: z.string().min(1).optional(),
   casNumber: z.string().optional(),
@@ -16,7 +16,7 @@ export const chemicalsCreateSchema = z.object({
 export const chemicalUpdateSchema = z
   .object({
     name: z.string().min(1),
-    form: z.enum(["LIQUID", "SOLID", "GAS"]),
+    form: z.enum(["LIQUID", "SOLID"]),
     characteristic: z.enum(["ACID", "BASE", "OXIDANT", "GENERAL"]),
     formula: z.string().min(1).optional(),
     unit: z.string().min(1),
