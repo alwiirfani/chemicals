@@ -35,14 +35,14 @@ const BorrowingFilter = ({
       <div className="p-6 space-y-2">
         <span className="text-lg font-semibold">Filter & Pencarian</span>
         <p className="text-sm sm:text-base text-muted-foreground">
-          Cari Data Peminjaman berdasarkan peminjam, tujuan, atau bahan kimia.
+          Cari Data Permintaan berdasarkan peminta, tujuan, atau bahan kimia.
         </p>
 
         <div className="flex flex-col lg:flex-row gap-4 mt-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Cari peminjam, tujuan, atau bahan kimia..."
+              placeholder="Cari peminta, tujuan, atau bahan kimia..."
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

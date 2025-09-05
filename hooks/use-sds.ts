@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { useDebounce } from "./use-debounce";
 import { convertSnakeToCamel } from "@/helpers/case";
 import { SDS, SDSData, UploadType } from "@/types/sds";
 
@@ -11,20 +10,15 @@ export const useSds = () => {
   const [uploadType, setUploadType] = useState<UploadType>("file");
   const [file, setFile] = useState<File | null>(null);
   const [sdsRecords, setSdsRecords] = useState<SDS[]>([]);
-  const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterLanguage, setFilterLanguage] = useState("all");
   const [loadingTable, setLoadingTable] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deletingSdsId, setDeletingSdsId] = useState<string | null>(null);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    total: 0,
-    totalPages: 1,
-  });
 
-  const debouncedSearch = useDebounce(searchTerm, 400);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { toast } = useToast();
 
   // State untuk form
@@ -34,49 +28,34 @@ export const useSds = () => {
     language: "ID",
   });
 
-  const fetchSds = useCallback(
-    async (page = 1) => {
-      try {
-        setLoadingTable(true);
-        const params = {
-          page,
-          limit: 10,
-          ...(debouncedSearch && { search: debouncedSearch }),
-          ...(filterLanguage !== "all" && { language: filterLanguage }),
-        };
-        const { data } = await axios.get("/api/v1/sds", { params });
+  const fetchSds = useCallback(async () => {
+    try {
+      setLoadingTable(true);
 
-        const sdsCamelCase = convertSnakeToCamel<SDS[]>(
-          data.formattedSdsRecords
-        );
+      const { data } = await axios.get("/api/v1/sds");
 
-        console.log("Data safety documents: ", sdsCamelCase);
+      const sdsCamelCase = convertSnakeToCamel<SDS[]>(data.sds);
 
-        setSdsRecords(sdsCamelCase);
-        setTotal(data.pagination.totalAllSds);
-        setPagination({
-          currentPage: data.pagination.page,
-          total: data.pagination.totalAllSds,
-          totalPages: data.pagination.pages,
-        });
-        setLoadingTable(false);
-      } catch (error) {
-        console.error("Error fetching SDS:", error);
-        toast({
-          title: "Gagal",
-          description: "Tidak dapat memuat data SDS",
-          variant: "destructive",
-        });
-      } finally {
-        setLoadingTable(false);
-      }
-    },
-    [debouncedSearch, filterLanguage, toast]
-  );
+      console.log("Data safety documents: ", sdsCamelCase);
+
+      setSdsRecords(sdsCamelCase);
+
+      setLoadingTable(false);
+    } catch (error) {
+      console.error("Error fetching SDS:", error);
+      toast({
+        title: "Gagal",
+        description: "Tidak dapat memuat data SDS",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingTable(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    fetchSds(pagination.currentPage);
-  }, [fetchSds, pagination.currentPage, debouncedSearch, filterLanguage]);
+    fetchSds();
+  }, [fetchSds]);
 
   const handleRequestDelete = (sdsId: string) => {
     setDeletingSdsId(sdsId);
@@ -106,9 +85,34 @@ export const useSds = () => {
     }
   };
 
+  // Apply search and filters
+  const filteredSds = useMemo(() => {
+    return sdsRecords.filter((sds) => {
+      const matchesSearch =
+        sds.chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sds.chemical.formula
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (sds.fileName &&
+          sds.fileName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+      const matchesLanguage =
+        filterLanguage === "all" || sds.language === filterLanguage;
+
+      return matchesSearch && matchesLanguage;
+    });
+  }, [sdsRecords, searchTerm, filterLanguage]);
+
+  // pagination di frontend
+  const totalPages = Math.ceil(filteredSds.length / pageSize);
+  const paginatedSds = filteredSds.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   const handlePageChange = (page: number) => {
-    if (page < 1 || page > pagination.totalPages) return;
-    setPagination((prev) => ({ ...prev, currentPage: page }));
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
 
   // Fungsi untuk update form dasar
@@ -153,7 +157,6 @@ export const useSds = () => {
       language: sdsData.language,
     });
 
-    // Reset file karena kita akan menggunakan existing file atau upload baru
     setFile(null);
 
     // Set upload type
@@ -266,9 +269,9 @@ export const useSds = () => {
 
   return {
     // Data
-    sdsRecords,
-    total,
-    pagination,
+    sdsRecords: sdsRecords,
+    filteredSds: filteredSds,
+    paginatedSds: paginatedSds,
     loadingTable,
 
     // Filter
@@ -278,7 +281,8 @@ export const useSds = () => {
     setFilterLanguage,
 
     // Actions
-    fetchSds,
+    currentPage,
+    totalPages,
     handlePageChange,
 
     // Delete Modal

@@ -15,10 +15,11 @@ import HomeChemicalTable from "./home-chemical-table";
 const HomeChemicalClient = () => {
   // chemicals hook
   const {
-    chemicals,
-    pagination,
+    paginatedChemicals,
+    filteredChemicals,
+    currentPage,
+    totalPages,
     loading,
-    total,
 
     searchTerm,
     setSearchTerm,
@@ -29,17 +30,6 @@ const HomeChemicalClient = () => {
 
     handlePageChange,
   } = useChemicals();
-
-  // Filter chemicals based on search and filters
-  const filteredChemicals = chemicals.filter((chemical) => {
-    const matchesSearch =
-      chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chemical.formula.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesForm = filterForm === "all" || chemical.form === filterForm;
-
-    return matchesSearch && matchesForm;
-  });
 
   return (
     <>
@@ -57,7 +47,8 @@ const HomeChemicalClient = () => {
         <CardHeader>
           <CardTitle className="text-lg">Data Bahan Kimia</CardTitle>
           <CardDescription>
-            Menampilkan {filteredChemicals.length} dari {total} bahan kimia
+            Menampilkan {paginatedChemicals.length} dari{" "}
+            {filteredChemicals.length} bahan kimia
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -67,9 +58,10 @@ const HomeChemicalClient = () => {
             </div>
           ) : (
             <HomeChemicalTable
-              chemicals={filteredChemicals}
+              chemicals={paginatedChemicals}
               onPageChange={handlePageChange}
-              pagination={pagination}
+              currentPage={currentPage}
+              totalPages={totalPages}
             />
           )}
         </CardContent>

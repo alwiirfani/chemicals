@@ -35,8 +35,10 @@ export function SDSClient({ user }: SDSClientProps) {
   const {
     // Data
     sdsRecords,
-    total,
-    pagination,
+    filteredSds,
+    paginatedSds,
+    currentPage,
+    totalPages,
     loadingTable,
 
     // Filter
@@ -55,20 +57,6 @@ export function SDSClient({ user }: SDSClientProps) {
     handleRequestDelete,
     handleConfirmDelete,
   } = useSds();
-
-  // Apply search and filters
-  const filteredSDS = sdsRecords.filter((sds) => {
-    const matchesSearch =
-      sds.chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sds.chemical.formula?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (sds.fileName &&
-        sds.fileName.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    const matchesLanguage =
-      filterLanguage === "all" || sds.language === filterLanguage;
-
-    return matchesSearch && matchesLanguage;
-  });
 
   const limit = pLimit(5);
   const MAX_ZIP_SIZE = 50 * 1024 * 1024; // 50MB
@@ -217,7 +205,7 @@ export function SDSClient({ user }: SDSClientProps) {
           title="Total SDS"
           icon={<File className="h-4 w-4 text-green-600" />}>
           <div className="text-xl sm:text-2xl text-green-600 font-bold pt-4 sm:pt-7">
-            {total}
+            {sdsRecords.length}
           </div>
           <p className="text-xs text-muted-foreground">dokumen</p>
         </CardStats>
@@ -230,7 +218,7 @@ export function SDSClient({ user }: SDSClientProps) {
         uniqueLanguages={uniqueLanguages}
         setFilterLanguage={setFilterLanguage}
         filterLanguage={filterLanguage}
-        onExport={() => exportSdsToExcel(filteredSDS)}
+        onExport={() => exportSdsToExcel(sdsRecords)}
         onImport={handleImport}
         loadingImport={loadingImport}
         userRole={user.role}
@@ -241,7 +229,8 @@ export function SDSClient({ user }: SDSClientProps) {
         <CardHeader>
           <CardTitle className="text-lg">Data Safety Data Sheet</CardTitle>
           <CardDescription>
-            Menampilkan {filteredSDS.length} dari {total} Safety Data Sheet
+            Menampilkan {paginatedSds.length} dari {filteredSds.length} Safety
+            Data Sheet
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -251,8 +240,9 @@ export function SDSClient({ user }: SDSClientProps) {
             </div>
           ) : (
             <SDSTable
-              sdsRecords={filteredSDS}
-              pagination={pagination}
+              sdsRecords={paginatedSds}
+              currentPage={currentPage}
+              totalPages={totalPages}
               onPageChange={handlePageChange}
               onDelete={handleRequestDelete}
               userRole={user.role}

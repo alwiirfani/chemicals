@@ -15,9 +15,11 @@ const HomeSdsClient = () => {
   const {
     // Data
     sdsRecords,
-    pagination,
+    paginatedSds,
+    filteredSds,
+    currentPage,
+    totalPages,
     loadingTable,
-    total,
 
     // Filter
     searchTerm,
@@ -28,23 +30,6 @@ const HomeSdsClient = () => {
     // Actions
     handlePageChange,
   } = useSds();
-
-  // Apply search and filters
-  const filteredSDS = sdsRecords.filter((sds) => {
-    const matchesSearch =
-      sds.chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (sds.chemical.formula &&
-        sds.chemical.formula
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())) ||
-      (sds.fileName &&
-        sds.fileName.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    const matchesLanguage =
-      filterLanguage === "all" || sds.language === filterLanguage;
-
-    return matchesSearch && matchesLanguage;
-  });
 
   // Get unique values for filters
   const uniqueLanguages = Array.from(
@@ -66,7 +51,8 @@ const HomeSdsClient = () => {
         <CardHeader>
           <CardTitle className="text-lg">Data Safety Data Sheet</CardTitle>
           <CardDescription>
-            Menampilkan {filteredSDS.length} dari {total} Safety Data Sheet
+            Menampilkan {paginatedSds.length} dari {filteredSds.length} Safety
+            Data Sheet
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -76,9 +62,10 @@ const HomeSdsClient = () => {
             </div>
           ) : (
             <HomeSdsTable
-              sdsRecords={filteredSDS}
+              sdsRecords={paginatedSds}
               onPageChange={handlePageChange}
-              pagination={pagination}
+              currentPage={currentPage}
+              totalPages={totalPages}
             />
           )}
         </CardContent>

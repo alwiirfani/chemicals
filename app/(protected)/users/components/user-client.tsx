@@ -20,9 +20,12 @@ import { AlertModal } from "@/components/alert-modal";
 
 export function UserClient() {
   const {
-    users,
+    filteredUsers,
+    paginatedUsers,
+    currentPage,
+    totalPages,
     stats,
-    pagination,
+
     searchTerm,
     roleFilter,
     statusFilter,
@@ -36,6 +39,7 @@ export function UserClient() {
     handlePageChange,
     handleRequestDelete,
     handleConfirmDelete,
+
     fetchUsers,
   } = useUsers();
   const [selectedUser, setSelectedUser] = useState<UserAuth | null>(null);
@@ -91,7 +95,10 @@ export function UserClient() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Daftar Pengguna</CardTitle>
-          <CardDescription>Menampilkan {users.length} pengguna</CardDescription>
+          <CardDescription>
+            Menampilkan {paginatedUsers.length} dari {filteredUsers.length}{" "}
+            pengguna
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {loadingTable ? (
@@ -100,8 +107,9 @@ export function UserClient() {
             </div>
           ) : (
             <UserTable
-              users={users}
-              pagination={pagination}
+              users={paginatedUsers}
+              currentPage={currentPage}
+              totalPages={totalPages}
               onPageChange={handlePageChange}
               onEdit={handleEditUser}
               onView={handleViewUser}

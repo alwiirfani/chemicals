@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import CardStats from "@/components/card-stats";
 import { UserAuth } from "@/types/auth";
+import useChemicals from "@/hooks/use-chemicals";
 
 interface DashboardClientProps {
   user: UserAuth;
@@ -27,12 +28,10 @@ interface DashboardClientProps {
 
 export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
   const [stats, setStats] = useState({
-    totalChemicals: 0,
     activeBorrowings: 0,
-    lowStockChemicals: 0,
-    expiringChemicals: 0,
   });
   const [activities, setActivities] = useState<MappedActivity[]>([]);
+  const { dasboardStatsChemicals } = useChemicals();
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchDashboard = async () => {
@@ -43,10 +42,7 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
       console.log("Dashboard Data:", data);
 
       setStats({
-        totalChemicals: data.totalChemicals,
         activeBorrowings: data.activeBorrowings,
-        lowStockChemicals: data.lowStockChemicals,
-        expiringChemicals: data.expiringChemicals,
       });
 
       const mappedActivities: MappedActivity[] = data.recentActivities.map(
@@ -100,7 +96,7 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
               title="Total Bahan Kimia"
               icon={<Package className="h-4 w-4 text-muted-foreground" />}>
               <div className="text-2xl font-bold pt-4 sm:pt-7">
-                {stats.totalChemicals}
+                {dasboardStatsChemicals.totalChemicals}
               </div>
               <p className="text-xs text-muted-foreground">
                 bahan padat, cair dan gas
@@ -124,7 +120,7 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
                 title="Semua Peminjaman Aktif"
                 icon={<FileText className="h-4 w-4 text-muted-foreground" />}>
                 <div className="text-2xl font-bold pt-4 sm:pt-7">
-                  {stats.totalChemicals - stats.activeBorrowings}
+                  {-stats.activeBorrowings}
                 </div>
                 <p className="text-xs text-muted-foreground">transaksi</p>
               </CardStats>
@@ -134,7 +130,7 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
               title="Stok Hampir Habis"
               icon={<AlertTriangle className="h-4 w-4 text-yellow-600" />}>
               <div className="text-2xl font-bold text-yellow-600 pt-9 sm:pt-7">
-                {stats.lowStockChemicals}
+                {dasboardStatsChemicals.lowStockChemicals}
               </div>
               <p className="text-xs text-muted-foreground">item</p>
             </CardStats>
@@ -144,7 +140,7 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
               icon={<Calendar className="h-4 w-4 text-red-600" />}>
               <div className=" pt-4 sm:pt-7">
                 <span className="text-2xl font-bold text-red-600">
-                  {stats.expiringChemicals}
+                  {dasboardStatsChemicals.expiringChemicals}
                 </span>
                 <p className="text-xs text-muted-foreground">item</p>
               </div>
@@ -194,7 +190,8 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
                   <AlertTriangle className="h-4 w-4 text-red-500" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">
-                      {stats.expiringChemicals} bahan akan kadaluwarsa bulan ini
+                      {dasboardStatsChemicals.expiringChemicals} bahan akan
+                      kadaluwarsa bulan ini
                     </p>
                     <p className="text-xs text-gray-500">
                       Periksa tanggal kadaluwarsa
@@ -205,7 +202,8 @@ export const DashboardClient: React.FC<DashboardClientProps> = ({ user }) => {
                   <AlertTriangle className="h-4 w-4 text-yellow-500" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">
-                      {stats.lowStockChemicals} bahan stok rendah
+                      {dasboardStatsChemicals.lowStockChemicals} bahan stok
+                      rendah
                     </p>
                     <p className="text-xs text-gray-500">
                       Pertimbangkan untuk restok

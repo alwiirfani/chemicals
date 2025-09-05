@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
@@ -11,6 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Download, ExternalLink, FileText, Globe } from "lucide-react";
@@ -20,24 +28,23 @@ import { useToast } from "@/hooks/use-toast";
 import { SDS } from "@/types/sds";
 import type { SDSData } from "@/hooks/use-sds";
 
-interface SDSPaginationProps {
-  currentPage: number;
-  totalPages: number;
-}
-
 interface SDSTableProps {
   sdsRecords: SDS[];
-  pagination: SDSPaginationProps;
+  currentPage: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
 }
 
 const HomeSdsTable = ({
   sdsRecords,
-  pagination,
+  currentPage,
+  totalPages,
   onPageChange,
 }: SDSTableProps) => {
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const [editingSDS, setEditingSDS] = useState<SDSData | null>(null);
+  const [pageWindowStart, setPageWindowStart] = useState(1);
+  const windowSize = 3;
   const { toast } = useToast();
 
   const getLanguageBadge = (language: string) => {
@@ -88,6 +95,25 @@ const HomeSdsTable = ({
       });
     }
   };
+
+  useEffect(() => {
+    const newWindowStart =
+      Math.floor((currentPage - 1) / windowSize) * windowSize + 1;
+    setPageWindowStart(newWindowStart);
+  }, [currentPage]);
+
+  const handleEllipsisClick = () => {
+    const nextStart = pageWindowStart + windowSize;
+    if (nextStart <= totalPages) {
+      setPageWindowStart(nextStart);
+      onPageChange(nextStart); // pindah ke awal window baru
+    }
+  };
+
+  const pageNumbers = Array.from(
+    { length: Math.min(windowSize, totalPages - pageWindowStart + 1) },
+    (_, i) => pageWindowStart + i
+  );
 
   return (
     <>
@@ -179,28 +205,50 @@ const HomeSdsTable = ({
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
-        <p className="text-sm text-muted-foreground">
-          Halaman {pagination.currentPage} dari {pagination.totalPages}
-        </p>
-        <div className="flex gap-2 w-full md:w-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 md:flex-none"
-            onClick={() => onPageChange(pagination.currentPage - 1)}
-            disabled={pagination.currentPage <= 1}>
-            Sebelumnya
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 md:flex-none"
-            onClick={() => onPageChange(pagination.currentPage + 1)}
-            disabled={pagination.currentPage >= pagination.totalPages}>
-            Selanjutnya
-          </Button>
-        </div>
+      <div className="flex justify-center py-4">
+        <Pagination>
+          <PaginationContent className="flex flex-wrap gap-1">
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => onPageChange(currentPage - 1)}
+                className={
+                  currentPage <= 1 || totalPages <= 1
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              />
+            </PaginationItem>
+
+            {pageNumbers.map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  isActive={currentPage === page}
+                  onClick={() => onPageChange(page)}>
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            {pageWindowStart + windowSize - 1 < totalPages && (
+              <PaginationItem>
+                <PaginationLink onClick={handleEllipsisClick}>
+                  ...
+                </PaginationLink>
+              </PaginationItem>
+            )}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => onPageChange(currentPage + 1)}
+                className={
+                  currentPage >= totalPages || totalPages <= 1
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
 
       {/* Detail Dialog */}

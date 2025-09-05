@@ -1,101 +1,21 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { hashPassword, requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
-import { Prisma } from "@prisma/client";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN", "LABORAN"]);
     if (userAccess instanceof NextResponse) return userAccess;
 
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      return NextResponse.json(
-        { error: "Invalid pagination params" },
-        { status: 400 }
-      );
-    }
-
-    const search = searchParams.get("search") || "";
-    const role = searchParams.get("role") || "";
-    const status = searchParams.get("status") || "";
-
-    const skip = (page - 1) * limit;
-
-    const where: Prisma.UserWhereInput = {
-      AND: [
-        search
-          ? {
-              OR: [
-                { email: { contains: search, mode: "insensitive" } },
-                { username: { contains: search, mode: "insensitive" } },
-                {
-                  mahasiswa: {
-                    full_name: {
-                      contains: search,
-                      mode: "insensitive",
-                    },
-                  },
-                },
-                {
-                  dosen: {
-                    full_name: {
-                      contains: search,
-                      mode: "insensitive",
-                    },
-                  },
-                },
-                {
-                  laboran: {
-                    full_name: {
-                      contains: search,
-                      mode: "insensitive",
-                    },
-                  },
-                },
-              ],
-            }
-          : null, // null
-        status ? { status } : null,
-        role ? { role } : null,
-      ].filter(Boolean) as Prisma.UserWhereInput[], // filter buang null
-    };
-
-    const [
-      users,
-      total,
-      active,
-      inactive,
-      blocked,
-      admins,
-      laborans,
-      mahasiswa,
-      dosen,
-    ] = await Promise.all([
-      db.user.findMany({
-        where,
-        include: {
-          admin: true,
-          mahasiswa: true,
-          dosen: true,
-          laboran: true,
-        },
-        skip,
-        take: limit,
-        orderBy: { created_at: "desc" },
-      }),
-      db.user.count({ where }),
-      db.user.count({ where: { ...where, status: "ACTIVE" } }),
-      db.user.count({ where: { ...where, status: "INACTIVE" } }),
-      db.user.count({ where: { ...where, status: "BLOCKED" } }),
-      db.user.count({ where: { ...where, role: "ADMIN" } }),
-      db.user.count({ where: { ...where, role: "LABORAN" } }),
-      db.user.count({ where: { ...where, role: "MAHASISWA" } }),
-      db.user.count({ where: { ...where, role: "DOSEN" } }),
-    ]);
+    const users = await db.user.findMany({
+      include: {
+        admin: true,
+        mahasiswa: true,
+        dosen: true,
+        laboran: true,
+      },
+      orderBy: { created_at: "desc" },
+    });
 
     const formattedUsers = users.map((user) => {
       let roleId = "";
@@ -134,22 +54,9 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
+      message: "Users fetched successfully",
       users: formattedUsers,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-      stats: {
-        total,
-        active,
-        inactive,
-        blocked,
-        admins,
-        laborans,
-        regularUsers: mahasiswa + dosen,
-      },
+      total: formattedUsers.length,
     });
   } catch (error) {
     console.error("Get users error:", error);

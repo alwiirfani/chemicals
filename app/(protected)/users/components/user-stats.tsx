@@ -21,7 +21,6 @@ export const UserStats: React.FC<UserStatsProps> = ({ stats }) => {
         icon={<Users className="h-4 w-4 text-muted-foreground" />}>
         <div className="text-2xl font-bold">{stats.total}</div>
         <div className="text-xs text-muted-foreground">
-          <span className="text-green-600">{stats.active} aktif</span> •{" "}
           <span className="text-gray-500">{stats.inactive} tidak aktif</span>
         </div>
       </CardStats>

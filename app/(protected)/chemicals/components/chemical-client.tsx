@@ -27,9 +27,11 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
   const [loadingImport, setLoadingImport] = useState(false);
   const {
     chemicals,
-    pagination,
+    paginatedChemicals,
+    filteredChemicals,
+    currentPage,
+    totalPages,
     loading,
-    total,
 
     searchTerm,
     setSearchTerm,
@@ -46,24 +48,6 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
     handleRequestDelete,
     handleConfirmDelete,
   } = useChemicals();
-
-  // Filter chemicals based on search and filters
-  const filteredChemicals = chemicals.filter((chemical) => {
-    const matchesSearch =
-      chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chemical.formula.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesForm = filterForm === "all" || chemical.form === filterForm;
-
-    const matchesLocation =
-      filterCharacteristic === "all" ||
-      (chemical.characteristic &&
-        chemical.characteristic
-          .toLowerCase()
-          .includes(filterCharacteristic.toLowerCase()));
-
-    return matchesSearch && matchesForm && matchesLocation;
-  });
 
   const handleImport = async (form: string, file: File | null) => {
     try {
@@ -137,7 +121,7 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
         onFilterFormChange={setFilterForm}
         filterCharacteristic={filterCharacteristic}
         onFilterCharacteristicChange={setFilterCharacteristic}
-        onExport={() => exportChemicalsToExcel(filteredChemicals)}
+        onExport={() => exportChemicalsToExcel(chemicals)}
         onImport={handleImport}
         loadingImport={loadingImport}
         userRole={user.role}
@@ -148,7 +132,8 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
         <CardHeader>
           <CardTitle className="text-lg">Data Bahan Kimia</CardTitle>
           <CardDescription>
-            Menampilkan {filteredChemicals.length} dari {total} bahan kimia
+            Menampilkan {paginatedChemicals.length} dari{" "}
+            {filteredChemicals.length} bahan kimia
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -158,11 +143,12 @@ export const ChemicalsClient: React.FC<ChemicalsClientProps> = ({ user }) => {
             </div>
           ) : (
             <ChemicalTable
-              chemicals={filteredChemicals}
+              chemicals={paginatedChemicals}
               userRole={user.role}
               onPageChange={handlePageChange}
               onDelete={handleRequestDelete}
-              pagination={pagination}
+              currentPage={currentPage}
+              totalPages={totalPages}
             />
           )}
         </CardContent>

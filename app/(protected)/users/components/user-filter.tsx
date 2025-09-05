@@ -62,7 +62,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="all">Semua Status</SelectItem>
               <SelectItem value="ACTIVE">Aktif</SelectItem>
               <SelectItem value="INACTIVE">Tidak Aktif</SelectItem>
               <SelectItem value="BLOCKED">Ditangguhkan</SelectItem>

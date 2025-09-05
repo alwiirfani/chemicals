@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useToast } from "@/hooks/use-toast";
 import { UserAuth } from "@/types/auth";
 
@@ -16,74 +15,34 @@ export const useUsers = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    total: 0,
-    totalPages: 1,
-  });
-  const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    inactive: 0,
-    blocked: 0,
-    admins: 0,
-    laborans: 0,
-    regularUsers: 0,
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const { toast } = useToast();
-  const debouncedSearch = useDebounce(searchTerm, 400);
 
-  const fetchUsers = useCallback(
-    async (page = 1) => {
-      try {
-        setLoadingTable(true);
-        const params = {
-          page,
-          limit: 10,
-          ...(debouncedSearch && { search: debouncedSearch }),
-          ...(roleFilter !== "all" && { role: roleFilter }),
-          ...(statusFilter !== "all" && { status: statusFilter }),
-        };
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoadingTable(true);
 
-        const { data } = await axios.get("/api/v1/users", { params });
-        console.log("from useUsers: ", data.users);
+      const { data } = await axios.get("/api/v1/users");
+      console.log("from useUsers: ", data.users);
 
-        setUsers(data.users);
-        setPagination({
-          currentPage: data.pagination.page,
-          total: data.pagination.total,
-          totalPages: data.pagination.pages,
-        });
-        setStats(data.stats);
-      } catch (error) {
-        console.log("Gagal memuat data: ", error);
-        toast({
-          title: "Gagal",
-          description: "Tidak dapat memuat data pengguna",
-          variant: "destructive",
-        });
-      } finally {
-        setLoadingTable(false);
-      }
-    },
-    [debouncedSearch, roleFilter, statusFilter, toast]
-  );
+      setUsers(data.users);
+    } catch (error) {
+      console.log("Gagal memuat data: ", error);
+      toast({
+        title: "Gagal",
+        description: "Tidak dapat memuat data pengguna",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingTable(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    fetchUsers(pagination.currentPage);
-  }, [
-    debouncedSearch,
-    roleFilter,
-    statusFilter,
-    pagination.currentPage,
-    fetchUsers,
-  ]);
-
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > pagination.totalPages) return;
-    setPagination((prev) => ({ ...prev, currentPage: page }));
-  };
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleRequestDelete = (userId: string) => {
     setDeletingUserId(userId);
@@ -111,11 +70,56 @@ export const useUsers = () => {
     }
   };
 
+  // stats
+  const stats = useMemo(() => {
+    const total = users.length;
+    const active = users.filter((u) => u.status === "ACTIVE").length;
+    const inactive = users.filter((u) => u.status === "INACTIVE").length;
+    const blocked = users.filter((u) => u.status === "BLOCKED").length;
+    const admins = users.filter((u) => u.role === "ADMIN").length;
+    const laborans = users.filter((u) => u.role === "LABORAN").length;
+    const regularUsers = total - admins - laborans;
+
+    return { total, active, inactive, blocked, admins, laborans, regularUsers };
+  }, [users]);
+
+  // ✅ Filtering (client-side)
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesSearch =
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all" || user.status === statusFilter;
+
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+
+      return matchesSearch && matchesStatus && matchesRole;
+    });
+  }, [users, searchTerm, statusFilter, roleFilter]);
+
+  // pagination di frontend
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
+  }, [filteredUsers, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
   return {
     // data users
     users,
+    filteredUsers,
+    paginatedUsers,
     stats,
-    pagination,
     loadingTable,
 
     // filter
@@ -134,7 +138,10 @@ export const useUsers = () => {
     handleConfirmDelete,
 
     // actions
-    fetchUsers,
+    currentPage,
+    totalPages,
     handlePageChange,
+
+    fetchUsers,
   };
 };

@@ -17,9 +17,6 @@ export type Activity = {
 export type DashboardData = {
   activeAllBorrowings: number;
   activeBorrowings: number;
-  totalChemicals: number;
-  lowStockChemicals: number;
-  expiringChemicals: number;
   recentActivities: Activity[];
 };
 

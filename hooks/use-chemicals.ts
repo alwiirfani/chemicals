@@ -1,13 +1,11 @@
 import { Chemical } from "@/types/chemicals";
-import { useCallback, useEffect, useState } from "react";
-import { useDebounce } from "./use-debounce";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "./use-toast";
 import axios from "axios";
 import { convertSnakeToCamel } from "@/helpers/case";
 
 const useChemicals = () => {
   const [chemicals, setChemicals] = useState<Chemical[]>([]);
-  const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterForm, setFilterForm] = useState("all");
   const [filterCharacteristic, setFilterCharacteristic] = useState("all");
@@ -17,67 +15,36 @@ const useChemicals = () => {
   const [deletingChemicalId, setDeletingChemicalId] = useState<string | null>(
     null
   );
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    total: 0,
-    totalPages: 1,
-  });
 
-  const debouncedSearch = useDebounce(searchTerm, 400);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { toast } = useToast();
 
-  const fetchChemicals = useCallback(
-    async (page = 1) => {
-      try {
-        setLoading(true);
-        const params = {
-          page,
-          limit: 10,
-          ...(debouncedSearch && { search: debouncedSearch }),
-          ...(filterForm !== "all" && { form: filterForm }),
-          ...(filterCharacteristic !== "all" && {
-            characteristic: filterCharacteristic,
-          }),
-        };
+  const fetchChemicals = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get("/api/v1/chemicals");
 
-        const { data } = await axios.get("/api/v1/chemicals", { params });
+      const chemicalsCamelCase = convertSnakeToCamel<Chemical[]>(
+        data.chemicals
+      );
 
-        const chemicalsFormattedCamelCase = convertSnakeToCamel<Chemical[]>(
-          data.formattedChemicals
-        );
-
-        console.log("Fetched Chemicals:", chemicalsFormattedCamelCase);
-
-        setChemicals(chemicalsFormattedCamelCase);
-        setTotal(data.stats.totalChemicals);
-        setPagination({
-          currentPage: data.pagination.page,
-          total: data.pagination.total,
-          totalPages: data.pagination.pages,
-        });
-      } catch (error) {
-        console.error("Gagal memuat data bahan kimia: ", error);
-        toast({
-          title: "Gagal",
-          description: "Tidak dapat memuat data bahan kimia",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [debouncedSearch, filterForm, filterCharacteristic, toast]
-  );
+      setChemicals(chemicalsCamelCase);
+    } catch (error) {
+      console.error("Gagal memuat data bahan kimia: ", error);
+      toast({
+        title: "Gagal",
+        description: "Tidak dapat memuat data bahan kimia",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    fetchChemicals(pagination.currentPage);
-  }, [
-    debouncedSearch,
-    filterForm,
-    filterCharacteristic,
-    pagination.currentPage,
-    fetchChemicals,
-  ]);
+    fetchChemicals();
+  }, [fetchChemicals]);
 
   const handleRequestDelete = (chemicalId: string) => {
     setDeletingChemicalId(chemicalId);
@@ -114,15 +81,56 @@ const useChemicals = () => {
     }
   };
 
+  const filteredChemicals = useMemo(() => {
+    return chemicals.filter((chemical) => {
+      const matchesSearch =
+        chemical.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        chemical.formula.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesForm = filterForm === "all" || chemical.form === filterForm;
+
+      const matchesLocation =
+        filterCharacteristic === "all" ||
+        (chemical.characteristic &&
+          chemical.characteristic
+            .toLowerCase()
+            .includes(filterCharacteristic.toLowerCase()));
+
+      return matchesSearch && matchesForm && matchesLocation;
+    });
+  }, [chemicals, searchTerm, filterForm, filterCharacteristic]);
+
+  const dasboardStatsChemicals = useMemo(() => {
+    const totalChemicals = chemicals.length;
+    const lowStockChemicals = chemicals.filter(
+      (chemical) => chemical.stock <= 10
+    ).length;
+    const expiringChemicals = chemicals.filter(
+      (chemical) =>
+        chemical.expirationDate && chemical.expirationDate < new Date()
+    ).length;
+
+    return { totalChemicals, lowStockChemicals, expiringChemicals };
+  }, [chemicals]);
+
+  // pagination di frontend
+  const totalPages = Math.ceil(filteredChemicals.length / pageSize);
+  const paginatedChemicals = filteredChemicals.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   const handlePageChange = (page: number) => {
-    if (page < 1 || page > pagination.totalPages) return;
-    setPagination((prev) => ({ ...prev, currentPage: page }));
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
+
   return {
     // Data
-    chemicals,
-    total,
-    pagination,
+    chemicals: chemicals,
+    filteredChemicals: filteredChemicals,
+    paginatedChemicals: paginatedChemicals,
+    dasboardStatsChemicals,
     loading,
 
     // Filter & search
@@ -134,7 +142,8 @@ const useChemicals = () => {
     setFilterCharacteristic,
 
     // Actions
-    fetchChemicals,
+    currentPage,
+    totalPages,
     handlePageChange,
 
     // Delete modal

@@ -1,81 +1,28 @@
 import db from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      return NextResponse.json(
-        { error: "Invalid pagination params" },
-        { status: 400 }
-      );
-    }
-
-    const search = searchParams.get("search") || "";
-    const language = searchParams.get("language") || "";
-
-    const skip = (page - 1) * limit;
-
-    const where: Prisma.SafetyDataSheetWhereInput = {
-      AND: [
-        search
-          ? {
-              OR: [
-                {
-                  chemical: {
-                    name: { contains: search, mode: "insensitive" },
-                  },
-                },
-                {
-                  chemical: {
-                    formula: { contains: search, mode: "insensitive" },
-                  },
-                },
-                {
-                  chemical: {
-                    casNumber: { contains: search, mode: "insensitive" },
-                  },
-                },
-                { fileName: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : null,
-        language
-          ? { language: { contains: language, mode: "insensitive" } }
-          : null,
-      ].filter(Boolean) as Prisma.SafetyDataSheetWhereInput[],
-    };
-
-    const [sdsRecords, totalConditional, totalAllSds] = await Promise.all([
-      db.safetyDataSheet.findMany({
-        where,
-        include: {
-          chemical: {
-            select: {
-              name: true,
-              formula: true,
-              form: true,
-              characteristic: true,
-            },
+    const sdsRecords = await db.safetyDataSheet.findMany({
+      include: {
+        chemical: {
+          select: {
+            name: true,
+            formula: true,
+            form: true,
+            characteristic: true,
           },
-          createdBy: { include: { admin: true, laboran: true } },
-          updatedBy: { include: { admin: true, laboran: true } },
         },
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-      }),
-      db.safetyDataSheet.count({ where }),
-      db.safetyDataSheet.count(),
-    ]);
+        createdBy: { include: { admin: true, laboran: true } },
+        updatedBy: { include: { admin: true, laboran: true } },
+      },
+      orderBy: { fileName: "asc" },
+    });
 
     const formattedSdsRecords = sdsRecords.map((sds) => {
       let createdByName = "";
       let updatedByName = undefined;
+
       switch (sds.createdBy.role) {
         case "ADMIN":
           createdByName = "Administrator";
@@ -115,20 +62,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "SDS fetched successfully",
-        sds: sdsRecords,
-        formattedSdsRecords: formattedSdsRecords,
-        totalConditional,
-        pagination: {
-          page,
-          totalAllSds,
-          pages: Math.ceil(totalAllSds / limit),
-        },
+        message: "All SDS fetched successfully",
+        total: sdsRecords.length,
+        sds: formattedSdsRecords,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching SDS [GET]:", error);
+    console.error("Error fetching all SDS [GET]:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

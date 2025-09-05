@@ -1,86 +1,20 @@
 import { chemicalsCreateSchema } from "@/lib/validation/chemicals";
 import { type NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import { ChemicalForm } from "@/types/chemicals";
 import { requireRoleOrNull } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      return NextResponse.json(
-        { error: "Invalid pagination params" },
-        { status: 400 }
-      );
-    }
-
-    const search = searchParams.get("search") || "";
-    const form = searchParams.get("form") || "";
-    const characteristic = searchParams.get("characteristic") || "";
-
-    const skip = (page - 1) * limit;
-
-    const where: Prisma.ChemicalWhereInput = {
-      AND: [
-        search
-          ? {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { formula: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : null,
-        characteristic ? { characteristic: { equals: characteristic } } : null,
-        form ? { form: { equals: form as ChemicalForm } } : null,
-      ].filter(Boolean) as Prisma.ChemicalWhereInput[],
-    };
-
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const [
-      chemicals,
-      total,
-      totalChemicals,
-      lowStockChemicals,
-      expiringChemicals,
-    ] = await Promise.all([
-      db.chemical.findMany({
-        where,
-        include: {
-          createdBy: {
-            include: { admin: true, laboran: true },
-          },
-          updatedBy: {
-            include: { admin: true, laboran: true },
-          },
-          safetyDataSheet: true,
-          borrowings: { include: { borrowing: true } },
-          usageHistory: true,
-        },
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-      }),
-      db.chemical.count({ where }),
-      db.chemical.count(),
-      db.chemical.count({
-        where: { currentStock: { lt: 10 } },
-      }),
-      db.chemical.count({
-        where: {
-          expirationDate: {
-            gte: startOfMonth,
-            lte: endOfMonth,
-          },
-        },
-      }),
-    ]);
+    const chemicals = await db.chemical.findMany({
+      include: {
+        createdBy: { include: { admin: true, laboran: true } },
+        updatedBy: { include: { admin: true, laboran: true } },
+        safetyDataSheet: true,
+        borrowings: { include: { borrowing: true } },
+        usageHistory: true,
+      },
+      orderBy: { name: "asc" },
+    });
 
     const formattedChemicals = chemicals.map((chemical) => {
       let createdByName = "";
@@ -129,20 +63,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       message: "Chemicals fetched successfully",
-      chemicals: chemicals,
-      formattedChemicals: formattedChemicals,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-      stats: {
-        total: total,
-        totalChemicals,
-        lowStockChemicals,
-        expiringChemicals,
-      },
+      chemicals: formattedChemicals,
+      total: formattedChemicals.length,
     });
   } catch (error) {
     console.error("Get chemicals error:", error);

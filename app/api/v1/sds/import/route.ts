@@ -1,3 +1,4 @@
+import { normalizeChemicalName } from "@/helpers/sds/normalization-pdf";
 import { requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { UploadedFile } from "@/types/sds";
@@ -220,7 +221,7 @@ export async function POST(request: NextRequest) {
       const { fileName, filePath } = file;
 
       // ambil nama bahan kimia dari nama file (misal "Butanol.pdf" → "Butanol")
-      const baseName = fileName.replace(/\.pdf$/i, "").trim();
+      const baseName = normalizeChemicalName(fileName);
 
       // coba cari chemical di database
       const chemical = await db.chemical.findFirst({
