@@ -11,7 +11,7 @@ export interface Chemical {
   createdBy: { name: string };
 }
 
-export type ChemicalForm = "LIQUID" | "SOLID" | "GAS";
+export type ChemicalForm = "LIQUID" | "SOLID";
 export type ChemicalCharacteristic = "ACID" | "BASE" | "OXIDANT" | "GENERAL";
 
 export interface ChemicalFormData {

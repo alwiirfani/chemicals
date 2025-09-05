@@ -27,7 +27,6 @@ enum Role {
 enum ChemicalForm {
   SOLID
   LIQUID
-  GAS
 }
 
 enum ChemicalCharacteristic {

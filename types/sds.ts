@@ -45,3 +45,11 @@ export interface UploadedFile {
   fileName: string;
   filePath: string; // url dari vercel blob
 }
+
+export interface ImportResult {
+  fileName: string;
+  status: "success" | "not_found" | "error";
+  message?: string;
+  chemical?: string;
+  sdsId?: string;
+}

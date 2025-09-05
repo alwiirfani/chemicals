@@ -17,12 +17,12 @@ import { useSds } from "@/hooks/use-sds";
 import CardStats from "@/components/card-stats";
 import SdsFilter from "./sds-filter";
 import { exportSdsToExcel } from "@/helpers/sds/export-sds-to-excel";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import JSZip from "jszip";
 import pLimit from "p-limit";
-import { UploadedFile } from "@/types/sds";
+import { ImportResult, UploadedFile } from "@/types/sds";
 import { normalizeFileName } from "@/helpers/sds/normalization-pdf";
 
 interface SDSClientProps {
@@ -136,7 +136,22 @@ export function SDSClient({ user }: SDSClientProps) {
           { withCredentials: true }
         );
 
-        console.log("Import response:", response.data);
+        const results: ImportResult[] = response.data.results || [];
+        const successCount = results.filter(
+          (r) => r.status === "success"
+        ).length;
+        const failCount = results.length - successCount;
+
+        // simpan ke localStorage
+        localStorage.setItem(
+          "sdsImportSummary",
+          JSON.stringify({
+            total: results.length,
+            success: successCount,
+            failed: failCount,
+            results,
+          })
+        );
 
         toast({
           title: "Import selesai 🎉",
@@ -166,6 +181,22 @@ export function SDSClient({ user }: SDSClientProps) {
       setLoadingImport(false);
     }
   };
+
+  useEffect(() => {
+    const summary = localStorage.getItem("sdsImportSummary");
+    if (summary) {
+      const { total, success, failed, results } = JSON.parse(summary);
+
+      console.log("===== IMPORT SUMMARY (AFTER RELOAD) =====");
+      console.log("Total files:", total);
+      console.log("✅ Berhasil masuk DB:", success);
+      console.log("❌ Gagal masuk DB:", failed);
+      console.table(results);
+
+      // hapus biar tidak muncul lagi di reload berikutnya
+      localStorage.removeItem("sdsImportSummary");
+    }
+  }, []);
 
   // Get unique values for filters
   const uniqueLanguages = Array.from(
