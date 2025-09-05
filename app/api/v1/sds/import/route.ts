@@ -1,7 +1,4 @@
-import {
-  findClosestChemical,
-  normalizeChemicalName,
-} from "@/helpers/sds/normalization-pdf";
+import { normalizeChemicalName } from "@/helpers/sds/normalization-pdf";
 import { requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { UploadedFile } from "@/types/sds";
@@ -67,11 +64,6 @@ export async function POST(request: NextRequest) {
             name: { contains: baseName, mode: "insensitive" },
           },
         });
-      }
-
-      if (!chemical) {
-        // jika chemical tidak ditemukan, cari chemical dengan edit distance
-        chemical = await findClosestChemical(baseName);
       }
 
       if (!chemical) {
