@@ -1,4 +1,7 @@
-import { normalizeChemicalName } from "@/helpers/sds/normalization-pdf";
+import {
+  normalizeForCompare,
+  similarity,
+} from "@/helpers/sds/normalization-pdf";
 import { requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { UploadedFile } from "@/types/sds";
@@ -31,7 +34,7 @@ export async function POST(request: NextRequest) {
       sdsId?: string;
     }[] = [];
 
-    console.log("Files:", files);
+    const chemicals = await db.chemical.findMany();
 
     for (const file of files) {
       if (!file || !file.fileName || !file.filePath) {
@@ -44,29 +47,32 @@ export async function POST(request: NextRequest) {
       }
 
       const { fileName, filePath } = file;
+      const baseNameNorm = normalizeForCompare(fileName);
 
-      // ambil nama bahan kimia dari nama file (misal "Butanol.pdf" → "Butanol")
-      const baseName = normalizeChemicalName(fileName);
+      // 1) exact match
+      let matched = chemicals.find(
+        (chem) => normalizeForCompare(chem.name) === baseNameNorm
+      );
 
-      // coba cari chemical di database
-      let chemical = await db.chemical.findFirst({
-        where: {
-          name: {
-            equals: baseName,
-            mode: "insensitive", // case-insensitive match
-          },
-        },
-      });
+      // 2) fallback similarity >= 0.7
+      if (!matched) {
+        let bestMatch: { chem: (typeof chemicals)[0]; score: number } | null =
+          null;
 
-      if (!chemical) {
-        chemical = await db.chemical.findFirst({
-          where: {
-            name: { contains: baseName, mode: "insensitive" },
-          },
-        });
+        for (const chem of chemicals) {
+          const score = similarity(
+            baseNameNorm,
+            normalizeForCompare(chem.name)
+          );
+          if (score >= 0.7 && (!bestMatch || score > bestMatch.score)) {
+            bestMatch = { chem, score };
+          }
+        }
+
+        if (bestMatch) matched = bestMatch.chem;
       }
 
-      if (!chemical) {
+      if (!matched) {
         results.push({
           fileName,
           status: "error",
@@ -75,11 +81,9 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // simpan atau update SDS record
+      // Simpan atau update SDS
       const sds = await db.safetyDataSheet.upsert({
-        where: {
-          chemicalId: chemical.id,
-        },
+        where: { chemicalId: matched.id },
         update: {
           fileName,
           filePath,
@@ -88,7 +92,7 @@ export async function POST(request: NextRequest) {
           updatedById: userAccess.userId,
         },
         create: {
-          chemicalId: chemical.id,
+          chemicalId: matched.id,
           fileName,
           filePath,
           language: "ID",
@@ -100,7 +104,7 @@ export async function POST(request: NextRequest) {
       results.push({
         fileName,
         status: "success",
-        chemical: chemical.name,
+        chemical: matched.name,
         sdsId: sds.id,
       });
     }

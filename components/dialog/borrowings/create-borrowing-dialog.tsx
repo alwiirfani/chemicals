@@ -55,9 +55,10 @@ export function CreateBorrowingDialog({
   >({});
 
   const [formData, setFormData] = useState({
+    role: user?.role || "MAHASISWA",
     nrp: "",
     supervisor: "",
-    noTelp: 0,
+    noTelp: "",
     sarjanaLevel: "S1",
     purpose: "",
     notes: "",
@@ -160,9 +161,10 @@ export function CreateBorrowingDialog({
       // Reset form
       setOpen(false);
       setFormData({
+        role: user?.role || "MAHASISWA",
         nrp: "",
         supervisor: "",
-        noTelp: 0,
+        noTelp: "",
         sarjanaLevel: "S1",
         purpose: "",
         notes: "",
@@ -203,7 +205,7 @@ export function CreateBorrowingDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {user?.role === "MAHASISWA" && (
+          {user?.role === "MAHASISWA" ? (
             <>
               {/* Nama dan NRP */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -225,6 +227,7 @@ export function CreateBorrowingDialog({
                       setFormData({ ...formData, nrp: e.target.value })
                     }
                     placeholder="A323456789"
+                    error={errors.nrp}
                   />
                 </div>
               </div>
@@ -265,22 +268,40 @@ export function CreateBorrowingDialog({
                   </FormSelect>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="noTelp">No Telepon/WA</Label>
-                  <Input
+                  <FormInput
                     id="noTelp"
+                    label="No Telepon/WA"
                     value={formData.noTelp}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        noTelp: parseInt(e.target.value),
+                        noTelp: e.target.value,
                       })
                     }
-                    type="number"
                     placeholder="081234567890"
+                    error={errors.noTelp}
                   />
                 </div>
               </div>
             </>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <FormInput
+                  id="noTelp"
+                  label="No Telepon/WA"
+                  value={formData.noTelp}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      noTelp: e.target.value,
+                    })
+                  }
+                  placeholder="081234567890"
+                  error={errors.noTelp}
+                />
+              </div>
+            </div>
           )}
 
           {/* Purpose */}
