@@ -272,10 +272,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { purpose, notes, items } = parsed.data;
+    const { nrp, supervisor, noTelp, sarjanaLevel, purpose, notes, items } =
+      parsed.data;
 
     const borrowing = await db.borrowing.create({
       data: {
+        nrp,
+        supervisor,
+        noHp: String(noTelp),
+        sarjanaLevel,
         purpose,
         notes,
         borrowerId: userAccess.userId,
@@ -304,9 +309,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Cari semua ADMIN & LABORAN
+    // Cari semua ADMIN & LABORAN & PETUGAS_GUDANG
     const recipients = await db.user.findMany({
-      where: { role: { in: ["ADMIN", "LABORAN"] } },
+      where: { role: { in: ["ADMIN", "LABORAN", "PETUGAS_GUDANG"] } },
       select: { id: true },
     });
 

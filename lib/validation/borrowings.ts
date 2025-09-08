@@ -6,6 +6,10 @@ export const itemsBorrowingSchema = z.object({
 });
 
 export const createBorrowingSchema = z.object({
+  nrp: z.string().optional(),
+  supervisor: z.string().optional(),
+  noTelp: z.number().optional(),
+  sarjanaLevel: z.enum(["S1", "S2", "S3"]).optional(),
   purpose: z.string().min(1, "Tujuan peminjaman harus diisi"),
   notes: z.string().optional(),
   items: z

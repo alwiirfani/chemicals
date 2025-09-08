@@ -219,7 +219,10 @@ enum SarjanaLevel {
 model Borrowing {
   id           String          @id @default(nanoid()) @db.VarChar(255)
   purpose      String          @db.Text
+  nrp          String?         @db.VarChar(255)
   sarjanaLevel SarjanaLevel?   @map("sarjana_level")
+  supervisor   String?         @db.VarChar(255)
+  noHp         String?         @map("no_hp") @db.VarChar(255)
   status       BorrowingStatus @default(PENDING)
   requestDate  DateTime        @default(now()) @map("request_date")
   approvedAt   DateTime?       @map("approved_at")

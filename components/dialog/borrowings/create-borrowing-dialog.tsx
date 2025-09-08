@@ -31,6 +31,8 @@ import {
   createBorrowingSchema,
 } from "@/lib/validation/borrowings";
 import axios from "axios";
+import { FormSelect } from "@/components/form/form-select";
+import { FormInput } from "@/components/form/form-input";
 
 interface CreateBorrowingDialogProps {
   children: React.ReactNode;
@@ -54,6 +56,9 @@ export function CreateBorrowingDialog({
 
   const [formData, setFormData] = useState({
     nrp: "",
+    supervisor: "",
+    noTelp: 0,
+    sarjanaLevel: "S1",
     purpose: "",
     notes: "",
     items: [{ chemicalId: "", quantity: 0 }] as BorrowingItem[],
@@ -101,6 +106,7 @@ export function CreateBorrowingDialog({
 
     const result = createBorrowingSchema.safeParse(formData);
     if (!result.success) {
+      console.log(result.error.issues);
       const fieldErrors: Partial<
         Record<keyof CreateBorrowingFormData, string>
       > = {};
@@ -143,7 +149,7 @@ export function CreateBorrowingDialog({
         },
       });
 
-      console.log("response create peminjaman: ", response.data);
+      console.log("response create peminjaman: 324324", response.data);
 
       toast({
         title: "Peminjaman Berhasil Diajukan! 🎉",
@@ -155,6 +161,9 @@ export function CreateBorrowingDialog({
       setOpen(false);
       setFormData({
         nrp: "",
+        supervisor: "",
+        noTelp: 0,
+        sarjanaLevel: "S1",
         purpose: "",
         notes: "",
         items: [{ chemicalId: "", quantity: 0 }],
@@ -194,29 +203,85 @@ export function CreateBorrowingDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Nama dan NRP */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nama</Label>
-              <Input
-                id="name"
-                value={user?.name || ""}
-                disabled
-                className="cursor-not-allowed"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="nrp">NRP</Label>
-              <Input
-                id="nrp"
-                value={formData.nrp}
-                onChange={(e) =>
-                  setFormData({ ...formData, nrp: e.target.value })
-                }
-                className="cursor-not-allowed"
-              />
-            </div>
-          </div>
+          {user?.role === "MAHASISWA" && (
+            <>
+              {/* Nama dan NRP */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <FormInput
+                    id="name"
+                    label="Nama"
+                    value={user?.name || ""}
+                    disabled
+                    placeholder="Asam Sulfat"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <FormInput
+                    id="nrp"
+                    label="NRP"
+                    value={formData.nrp}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nrp: e.target.value })
+                    }
+                    placeholder="A323456789"
+                  />
+                </div>
+              </div>
+
+              {/* Nama Dosen */}
+              <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-2">
+                  <FormInput
+                    id="supervisor"
+                    label="Nama Dosen"
+                    value={formData.supervisor}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supervisor: e.target.value })
+                    }
+                    placeholder="Dr. Nama Dosen"
+                  />
+                </div>
+              </div>
+
+              {/* Mahasiswa dan no telp/wa */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <FormSelect
+                    htmlFor="sarjanaLevel"
+                    label="Mahasiswa"
+                    value={formData.sarjanaLevel}
+                    onChange={(value) =>
+                      setFormData({
+                        ...formData,
+                        sarjanaLevel:
+                          value ??
+                          ("S1" as CreateBorrowingFormData["sarjanaLevel"]),
+                      })
+                    }>
+                    <SelectItem value="S1">S1</SelectItem>
+                    <SelectItem value="S2">S2</SelectItem>
+                    <SelectItem value="S3">S3</SelectItem>
+                  </FormSelect>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="noTelp">No Telepon/WA</Label>
+                  <Input
+                    id="noTelp"
+                    value={formData.noTelp}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        noTelp: parseInt(e.target.value),
+                      })
+                    }
+                    type="number"
+                    placeholder="081234567890"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Purpose */}
           <div className="space-y-2">
