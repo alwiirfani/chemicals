@@ -1,7 +1,4 @@
-import {
-  normalizeForCompare,
-  similarity,
-} from "@/helpers/sds/normalization-pdf";
+import { matchChemical } from "@/helpers/sds/normalization-pdf";
 import { requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { UploadedFile } from "@/types/sds";
@@ -37,7 +34,7 @@ export async function POST(request: NextRequest) {
     const chemicals = await db.chemical.findMany();
 
     for (const file of files) {
-      if (!file || !file.fileName || !file.filePath) {
+      if (!file?.fileName || !file?.filePath) {
         results.push({
           fileName: file?.fileName ?? "Unknown",
           status: "error",
@@ -47,30 +44,7 @@ export async function POST(request: NextRequest) {
       }
 
       const { fileName, filePath } = file;
-      const baseNameNorm = normalizeForCompare(fileName);
-
-      // 1) exact match
-      let matched = chemicals.find(
-        (chem) => normalizeForCompare(chem.name) === baseNameNorm
-      );
-
-      // 2) fallback similarity >= 0.7
-      if (!matched) {
-        let bestMatch: { chem: (typeof chemicals)[0]; score: number } | null =
-          null;
-
-        for (const chem of chemicals) {
-          const score = similarity(
-            baseNameNorm,
-            normalizeForCompare(chem.name)
-          );
-          if (score >= 0.7 && (!bestMatch || score > bestMatch.score)) {
-            bestMatch = { chem, score };
-          }
-        }
-
-        if (bestMatch) matched = bestMatch.chem;
-      }
+      const matched = matchChemical(fileName, chemicals);
 
       if (!matched) {
         results.push({

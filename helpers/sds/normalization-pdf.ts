@@ -1,18 +1,3 @@
-// export function normalizeChemicalName(fileName: string) {
-//   let name = fileName.replace(/\.pdf$/i, ""); // hapus ekstensi
-
-//   // hapus prefix angka + karakter pemisah (spasi, -, _, .)
-//   name = name.replace(/^[\d\-\_.\s]+/, "");
-
-//   // ganti underscore ke spasi
-//   name = name.replace(/_/g, " ");
-
-//   // rapikan spasi ganda
-//   name = name.replace(/\s+/g, " ");
-
-//   return name.trim().toLowerCase();
-// }
-
 export function normalizeFileName(fileName: string): string {
   // Cari titik terakhir
   const lastDot = fileName.lastIndexOf(".");
@@ -73,4 +58,47 @@ export function similarity(a: string, b: string): number {
   if (!a.length && !b.length) return 1;
   const distance = levenshteinDistance(a, b);
   return 1 - distance / Math.max(a.length, b.length);
+}
+
+// Fungsi utama: cari chemical yang cocok
+export function matchChemical(
+  fileName: string,
+  chemicals: { id: string; name: string }[]
+) {
+  const baseNameNorm = normalizeForCompare(fileName);
+
+  // exact match
+  const matched = chemicals.find(
+    (chem) => normalizeForCompare(chem.name) === baseNameNorm
+  );
+  if (matched) return matched;
+
+  // contains match (cek semua alias dengan split "/")
+  for (const chem of chemicals) {
+    const aliases = chem.name.split("/").map((n) => normalizeForCompare(n));
+
+    if (
+      aliases.some(
+        (alias) => baseNameNorm.includes(alias) || alias.includes(baseNameNorm)
+      )
+    ) {
+      return chem;
+    }
+  }
+
+  // similarity match (>= 0.7)
+  let bestMatch: { chem: (typeof chemicals)[0]; score: number } | null = null;
+
+  for (const chem of chemicals) {
+    const aliases = chem.name.split("/").map((n) => normalizeForCompare(n));
+
+    for (const alias of aliases) {
+      const score = similarity(baseNameNorm, alias);
+      if (score >= 0.7 && (!bestMatch || score > bestMatch.score)) {
+        bestMatch = { chem, score };
+      }
+    }
+  }
+
+  return bestMatch ? bestMatch.chem : null;
 }
