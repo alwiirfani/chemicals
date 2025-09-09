@@ -237,7 +237,7 @@ export function CreateBorrowingDialog({
                 <div className="space-y-2">
                   <FormInput
                     id="supervisor"
-                    label="Nama Dosen"
+                    label="Nama Dosen Pembimbing"
                     value={formData.supervisor}
                     onChange={(e) =>
                       setFormData({ ...formData, supervisor: e.target.value })
