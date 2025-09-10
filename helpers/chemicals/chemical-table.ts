@@ -24,6 +24,8 @@ export const mapCharacteristic = (value: string): ChemicalCharacteristic => {
       return "OXIDANT";
     case "general":
       return "GENERAL";
+    case "indikator":
+      return "INDICATOR";
     default:
       throw new Error(`Invalid characteristic value: ${value}`);
   }

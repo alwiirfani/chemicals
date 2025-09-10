@@ -12,7 +12,12 @@ export interface Chemical {
 }
 
 export type ChemicalForm = "LIQUID" | "SOLID";
-export type ChemicalCharacteristic = "ACID" | "BASE" | "OXIDANT" | "GENERAL";
+export type ChemicalCharacteristic =
+  | "ACID"
+  | "BASE"
+  | "OXIDANT"
+  | "GENERAL"
+  | "INDICATOR";
 
 export interface ChemicalFormData {
   name: string;

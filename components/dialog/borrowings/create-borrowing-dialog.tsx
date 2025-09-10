@@ -288,17 +288,11 @@ export function CreateBorrowingDialog({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <FormInput
-                  id="noTelp"
-                  label="No Telepon/WA"
-                  value={formData.noTelp}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      noTelp: e.target.value,
-                    })
-                  }
-                  placeholder="081234567890"
-                  error={errors.noTelp}
+                  id="name"
+                  label="Nama"
+                  value={user?.name || ""}
+                  disabled
+                  placeholder="Namamu"
                 />
               </div>
             </div>

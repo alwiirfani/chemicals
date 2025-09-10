@@ -107,6 +107,7 @@ export const ChemicalFilter = ({
               <SelectItem value="BASE">Basa</SelectItem>
               <SelectItem value="GENERAL">General</SelectItem>
               <SelectItem value="OXIDANT">Oksidan</SelectItem>
+              <SelectItem value="INDICATOR">Indikator</SelectItem>
             </SelectContent>
           </Select>
 

@@ -35,7 +35,7 @@ const HomeCarousel = () => {
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 p-8 flex flex-col justify-center bg-gradient-to-r from-blue-50 to-white">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-            Sistem Peminjaman Bahan Kimia
+            Sistem Manajemen Bahan Kimia
           </h2>
           <p className="text-gray-600 mb-6">
             Platform terintegrasi untuk manajemen dan peminjaman bahan kimia di

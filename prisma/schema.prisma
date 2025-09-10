@@ -34,6 +34,7 @@ enum ChemicalCharacteristic {
   BASE
   GENERAL
   OXIDANT
+  INDICATOR
 }
 
 enum BorrowingStatus {
