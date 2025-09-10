@@ -300,7 +300,7 @@ export function CreateBorrowingDialog({
 
           {/* Purpose */}
           <div className="space-y-2">
-            <Label htmlFor="purpose">Judul Penelitian/Kegiatan *</Label>
+            <Label htmlFor="purpose">Nama Praktikum *</Label>
             <Textarea
               id="purpose"
               value={formData.purpose}
