@@ -5,7 +5,7 @@ export interface ChemicalStats {
   expiredChemicals: number;
   expiringSoonChemicals: number;
   byForm: Record<string, number>;
-  byLocation: Record<string, number>;
+  byCharacteristic: Record<string, number>;
   monthlyUsage: MonthlyUsage[];
   topUsedChemicals: TopUsedChemical[];
 }

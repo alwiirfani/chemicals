@@ -5,16 +5,13 @@ import { startOfMonth, endOfMonth, subMonths, format, subDays } from "date-fns";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get("period") || "6months";
+    const period = searchParams.get("period") || "1month";
 
     const now = new Date();
     let startDate: Date;
 
     switch (period) {
-      case "1month":
-        startDate = subMonths(now, 1);
-        break;
-      case "3months":
+      case "6months":
         startDate = subMonths(now, 3);
         break;
       case "1year":

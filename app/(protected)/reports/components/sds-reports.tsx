@@ -58,7 +58,9 @@ export function SDSReports({ data, period, onExport }: SDSReportsProps) {
             Analisis dokumen keselamatan dan akses
           </p>
         </div>
-        <Button onClick={onExport} className="shrink-0">
+        <Button
+          onClick={onExport}
+          className="shrink-0 bg-green-700 hover:bg-green-400 text-white">
           <Download className="mr-2 h-4 w-4" />
           Export Laporan
         </Button>

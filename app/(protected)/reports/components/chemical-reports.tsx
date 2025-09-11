@@ -56,7 +56,9 @@ export function ChemicalReports({
             Analisis stok, penggunaan, dan kondisi bahan kimia
           </p>
         </div>
-        <Button onClick={onExport}>
+        <Button
+          onClick={onExport}
+          className="shrink-0 bg-green-700 hover:bg-green-400 text-white">
           <Download className="mr-2 h-4 w-4" />
           Export Laporan
         </Button>
@@ -162,26 +164,28 @@ export function ChemicalReports({
         {/* By Location Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Distribusi Berdasarkan Lokasi</CardTitle>
+            <CardTitle>Distribusi Berdasarkan Sifat</CardTitle>
             <CardDescription>
-              Jumlah bahan kimia berdasarkan lokasi penyimpanan
+              Jumlah bahan kimia berdasarkan Sifat fisik
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {Object.entries(data.byLocation).map(([location, count]) => (
-                <div
-                  key={location}
-                  className="flex items-center justify-between">
-                  <span className="text-sm">{location}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{count}</span>
-                    <span className="text-xs text-gray-500">
-                      ({((count / data.totalChemicals) * 100).toFixed(1)}%)
-                    </span>
+              {Object.entries(data.byCharacteristic).map(
+                ([characteristic, count]) => (
+                  <div
+                    key={characteristic}
+                    className="flex items-center justify-between">
+                    <span className="text-sm">{characteristic}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{count}</span>
+                      <span className="text-xs text-gray-500">
+                        ({((count / data.totalChemicals) * 100).toFixed(1)}%)
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </CardContent>
         </Card>

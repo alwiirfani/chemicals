@@ -83,7 +83,7 @@ export function BorrowingReports({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
-            Laporan Peminjaman
+            Laporan Permintaan
           </h2>
           <div className="flex items-center mt-1 text-gray-600">
             <Calendar className="mr-2 h-4 w-4" />
@@ -92,7 +92,7 @@ export function BorrowingReports({
         </div>
         <Button
           onClick={onExport}
-          className="shrink-0 bg-blue-600 hover:bg-blue-700">
+          className="shrink-0 bg-green-700 hover:bg-green-400 text-white">
           <Download className="mr-2 h-4 w-4" />
           Export Laporan
         </Button>
@@ -103,7 +103,7 @@ export function BorrowingReports({
         <Card className="border-blue-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Peminjaman
+              Total Permintaan
             </CardTitle>
             <FileText className="h-4 w-4 text-blue-600" />
           </CardHeader>
@@ -166,7 +166,7 @@ export function BorrowingReports({
         <CardHeader>
           <CardTitle>Distribusi Jenis Pengguna</CardTitle>
           <CardDescription>
-            Peminjaman berdasarkan kategori pengguna pada periode {period}
+            Permintaan berdasarkan kategori pengguna pada periode {period}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -208,7 +208,7 @@ export function BorrowingReports({
               Tingkat Penyelesaian
             </CardTitle>
             <CardDescription>
-              Persentase peminjaman yang berhasil diselesaikan pada periode{" "}
+              Persentase permintaan yang berhasil diselesaikan pada periode{" "}
               {period}
             </CardDescription>
           </CardHeader>
@@ -222,7 +222,7 @@ export function BorrowingReports({
               </div>
               <Progress value={completionRate} className="h-2" />
               <div className="text-sm text-gray-600">
-                {completedBorrowings} dari {totalBorrowings} peminjaman
+                {completedBorrowings} dari {totalBorrowings} permintaan
               </div>
             </div>
           </CardContent>
@@ -244,7 +244,7 @@ export function BorrowingReports({
               </div>
               <p className="text-sm text-gray-600">hari rata-rata</p>
               <div className="text-xs text-gray-500">
-                Waktu ideal: ≤ 7 hari untuk peminjaman reguler
+                Waktu ideal: ≤ 7 hari untuk permintaan reguler
               </div>
               <div className="mt-2">
                 {averageReturnTime <= 7 ? (
@@ -265,9 +265,9 @@ export function BorrowingReports({
       {/* Top Borrowers */}
       <Card>
         <CardHeader>
-          <CardTitle>Peminjam Paling Aktif</CardTitle>
+          <CardTitle>Peminta Paling Aktif</CardTitle>
           <CardDescription>
-            Top 5 pengguna dengan jumlah peminjaman tertinggi pada periode{" "}
+            Top 5 pengguna dengan jumlah permintaan tertinggi pada periode{" "}
             {period}
           </CardDescription>
         </CardHeader>
@@ -298,7 +298,7 @@ export function BorrowingReports({
                   <div className="text-lg font-bold text-purple-600">
                     {borrower.count}
                   </div>
-                  <div className="text-sm text-gray-600">peminjaman</div>
+                  <div className="text-sm text-gray-600">Permintaan</div>
                 </div>
               </div>
             ))}
@@ -311,7 +311,7 @@ export function BorrowingReports({
         <CardHeader>
           <CardTitle>Performa Bulanan</CardTitle>
           <CardDescription>
-            Trend peminjaman dan pengembalian per bulan pada periode {period}
+            Trend permintaan dan pengembalian per bulan pada periode {period}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -320,7 +320,7 @@ export function BorrowingReports({
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-3 font-medium">Bulan</th>
-                  <th className="text-right p-3 font-medium">Peminjaman</th>
+                  <th className="text-right p-3 font-medium">Permintaan</th>
                   <th className="text-right p-3 font-medium">Pengembalian</th>
                   <th className="text-right p-3 font-medium">Tingkat</th>
                   <th className="text-right p-3 font-medium">Selisih</th>
@@ -383,7 +383,7 @@ export function BorrowingReports({
         <CardContent className="space-y-3">
           <div className="text-sm text-blue-700">
             • <span className="font-medium">Tindak lanjuti keterlambatan:</span>{" "}
-            Follow up {overdueBorrowings} peminjaman yang terlambat dengan
+            Follow up {overdueBorrowings} permintaan yang terlambat dengan
             reminder system
           </div>
 
@@ -395,7 +395,7 @@ export function BorrowingReports({
 
           <div className="text-sm text-blue-700">
             • <span className="font-medium">Evaluasi kebijakan:</span> Review
-            policy peminjaman untuk mengurangi tingkat keterlambatan sebesar{" "}
+            policy permintaan untuk mengurangi tingkat keterlambatan sebesar{" "}
             {Math.round(overdueRate)}%
           </div>
 
