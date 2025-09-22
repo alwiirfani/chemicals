@@ -137,7 +137,7 @@ model Chemical {
   initialStock   Int                    @default(0) @map("initial_stock") // Jumlah stok bahan yang tersedia
   currentStock   Int                    @default(0) @map("current_stock") // Jumlah stok bahan saat ini
   unit           String                 @db.VarChar(20) // Satuan stok (contoh: gram, liter, botol)
-  purchaseDate   DateTime               @map("purchase_date") // Tanggal pembelian bahan
+  purchaseDate   DateTime?              @map("purchase_date") // Tanggal pembelian bahan
   expirationDate DateTime?              @map("expiration_date") // Tanggal kadaluarsa (jika ada)
   createdAt      DateTime               @default(now()) @map("created_at")
   updatedAt      DateTime               @updatedAt @map("updated_at")
