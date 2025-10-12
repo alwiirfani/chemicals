@@ -12,8 +12,7 @@ export const createBorrowingSchema = z
     supervisor: z.string().optional(),
     noTelp: z
       .string()
-      .regex(/^\d+$/, "Nomor WA hanya boleh angka")
-      .min(10, "Nomor WA minimal 10 digit")
+      // .regex(/^\d+$/, "Nomor WA hanya boleh angka")
       .max(15, "Nomor WA maksimal 15 digit")
       .optional(),
     sarjanaLevel: z.enum(["S1", "S2", "S3"]).optional(),
@@ -53,14 +52,15 @@ export const createBorrowingSchema = z
           message: "Jenjang sarjana wajib diisi untuk mahasiswa",
         });
       }
-    } else {
-      if (!data.noTelp) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["noTelp"],
-          message: "No WA wajib diisi",
-        });
-      }
     }
+    // else {
+    //   if (!data.noTelp) {
+    //     ctx.addIssue({
+    //       code: "custom",
+    //       path: ["noTelp"],
+    //       message: "No WA wajib diisi",
+    //     });
+    //   }
+    // }
   });
 export type CreateBorrowingFormData = z.infer<typeof createBorrowingSchema>;
