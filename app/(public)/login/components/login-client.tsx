@@ -38,7 +38,7 @@ export default function LoginClient() {
               <FlaskConical className="relative h-8 w-8 text-blue-600 z-10" />
             </div>
             <h1 className="text-xl sm:text-3xl font-bold text-gray-900">
-              Sistem Manajemen Inventaris Kimia
+              Sistem Manajemen Inventaris Bahan Kimia
             </h1>
           </div>
           <p className="text-gray-600">

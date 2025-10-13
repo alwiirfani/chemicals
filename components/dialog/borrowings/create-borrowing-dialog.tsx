@@ -300,7 +300,12 @@ export function CreateBorrowingDialog({
 
           {/* Purpose */}
           <div className="space-y-2">
-            <Label htmlFor="purpose">Nama Praktikum *</Label>
+            <Label htmlFor="purpose">
+              {user.role === "MAHASISWA"
+                ? "Judul Penelitian/Tugas Akhir"
+                : "Nama Praktikum"}{" "}
+              *
+            </Label>
             <Textarea
               id="purpose"
               value={formData.purpose}
