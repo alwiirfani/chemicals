@@ -302,7 +302,7 @@ export function CreateBorrowingDialog({
           <div className="space-y-2">
             <Label htmlFor="purpose">
               {user.role === "MAHASISWA"
-                ? "Judul Penelitian/Tugas Akhir"
+                ? "Judul Penelitian/Kegiatan"
                 : "Nama Praktikum"}{" "}
               *
             </Label>

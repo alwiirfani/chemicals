@@ -51,3 +51,8 @@ export enum BorrowingStatus {
   RETURNED = "RETURNED",
   OVERDUE = "OVERDUE",
 }
+
+export interface BorrowingFormData {
+  chemicalId: string;
+  quantity: number;
+}
