@@ -15,13 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SelectItem } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
 import { UserAuth } from "@/types/auth";
@@ -33,6 +27,7 @@ import {
 import axios from "axios";
 import { FormSelect } from "@/components/form/form-select";
 import { FormInput } from "@/components/form/form-input";
+import { Combobox } from "@/components/ui/combobox";
 
 interface CreateBorrowingDialogProps {
   children: React.ReactNode;
@@ -50,6 +45,7 @@ export function CreateBorrowingDialog({
 }: CreateBorrowingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchTerms, setSearchTerms] = useState<string[]>([]);
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateBorrowingFormData, string>>
   >({});
@@ -68,11 +64,17 @@ export function CreateBorrowingDialog({
   const { toast } = useToast();
   const { chemicals } = useChemicals();
 
+  const chemicalOptions = chemicals.map((chemical) => ({
+    value: chemical.id,
+    label: `${chemical.name} - ${chemical.formula} (Sifat: ${chemical.characteristic})`,
+  }));
+
   const addItem = () => {
     setFormData((prev) => ({
       ...prev,
       items: [...prev.items, { chemicalId: "", quantity: 0 }],
     }));
+    setSearchTerms((prev) => [...prev, ""]);
   };
 
   const removeItem = (index: number) => {
@@ -81,6 +83,7 @@ export function CreateBorrowingDialog({
         ...prev,
         items: prev.items.filter((_, i) => i !== index),
       }));
+      setSearchTerms((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -354,29 +357,22 @@ export function CreateBorrowingDialog({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Pilih Bahan Kimia</Label>
-                      <Select
+                      <Combobox
+                        label="Pilih Bahan Kimia"
+                        options={chemicalOptions}
                         value={item.chemicalId}
                         onValueChange={(value) =>
                           updateItem(index, "chemicalId", value)
-                        }>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih bahan kimia" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {chemicals.map((chemical) => (
-                            <SelectItem key={chemical.id} value={chemical.id}>
-                              <div className="flex flex-col">
-                                <span>{chemical.name}</span>
-                                <span className="text-xs text-gray-500">
-                                  {chemical.formula} - Stok: {chemical.stock}{" "}
-                                  {chemical.unit}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        }
+                        searchTerm={searchTerms[index] || ""}
+                        onSearchChange={(term) => {
+                          const updated = [...searchTerms];
+                          updated[index] = term;
+                          setSearchTerms(updated);
+                        }}
+                        placeholder="Pilih bahan kimia"
+                        searchPlaceholder="Cari bahan kimia..."
+                      />
                     </div>
 
                     <div>
