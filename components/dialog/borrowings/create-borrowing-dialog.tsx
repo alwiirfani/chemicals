@@ -64,10 +64,17 @@ export function CreateBorrowingDialog({
   const { toast } = useToast();
   const { chemicals } = useChemicals();
 
-  const chemicalOptions = chemicals.map((chemical) => ({
-    value: chemical.id,
-    label: `${chemical.name} - ${chemical.formula} (Sifat: ${chemical.characteristic})`,
-  }));
+  const chemicalOptions = chemicals.map((chemical) => {
+    const truncatedName =
+      chemical.name.length > 20
+        ? chemical.name.slice(0, 21) + "..."
+        : chemical.name;
+
+    return {
+      value: chemical.id,
+      label: `${truncatedName} - ${chemical.formula}`,
+    };
+  });
 
   const addItem = () => {
     setFormData((prev) => ({
