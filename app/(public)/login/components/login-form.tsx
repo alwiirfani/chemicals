@@ -42,6 +42,7 @@ export default function LoginForm() {
 
       const data = response.data;
       console.log(data.user.name);
+      console.log(data.user);
 
       toast({
         title: "Login Berhasil",

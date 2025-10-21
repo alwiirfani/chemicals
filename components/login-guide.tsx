@@ -20,6 +20,7 @@ import {
   GraduationCap,
   FlaskConical,
   Users,
+  Truck,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -152,6 +153,21 @@ const accounts: Account[] = [
     description: "Akses mahasiswa, proyek akhir, peminjaman terawasi",
     permissions: ["Proyek Akhir", "Peminjaman Terawasi", "Akses Penelitian"],
   },
+  {
+    name: "Budi Santoso, S.Kom",
+    email: "gudang1@chemlab.com",
+    password: "password123",
+    role: "PETUGAS_GUDANG",
+    id: "1234567892",
+    description: "Manajemen lab, kontrol inventaris, persetujuan peminjaman",
+    permissions: [
+      "Manajemen Inventaris",
+      "Persetujuan Peminjaman",
+      "Manajemen SDS",
+      "Laporan Lab",
+      "Pemantauan Pengguna",
+    ],
+  },
 ];
 
 const getRoleIcon = (role: string) => {
@@ -164,6 +180,8 @@ const getRoleIcon = (role: string) => {
       return <GraduationCap className="h-4 w-4" />;
     case "MAHASISWA":
       return <Users className="h-4 w-4" />;
+    case "PETUGAS_GUDANG":
+      return <Truck className="h-4 w-4" />;
     default:
       return <Users className="h-4 w-4" />;
   }
@@ -179,6 +197,8 @@ const getRoleColor = (role: string) => {
       return "bg-green-100 text-green-800 border-green-200";
     case "MAHASISWA":
       return "bg-purple-100 text-purple-800 border-purple-200";
+    case "PETUGAS_GUDANG":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
     default:
       return "bg-gray-100 text-gray-800 border-gray-200";
   }
@@ -194,6 +214,8 @@ const getIdLabel = (role: string) => {
       return "NIDN";
     case "MAHASISWA":
       return "NIM";
+    case "PETUGAS_GUDANG":
+      return "NIP";
     default:
       return "ID";
   }
@@ -248,6 +270,7 @@ const LoginGuide: React.FC<LoginGuideProps> = ({ onQuickLogin }) => {
     LABORAN: accounts.filter((acc) => acc.role === "LABORAN"),
     DOSEN: accounts.filter((acc) => acc.role === "DOSEN"),
     MAHASISWA: accounts.filter((acc) => acc.role === "MAHASISWA"),
+    PETUGAS_GUDANG: accounts.filter((acc) => acc.role === "PETUGAS_GUDANG"),
   };
 
   return (
@@ -264,7 +287,7 @@ const LoginGuide: React.FC<LoginGuideProps> = ({ onQuickLogin }) => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full h-fit grid-cols-2 sm:grid-cols-5">
+            <TabsList className="grid w-full h-fit grid-cols-2 sm:grid-cols-6">
               <TabsTrigger value="all" className="border sm:border-none">
                 Semua
               </TabsTrigger>
@@ -277,11 +300,14 @@ const LoginGuide: React.FC<LoginGuideProps> = ({ onQuickLogin }) => {
               <TabsTrigger value="DOSEN" className="border sm:border-none">
                 Dosen
               </TabsTrigger>
-              <TabsTrigger
-                value="MAHASISWA"
-                className="col-span-2 justify-center border sm:border-none sm:col-span-1">
+              <TabsTrigger value="MAHASISWA" className="border sm:border-none">
                 Mahasiswa
-              </TabsTrigger>{" "}
+              </TabsTrigger>
+              <TabsTrigger
+                value="PETUGAS_GUDANG"
+                className="border sm:border-none">
+                Petugas Gudang
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="space-y-4">

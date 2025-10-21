@@ -68,6 +68,10 @@ export async function POST(request: NextRequest) {
         roleId = user.laboran?.nip || "";
         name = user.laboran?.full_name || "";
         break;
+      case "PETUGAS_GUDANG":
+        roleId = user.laboran?.nip || "";
+        name = user.laboran?.full_name || "";
+        break;
     }
 
     const token = generateToken({
