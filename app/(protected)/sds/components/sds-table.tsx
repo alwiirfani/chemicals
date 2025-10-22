@@ -63,7 +63,10 @@ export function SDSTable({
   const { toast } = useToast();
 
   const canAction =
-    mode === "management" && (userRole === "ADMIN" || userRole === "LABORAN");
+    mode === "management" &&
+    (userRole === "ADMIN" ||
+      userRole === "LABORAN" ||
+      userRole === "PETUGAS_GUDANG");
 
   const getLanguageBadge = (language: string) => {
     const colors = {
