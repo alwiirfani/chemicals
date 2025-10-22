@@ -152,7 +152,10 @@ export function BorrowingTable({
     }
   };
 
-  const canManage = userRole === "ADMIN" || userRole === "LABORAN";
+  const canManage =
+    userRole === "ADMIN" ||
+    userRole === "LABORAN" ||
+    userRole === "PETUGAS_GUDANG";
 
   return (
     <>

@@ -21,6 +21,8 @@ const SidebarFooter = ({ user }: SidebarFooterProps) => {
         return "Dosen";
       case "MAHASISWA":
         return "Mahasiswa";
+      case "PETUGAS_GUDANG":
+        return "Petugas Gudang";
       default:
         return role;
     }

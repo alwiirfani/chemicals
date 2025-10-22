@@ -66,7 +66,10 @@ export function BorrowingClient({ user }: BorrowingsClientProps) {
     returned: userBorrowings.filter((b) => b.status === "RETURNED").length,
   };
 
-  const canManage = user.role === "ADMIN" || user.role === "LABORAN";
+  const canManage =
+    user.role === "ADMIN" ||
+    user.role === "LABORAN" ||
+    user.role === "PETUGAS_GUDANG";
 
   return (
     <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
