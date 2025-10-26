@@ -172,6 +172,12 @@ export async function GET(request: NextRequest) {
 
           name = borrowing.borrower.laboran?.full_name;
           break;
+        case "PETUGAS_GUDANG":
+          approvedByName = borrowing.approvedBy?.laboran?.full_name;
+          rejectedByName = borrowing.rejectedBy?.laboran?.full_name;
+          returnedByName = borrowing.returnedBy?.laboran?.full_name;
+
+          name = borrowing.borrower.laboran?.full_name;
         case "DOSEN":
           name = borrowing.borrower.dosen?.full_name;
           break;
