@@ -178,6 +178,7 @@ export async function GET(request: NextRequest) {
           returnedByName = borrowing.returnedBy?.laboran?.full_name;
 
           name = borrowing.borrower.laboran?.full_name;
+          break;
         case "DOSEN":
           name = borrowing.borrower.dosen?.full_name;
           break;
