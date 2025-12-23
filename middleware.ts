@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { isTokenExpiredRuntimeEdge } from "./lib/auth";
+import { isTokenExpiredRuntimeEdge } from "./lib/auth-edge";
 
 const publicPaths = ["/login", "/about", "/contact", "/privacy"];
 

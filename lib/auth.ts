@@ -22,6 +22,7 @@ export const verifyToken = (token: string): UserAuth | null => {
   }
 };
 
+/*
 // cek token apakah expired
 export const isTokenExpiredRuntimeEdge = (token: string): boolean => {
   try {
@@ -50,6 +51,7 @@ export const isTokenExpiredRuntimeEdge = (token: string): boolean => {
   }
 };
 
+
 // apakah token masih aktif (tidak expired) (runtime nodejs)
 export function isTokenExpiredRuntimeNodeJS(token: string): boolean {
   try {
@@ -63,6 +65,7 @@ export function isTokenExpiredRuntimeNodeJS(token: string): boolean {
     return true;
   }
 }
+  */
 
 export const getCurrentUser = async () => {
   try {
