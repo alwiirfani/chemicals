@@ -1,4 +1,4 @@
-import { createUserRoleData, isRoleIdTaken } from "@/helpers/users/user-api";
+import { createUserRoleData } from "@/lib/services/users/user.service";
 import { hashPassword, requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { registerSchema } from "@/lib/validation/auth";
@@ -35,7 +35,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Cek apakah roleId sudah digunakan
+    /*
     const roleIdTaken = await isRoleIdTaken(role, roleId);
+    if (roleIdTaken) {
+      return NextResponse.json(
+        { error: `${role} dengan ID tersebut sudah ada` },
+        { status: 409 }
+      );
+    }
+    */
+    const roleIdTaken = await (async () => {
+      switch (role) {
+        case "ADMIN":
+          return db.admin.findUnique({ where: { pin: roleId } });
+        case "MAHASISWA":
+          return db.mahasiswa.findUnique({ where: { nim: roleId } });
+        case "DOSEN":
+          return db.dosen.findUnique({ where: { nidn: roleId } });
+        case "LABORAN":
+          return db.laboran.findUnique({ where: { nip: roleId } });
+        case "PETUGAS_GUDANG":
+          return db.laboran.findUnique({ where: { nip: roleId } });
+        default:
+          return null;
+      }
+    })();
+
     if (roleIdTaken) {
       return NextResponse.json(
         { error: `${role} dengan ID tersebut sudah ada` },

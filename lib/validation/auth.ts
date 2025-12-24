@@ -12,7 +12,7 @@ export const registerSchema = z
       }),
     status: z.enum(["ACTIVE", "INACTIVE", "BLOCKED"]),
     roleId: z.string().min(1, { message: "ID Role harus diisi" }),
-    role: z.enum(["ADMIN", "MAHASISWA", "DOSEN", "LABORAN"]),
+    role: z.enum(["ADMIN", "MAHASISWA", "DOSEN", "LABORAN", "PETUGAS_GUDANG"]),
     password: z.string().min(6, { message: "Password minimal 6 karakter" }),
     confirmPassword: z.string(),
   })

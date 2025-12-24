@@ -15,7 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { registerSchema, RegisterSchemaFormData } from "@/lib/validation/auth";
 import { FormInput } from "@/components/form/form-input";
-import { getRoleIdLabel, getRoleIdPlaceholder } from "@/helpers/users/user-api";
+import {
+  getRoleIdLabel,
+  getRoleIdPlaceholder,
+} from "@/helpers/users/user-client";
 import { FormSelect } from "@/components/form/form-select";
 import { SelectItem } from "@/components/ui/select";
 

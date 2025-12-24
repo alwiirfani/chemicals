@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { hashPassword, requireRoleOrNull, requireAuthOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { editUserForAdminSchema } from "@/lib/validation/users";
-import { updateUserRoleData } from "@/helpers/users/user-api";
+import { updateUserRoleData } from "@/lib/services/users/user.service";
 
 export async function GET(
   request: NextRequest,
