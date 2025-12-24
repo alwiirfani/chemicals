@@ -38,6 +38,10 @@ export async function GET() {
           roleId = user.laboran?.nip || "";
           name = user.laboran?.full_name || "";
           break;
+        case "PETUGAS_GUDANG":
+          roleId = user.laboran?.nip || "";
+          name = user.laboran?.full_name || "";
+          break;
       }
 
       return {

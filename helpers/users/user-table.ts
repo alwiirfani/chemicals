@@ -4,6 +4,8 @@ export const getRoleLabel = (role: string) => {
       return "Administrator";
     case "LABORAN":
       return "Laboran";
+    case "PETUGAS_GUDANG":
+      return "Petugas Gudang";
     case "MAHASISWA":
       return "Mahasiswa";
     case "DOSEN":

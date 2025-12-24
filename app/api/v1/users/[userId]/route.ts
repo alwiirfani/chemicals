@@ -123,6 +123,8 @@ export async function PUT(
         break;
       case "LABORAN":
         roleId = existingUser.laboran?.nip || "";
+      case "PETUGAS_GUDANG":
+        roleId = existingUser.laboran?.nip || "";
         break;
     }
 

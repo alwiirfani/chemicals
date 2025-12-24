@@ -87,6 +87,14 @@ export async function updateUserRoleData(
         },
       });
 
+    case "PETUGAS_GUDANG":
+      return tx.laboran.update({
+        where: { nip: roleId },
+        data: {
+          full_name: name || "",
+        },
+      });
+
     default:
       throw new Error("Role tidak valid");
   }

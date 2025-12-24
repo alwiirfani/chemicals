@@ -14,7 +14,7 @@ export function getRoleIdLabel(role: Role | string): string {
     case "ADMIN":
       return "PIN";
     case "MAHASISWA":
-      return "NIM";
+      return "NRP";
     case "DOSEN":
       return "NIDN";
     case "LABORAN":
