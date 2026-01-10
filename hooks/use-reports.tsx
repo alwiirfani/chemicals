@@ -1,13 +1,13 @@
 "use client";
 
-import { RealTimeData, ReportData } from "@/types/reports";
-import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import { RealTimeData, ReportData } from "@/types/reports";
 
 interface UseReportsParams {
   period: string;
-  startDate?: string | null;
-  endDate?: string | null;
+  startDate?: string;
+  endDate?: string;
 }
 
 export function useReports({ period, startDate, endDate }: UseReportsParams) {
@@ -25,71 +25,49 @@ export function useReports({ period, startDate, endDate }: UseReportsParams) {
   );
 
   /**
-   * ===============================
    * FETCH REPORT DATA
-   * ===============================
    */
-  const fetchReportData = useCallback(
-    async (params?: UseReportsParams) => {
-      const query = params ?? { period, startDate, endDate };
+  const fetchReportData = useCallback(async () => {
+    if (period === "custom" && (!startDate || !endDate)) return;
 
-      // ⛔ jangan fetch kalau custom tapi tanggal belum lengkap
-      if (query.period === "custom" && (!query.startDate || !query.endDate)) {
-        return;
-      }
+    const params: Record<string, string> = { period };
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
 
-      try {
-        setIsLoading(true);
-
-        const response = await axios.get("/api/v1/reports", {
-          params: {
-            period: query.period,
-            startDate: query.startDate,
-            endDate: query.endDate,
-          },
-        });
-
-        setReportData(response.data);
-      } catch (error) {
-        console.error("Error fetching report data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [period, startDate, endDate]
-  );
+    const res = await axios.get("/api/v1/reports", { params });
+    setReportData(res.data);
+  }, [period, startDate, endDate]);
 
   /**
-   * ===============================
-   * FETCH REAL-TIME DATA
-   * ===============================
+   * FETCH REALTIME DATA
    */
   const fetchRealTimeData = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/v1/reports/realtime");
-      setRealTimeData(response.data);
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      console.error("Error fetching real-time data:", error);
-    }
+    const res = await axios.get("/api/v1/reports/realtime");
+    setRealTimeData(res.data);
+    setLastUpdated(new Date().toLocaleTimeString());
   }, []);
 
   /**
-   * ===============================
-   * AUTO FETCH ON CHANGE
-   * ===============================
+   * REFETCH (PUBLIC API)
+   */
+  const refetch = useCallback(async () => {
+    setIsLoading(true);
+    await Promise.all([fetchReportData(), fetchRealTimeData()]);
+    setIsLoading(false);
+  }, [fetchReportData, fetchRealTimeData]);
+
+  /**
+   * AUTO FETCH
    */
   useEffect(() => {
-    fetchReportData();
-    fetchRealTimeData();
-  }, [fetchReportData, fetchRealTimeData]);
+    refetch();
+  }, [refetch]);
 
   return {
     reportData,
     realTimeData,
     isLoading,
-    fetchReportData,
-    fetchRealTimeData,
     lastUpdated,
+    refetch, // ✅ cukup ini
   };
 }

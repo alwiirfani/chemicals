@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
@@ -44,7 +44,6 @@ interface OverviewStat {
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   bgColor: string;
-  isRealTime?: boolean;
 }
 
 export function ReportsClient() {
@@ -52,41 +51,43 @@ export function ReportsClient() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // 👉 Date range (ShadCN)
+  // ShadCN Date Range
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const startDate = dateRange?.from
     ? format(dateRange.from, "yyyy-MM-dd")
-    : null;
+    : undefined;
 
-  const endDate = dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : null;
+  const endDate = dateRange?.to
+    ? format(dateRange.to, "yyyy-MM-dd")
+    : undefined;
 
-  const {
-    fetchRealTimeData,
-    fetchReportData,
-    isLoading,
-    realTimeData,
-    reportData,
-  } = useReports({
+  const { refetch, reportData, realTimeData, isLoading } = useReports({
     period: selectedPeriod,
     startDate,
     endDate,
   });
 
-  const handleRefresh = () => {
-    if (selectedPeriod === "custom" && (!dateRange?.from || !dateRange?.to)) {
-      return;
+  /**
+   * AUTO FETCH (FINAL)
+   * - Non custom → fetch langsung
+   * - Custom → fetch hanya saat from & to lengkap
+   */
+  useEffect(() => {
+    if (selectedPeriod === "custom") {
+      if (!startDate || !endDate) return;
     }
 
+    refetch();
+  }, [selectedPeriod, startDate, endDate, refetch]);
+
+  /**
+   * MANUAL REFRESH
+   */
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    Promise.all([
-      fetchReportData({
-        period: selectedPeriod,
-        startDate,
-        endDate,
-      }),
-      fetchRealTimeData(),
-    ]).finally(() => setIsRefreshing(false));
+    await refetch();
+    setIsRefreshing(false);
   };
 
   const handlePeriodChange = (period: string) => {
@@ -156,7 +157,6 @@ export function ReportsClient() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* SELECT PERIOD */}
             <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue />
@@ -169,7 +169,6 @@ export function ReportsClient() {
               </SelectContent>
             </Select>
 
-            {/* RANGE CALENDAR */}
             {selectedPeriod === "custom" && (
               <Popover>
                 <PopoverTrigger asChild>
