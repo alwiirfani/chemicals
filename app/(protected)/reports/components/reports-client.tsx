@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,20 +13,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 import {
   BarChart3,
   Download,
   Package,
   FileText,
   Shield,
-  Activity,
   RefreshCw,
+  Calendar as CalendarIcon,
 } from "lucide-react";
+
 import { ChemicalReports } from "./chemical-reports";
 import { BorrowingReports } from "./borrowing-reports";
 import { SDSReports } from "./sds-reports";
-import { useReports } from "@/hooks/use-reports";
 import { OverviewReports } from "./overview-reports";
+import { useReports } from "@/hooks/use-reports";
 
 interface OverviewStat {
   title: string;
@@ -41,44 +52,58 @@ export function ReportsClient() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // 👉 Date range (ShadCN)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const startDate = dateRange?.from
+    ? format(dateRange.from, "yyyy-MM-dd")
+    : null;
+
+  const endDate = dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : null;
+
   const {
-    lastUpdated,
     fetchRealTimeData,
     fetchReportData,
     isLoading,
     realTimeData,
     reportData,
-  } = useReports(selectedPeriod);
+  } = useReports({
+    period: selectedPeriod,
+    startDate,
+    endDate,
+  });
 
   const handleRefresh = () => {
+    if (selectedPeriod === "custom" && (!dateRange?.from || !dateRange?.to)) {
+      return;
+    }
+
     setIsRefreshing(true);
-    Promise.all([fetchReportData(selectedPeriod), fetchRealTimeData()]).finally(
-      () => setIsRefreshing(false)
-    );
+    Promise.all([
+      fetchReportData({
+        period: selectedPeriod,
+        startDate,
+        endDate,
+      }),
+      fetchRealTimeData(),
+    ]).finally(() => setIsRefreshing(false));
   };
 
   const handlePeriodChange = (period: string) => {
     setSelectedPeriod(period);
-  };
-
-  const handleExportReport = (reportType: string) => {
-    console.log(`Exporting ${reportType} report for period: ${selectedPeriod}`);
+    if (period !== "custom") {
+      setDateRange(undefined);
+    }
   };
 
   if (isLoading || !reportData) {
     return (
-      <div className="flex min-h-screen bg-gray-50 mt-16 sm:mt-0">
-        <div className="flex-1 md:ml-64 p-6 flex items-center justify-center">
-          <div className="text-center">
-            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-            <p className="text-gray-600">Memuat data laporan...</p>
-          </div>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
       </div>
     );
   }
 
-  // Overview statistics dengan data real-time
   const overviewStats: OverviewStat[] = [
     {
       title: "Total Bahan Kimia",
@@ -97,7 +122,6 @@ export function ReportsClient() {
       icon: FileText,
       color: "text-green-600",
       bgColor: "bg-green-100",
-      isRealTime: true,
     },
     {
       title: "Safety Data Sheets",
@@ -112,128 +136,147 @@ export function ReportsClient() {
 
   return (
     <div className="flex min-h-screen bg-gray-50 mt-16 sm:mt-0">
-      <div className="flex-1 md:ml-64">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Laporan</h1>
-              <p className="text-gray-600">
-                Dashboard laporan sistem manajemen bahan kimia
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1 month">1 Bulan Terakhir</SelectItem>
-                  <SelectItem value="6 months">6 Bulan Terakhir</SelectItem>
-                  <SelectItem value="1 year">1 Tahun Terakhir</SelectItem>
-                  <SelectItem value="custom">Custom Range</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                onClick={handleRefresh}
-                disabled={isRefreshing}>
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${
-                    isRefreshing ? "animate-spin" : ""
-                  }`}
-                />
-                Refresh
-              </Button>
-              <Button className="shrink-0 bg-green-700 hover:bg-green-400 text-white">
-                <Download className="mr-2 h-4 w-4" />
-                Export Semua
-              </Button>
-            </div>
+      <div className="flex-1 md:ml-64 p-6">
+        {/* HEADER */}
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Laporan</h1>
+            <p className="text-gray-600">
+              Dashboard laporan sistem manajemen bahan kimia
+            </p>
+
+            {selectedPeriod === "custom" &&
+              dateRange?.from &&
+              dateRange?.to && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Periode: {format(dateRange.from, "dd MMM yyyy")} –{" "}
+                  {format(dateRange.to, "dd MMM yyyy")}
+                </p>
+              )}
           </div>
 
-          {/* Real-time Status Bar */}
-          <div className="flex items-center justify-between mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-blue-600" />
-              <span className="text-sm text-blue-800 font-medium">
-                Monitoring Real-time
-              </span>
-              <span className="text-xs text-blue-600">
-                Terakhir update: {lastUpdated}
-              </span>
-            </div>
-            <div className="flex items-center gap-4 text-xs text-blue-700">
-              <span>📊 {realTimeData.activeBorrowings} peminjaman aktif</span>
-              <span>⚡ {realTimeData.recentUsage} penggunaan 1 jam</span>
-              <span>⚠️ {realTimeData.lowStockAlerts} stok rendah</span>
-              <span>🚨 {realTimeData.expiringAlerts} akan kadaluarsa</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* SELECT PERIOD */}
+            <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1 month">1 Bulan Terakhir</SelectItem>
+                <SelectItem value="6 months">6 Bulan Terakhir</SelectItem>
+                <SelectItem value="1 year">1 Tahun Terakhir</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* RANGE CALENDAR */}
+            {selectedPeriod === "custom" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[260px] justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "dd/MM/yyyy")} -{" "}
+                          {format(dateRange.to, "dd/MM/yyyy")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "dd/MM/yyyy")
+                      )
+                    ) : (
+                      <span>Pilih rentang tanggal</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={
+                isRefreshing ||
+                (selectedPeriod === "custom" &&
+                  (!dateRange?.from || !dateRange?.to))
+              }>
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
+
+            <Button className="bg-green-700 hover:bg-green-600 text-white">
+              <Download className="mr-2 h-4 w-4" />
+              Export Semua
+            </Button>
           </div>
-
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger
-                value="chemicals"
-                className="flex items-center gap-2">
-                <Package className="h-4 w-4" />
-                Inventaris
-              </TabsTrigger>
-              <TabsTrigger
-                value="borrowings"
-                className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Permintaan
-              </TabsTrigger>
-              <TabsTrigger value="sds" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                SDS
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Overview Tab */}
-            <TabsContent value="overview">
-              <OverviewReports
-                overviewStats={overviewStats}
-                realTimeData={realTimeData}
-                reportData={reportData}
-              />
-            </TabsContent>
-
-            {/* Chemical Reports Tab */}
-            <TabsContent value="chemicals">
-              <ChemicalReports
-                data={reportData.chemicalStats}
-                period={selectedPeriod}
-                onExport={() => handleExportReport("chemicals")}
-              />
-            </TabsContent>
-
-            {/* Borrowing Reports Tab */}
-            <TabsContent value="borrowings">
-              <BorrowingReports
-                data={reportData.borrowingStats}
-                period={selectedPeriod}
-                onExport={() => handleExportReport("borrowings")}
-              />
-            </TabsContent>
-
-            {/* SDS Reports Tab */}
-            <TabsContent value="sds">
-              <SDSReports
-                data={reportData.sdsStats}
-                period={selectedPeriod}
-                onExport={() => handleExportReport("sds")}
-              />
-            </TabsContent>
-          </Tabs>
         </div>
+
+        {/* TABS */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="chemicals">
+              <Package className="h-4 w-4 mr-2" />
+              Inventaris
+            </TabsTrigger>
+            <TabsTrigger value="borrowings">
+              <FileText className="h-4 w-4 mr-2" />
+              Permintaan
+            </TabsTrigger>
+            <TabsTrigger value="sds">
+              <Shield className="h-4 w-4 mr-2" />
+              SDS
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <OverviewReports
+              overviewStats={overviewStats}
+              realTimeData={realTimeData}
+              reportData={reportData}
+            />
+          </TabsContent>
+
+          <TabsContent value="chemicals">
+            <ChemicalReports
+              data={reportData.chemicalStats}
+              period={selectedPeriod}
+              onExport={() => {}}
+            />
+          </TabsContent>
+
+          <TabsContent value="borrowings">
+            <BorrowingReports
+              data={reportData.borrowingStats}
+              period={selectedPeriod}
+              onExport={() => {}}
+            />
+          </TabsContent>
+
+          <TabsContent value="sds">
+            <SDSReports
+              data={reportData.sdsStats}
+              period={selectedPeriod}
+              onExport={() => {}}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

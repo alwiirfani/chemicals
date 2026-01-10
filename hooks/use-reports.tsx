@@ -2,9 +2,15 @@
 
 import { RealTimeData, ReportData } from "@/types/reports";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export function useReports(period: string) {
+interface UseReportsParams {
+  period: string;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+export function useReports({ period, startDate, endDate }: UseReportsParams) {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [realTimeData, setRealTimeData] = useState<RealTimeData>({
     activeBorrowings: 0,
@@ -18,39 +24,65 @@ export function useReports(period: string) {
     new Date().toLocaleTimeString()
   );
 
-  const fetchReportData = async (period: string = "6months") => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`/api/v1/reports?period=${period}`);
-      const data = response.data;
+  /**
+   * ===============================
+   * FETCH REPORT DATA
+   * ===============================
+   */
+  const fetchReportData = useCallback(
+    async (params?: UseReportsParams) => {
+      const query = params ?? { period, startDate, endDate };
 
-      console.log("data reports: ", data);
+      // ⛔ jangan fetch kalau custom tapi tanggal belum lengkap
+      if (query.period === "custom" && (!query.startDate || !query.endDate)) {
+        return;
+      }
 
-      setReportData(data);
-    } catch (error) {
-      console.error("Error fetching report data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const fetchRealTimeData = async () => {
+      try {
+        setIsLoading(true);
+
+        const response = await axios.get("/api/v1/reports", {
+          params: {
+            period: query.period,
+            startDate: query.startDate,
+            endDate: query.endDate,
+          },
+        });
+
+        setReportData(response.data);
+      } catch (error) {
+        console.error("Error fetching report data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [period, startDate, endDate]
+  );
+
+  /**
+   * ===============================
+   * FETCH REAL-TIME DATA
+   * ===============================
+   */
+  const fetchRealTimeData = useCallback(async () => {
     try {
       const response = await axios.get("/api/v1/reports/realtime");
-      const data = response.data;
-
-      console.log("real time data reports: ", data);
-
-      setRealTimeData(data);
+      setRealTimeData(response.data);
       setLastUpdated(new Date().toLocaleTimeString());
     } catch (error) {
       console.error("Error fetching real-time data:", error);
     }
-  };
+  }, []);
 
+  /**
+   * ===============================
+   * AUTO FETCH ON CHANGE
+   * ===============================
+   */
   useEffect(() => {
     fetchReportData();
     fetchRealTimeData();
-  }, [period]);
+  }, [fetchReportData, fetchRealTimeData]);
 
   return {
     reportData,
