@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { RealTimeData, ReportData } from "@/types/reports";
 
@@ -23,6 +23,8 @@ export function useReports({ period, startDate, endDate }: UseReportsParams) {
   const [lastUpdated, setLastUpdated] = useState(
     new Date().toLocaleTimeString()
   );
+
+  const isFirstLoad = useRef(true);
 
   /**
    * FETCH REPORT DATA
@@ -51,16 +53,22 @@ export function useReports({ period, startDate, endDate }: UseReportsParams) {
    * REFETCH (PUBLIC API)
    */
   const refetch = useCallback(async () => {
-    setIsLoading(true);
     await Promise.all([fetchReportData(), fetchRealTimeData()]);
-    setIsLoading(false);
   }, [fetchReportData, fetchRealTimeData]);
 
   /**
-   * AUTO FETCH
+   * INITIAL LOAD ONLY
    */
   useEffect(() => {
-    refetch();
+    const init = async () => {
+      await refetch();
+      setIsLoading(false); // ✅ hanya sekali
+      isFirstLoad.current = false;
+    };
+
+    if (isFirstLoad.current) {
+      init();
+    }
   }, [refetch]);
 
   return {
