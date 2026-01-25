@@ -9,41 +9,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-  BLOCKED
-}
-
-enum Role {
-  PETUGAS_GUDANG
-  ADMIN
-  MAHASISWA
-  DOSEN
-  LABORAN
-}
-
-enum ChemicalForm {
-  SOLID
-  LIQUID
-}
-
-enum ChemicalCharacteristic {
-  ACID
-  BASE
-  GENERAL
-  OXIDANT
-  INDICATOR
-}
-
-enum BorrowingStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  RETURNED
-  OVERDUE
-}
-
 model Device {
   id          String   @id @default(nanoid()) @db.VarChar(255)
   browserName String   @map("browser_name") @db.VarChar(255)
@@ -57,6 +22,20 @@ model Device {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("devices")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum Role {
+  PETUGAS_GUDANG
+  ADMIN
+  MAHASISWA
+  DOSEN
+  LABORAN
 }
 
 model User {
@@ -127,6 +106,19 @@ model Laboran {
   @@map("laboran")
 }
 
+enum ChemicalForm {
+  SOLID
+  LIQUID
+}
+
+enum ChemicalCharacteristic {
+  ACID
+  BASE
+  GENERAL
+  OXIDANT
+  INDICATOR
+}
+
 model Chemical {
   id             String                 @id @default(nanoid()) @db.VarChar(255)
   name           String                 @unique @db.VarChar(255) // Nama bahan kimia
@@ -156,12 +148,20 @@ model Chemical {
   @@map("chemicals")
 }
 
+enum StockMutationType {
+  IN
+  OUT
+  ADJUST
+  RETURN
+}
+
 model stockMutation {
-  id          String   @id @default(nanoid()) @db.VarChar(255)
-  quantity    Int // Jumlah perubahan stok (positif untuk penambahan, negatif untuk pengurangan)
-  description String?  @db.Text // Deskripsi perubahan stok
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id          String            @id @default(nanoid()) @db.VarChar(255)
+  type        StockMutationType
+  quantity    Int // selalu positif
+  description String?           @db.Text // Deskripsi perubahan stok
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
 
   // Relations
   chemicalId  String   @map("chemical_id") @db.VarChar(255)
@@ -216,6 +216,14 @@ enum SarjanaLevel {
   S3
 }
 
+enum BorrowingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+  OVERDUE
+}
+
 model Borrowing {
   id           String          @id @default(nanoid()) @db.VarChar(255)
   purpose      String          @db.Text
@@ -241,7 +249,7 @@ model Borrowing {
   returnedBy   User?   @relation("returnedBy", fields: [returnedById], references: [id])
 
   borrowerId   String          @map("borrower_id") @db.VarChar(255)
-  borrower     User            @relation(fields: [borrowerId], references: [id])
+  borrower     User            @relation(fields: [borrowerId], references: [id], onDelete: Cascade)
   items        BorrowingItem[]
   UsageHistory UsageHistory[]
 

@@ -99,7 +99,7 @@ export function ReportsClient() {
 
   if (isLoading || !reportData) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center md:ml-64">
         <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
       </div>
     );

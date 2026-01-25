@@ -47,9 +47,9 @@ export default function LoginClient() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+          <TabsList className="grid w-full grid-cols-1 max-w-md mx-auto">
             <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="demo">Akun Demo</TabsTrigger>
+            {/* <TabsTrigger value="demo">Akun Demo</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="login" className="flex justify-center">
@@ -74,14 +74,14 @@ export default function LoginClient() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="demo">
+          {/* <TabsContent value="demo">
             <LoginGuide onQuickLogin={handleQuickLogin} />
             <div className="mt-4 text-center">
               <Button variant="outline" onClick={() => setActiveTab("login")}>
                 Kembali ke Form Login
               </Button>
             </div>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
 
         {/* Footer */}
