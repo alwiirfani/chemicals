@@ -1,11 +1,12 @@
 import { requireAuthOrNull, requireRoleOrNull } from "@/lib/auth";
 import db from "@/lib/db";
 import { chemicalUpdateSchema } from "@/lib/validation/chemicals";
+import { StockMutationType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ chemicalId: string }> }
+  { params }: { params: Promise<{ chemicalId: string }> },
 ) {
   try {
     const userAccess = await requireAuthOrNull();
@@ -16,7 +17,7 @@ export async function GET(
     if (!chemicalId)
       return NextResponse.json(
         { error: "Chemical ID not provided" },
-        { status: 400 }
+        { status: 400 },
       );
 
     const chemical = await db.chemical.findUnique({
@@ -26,26 +27,34 @@ export async function GET(
     if (!chemical) {
       return NextResponse.json(
         { error: "Chemical not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Chemical fetched successfully", chemical },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error fetching chemical:", error);
     return NextResponse.json(
       { error: "Failed to fetch chemical" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
+type MutationAction = "ADD" | "REDUCE";
+
+function mapStockMutation(type: MutationAction) {
+  return type === "ADD"
+    ? { mutationType: StockMutationType.IN, stockEffect: 1 }
+    : { mutationType: StockMutationType.OUT, stockEffect: -1 };
+}
+
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ chemicalId: string }> }
+  { params }: { params: Promise<{ chemicalId: string }> },
 ) {
   try {
     const userAccess = await requireRoleOrNull([
@@ -65,7 +74,7 @@ export async function PUT(
     if (!parsedChemical.success) {
       return NextResponse.json(
         { error: "Data tidak valid", issues: parsedChemical.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -88,28 +97,30 @@ export async function PUT(
     if (!existingChemical) {
       return NextResponse.json(
         { error: "Chemical not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // default: stok lama dipakai
     let newStock = existingChemical.currentStock;
 
-    // hanya lakukan mutasi stok kalau type = ADD atau REDUCE
-    if (type === "ADD" && quantity !== undefined) {
-      newStock += quantity;
-    } else if (type === "REDUCE" && quantity !== undefined) {
-      newStock -= quantity;
+    if ((type === "ADD" || type === "REDUCE") && quantity !== undefined) {
+      const { stockEffect } = mapStockMutation(type);
+      newStock += stockEffect * quantity;
+
       if (newStock < 0) {
         return NextResponse.json(
           { error: "Stok tidak boleh negatif" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
 
-    // mutasi stok dicatat hanya kalau ADD/REDUCE
-    if (type === "ADD" || type === "REDUCE") {
+    // 🧾 Catat mutasi stok
+    if ((type === "ADD" || type === "REDUCE") && quantity !== undefined) {
+      const { mutationType } = mapStockMutation(type);
+      const safeQuantity = Math.abs(quantity);
+
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
 
@@ -119,18 +130,19 @@ export async function PUT(
       const existingMutation = await db.stockMutation.findFirst({
         where: {
           chemicalId,
-          createdAt: { gte: startOfToday, lte: endOfToday },
+          type: mutationType,
+          createdAt: {
+            gte: startOfToday,
+            lte: endOfToday,
+          },
         },
       });
-
-      const safeQuantity = quantity ?? 0;
-      const quantityChange = type === "ADD" ? safeQuantity : -safeQuantity;
 
       if (existingMutation) {
         await db.stockMutation.update({
           where: { id: existingMutation.id },
           data: {
-            quantity: existingMutation.quantity + quantityChange,
+            quantity: existingMutation.quantity + safeQuantity,
             description: description || "Perubahan stok (otomatis)",
             updatedById: userAccess.userId,
           },
@@ -139,7 +151,8 @@ export async function PUT(
         await db.stockMutation.create({
           data: {
             chemicalId,
-            quantity: quantityChange,
+            type: mutationType,
+            quantity: safeQuantity,
             description: description || "Perubahan stok (otomatis)",
             createdById: userAccess.userId,
           },
@@ -147,7 +160,7 @@ export async function PUT(
       }
     }
 
-    // update data kimia (stok ikut diupdate jika ada mutasi)
+    // ✏️ Update chemical
     const updatedChemical = await db.chemical.update({
       where: { id: chemicalId },
       data: {
@@ -157,32 +170,37 @@ export async function PUT(
         characteristic,
         currentStock: newStock,
         unit,
-        purchaseDate: new Date(purchaseDate).toISOString(),
+        purchaseDate: purchaseDate
+          ? new Date(purchaseDate).toISOString()
+          : null,
         expirationDate: expirationDate
           ? new Date(expirationDate).toISOString()
           : null,
-        updatedBy: { connect: { id: userAccess.userId } },
+        updatedBy: {
+          connect: { id: userAccess.userId },
+        },
       },
     });
 
-    console.log("Updated Chemical:", updatedChemical);
-
     return NextResponse.json(
-      { message: "Chemical updated successfully", chemical: updatedChemical },
-      { status: 200 }
+      {
+        message: "Chemical updated successfully",
+        chemical: updatedChemical,
+      },
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error updating chemical:", error);
     return NextResponse.json(
       { error: "Failed to update chemical" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ chemicalId: string }> }
+  { params }: { params: Promise<{ chemicalId: string }> },
 ) {
   try {
     const userAccess = await requireRoleOrNull([
@@ -200,13 +218,13 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Chemical deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error deleting chemical:", error);
     return NextResponse.json(
       { error: "Failed to delete chemical" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

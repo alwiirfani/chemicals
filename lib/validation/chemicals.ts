@@ -36,7 +36,7 @@ export const chemicalUpdateSchema = z
     {
       message: "Quantity wajib jika type = ADD atau REDUCE",
       path: ["quantity"],
-    }
+    },
   );
 
 export type ChemicalCreateSchemaFormData = z.infer<

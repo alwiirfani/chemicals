@@ -6,7 +6,7 @@ import { updateUserRoleData } from "@/lib/services/users/user.service";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const userAccess = await requireAuthOrNull();
@@ -70,14 +70,14 @@ export async function GET(
     console.error("Get user error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN"]);
@@ -90,7 +90,7 @@ export async function PUT(
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Data tidak valid", issues: parsed.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -151,20 +151,20 @@ export async function PUT(
 
     return NextResponse.json(
       { message: "User berhasil diupdate", userId: updatedUser.id },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Update user error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export async function DELETE(
+export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN"]);
@@ -180,19 +180,20 @@ export async function DELETE(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    await db.user.delete({
+    await db.user.update({
       where: { id: user.id },
+      data: { status: "BLOCKED" },
     });
 
     return NextResponse.json(
       { message: "User deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Delete user error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

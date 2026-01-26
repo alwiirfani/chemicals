@@ -41,7 +41,7 @@ interface UserTableProps {
   onPageChange: (page: number) => void;
   onEdit: (user: UserAuth) => void;
   onView: (user: UserAuth) => void;
-  onDelete: (userId: string) => void;
+  onBlocked: (userId: string) => void;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({
@@ -51,7 +51,7 @@ export const UserTable: React.FC<UserTableProps> = ({
   onPageChange,
   onEdit,
   onView,
-  onDelete,
+  onBlocked,
 }) => {
   const [pageWindowStart, setPageWindowStart] = useState(1);
   const windowSize = 3;
@@ -72,7 +72,7 @@ export const UserTable: React.FC<UserTableProps> = ({
 
   const pageNumbers = Array.from(
     { length: Math.min(windowSize, totalPages - pageWindowStart + 1) },
-    (_, i) => pageWindowStart + i
+    (_, i) => pageWindowStart + i,
   );
   return (
     <>
@@ -154,10 +154,10 @@ export const UserTable: React.FC<UserTableProps> = ({
                           )}
 
                           <DropdownMenuItem
-                            onClick={() => onDelete(user.userId)}
+                            onClick={() => onBlocked(user.userId)}
                             className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
+                            Blokir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

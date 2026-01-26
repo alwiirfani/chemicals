@@ -11,9 +11,9 @@ export const useUsers = () => {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loadingTable, setLoadingTable] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [isBlocking, setIsBlocking] = useState(false);
+  const [openBlockModal, setOpenBlockModal] = useState(false);
+  const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -44,29 +44,33 @@ export const useUsers = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleRequestDelete = (userId: string) => {
-    setDeletingUserId(userId);
-    setOpenDeleteModal(true);
+  const handleRequestBlock = (userId: string) => {
+    setBlockingUserId(userId);
+    setOpenBlockModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!deletingUserId) return;
+  const handleConfirmBlock = async () => {
+    if (!blockingUserId) return;
 
     try {
-      setIsDeleting(true);
-      await axios.delete(`/api/v1/users/${deletingUserId}`);
-      setUsers((prev) => prev.filter((u) => u.userId !== deletingUserId));
+      setIsBlocking(true);
+      await axios.patch(`/api/v1/users/${blockingUserId}`, {
+        withCredentials: true,
+      });
+      setUsers((prev) => prev.filter((u) => u.userId !== blockingUserId));
       toast({ title: "Berhasil", description: "Pengguna dihapus" });
+      setUsers((prev) => prev.filter((u) => u.userId !== blockingUserId));
+      toast({ title: "Berhasil", description: "Pengguna diblokir" });
     } catch {
       toast({
         title: "Gagal",
-        description: "Terjadi kesalahan saat menghapus",
+        description: "Terjadi kesalahan saat memblokir",
         variant: "destructive",
       });
     } finally {
-      setIsDeleting(false);
-      setOpenDeleteModal(false);
-      setDeletingUserId(null);
+      setIsBlocking(false);
+      setOpenBlockModal(false);
+      setBlockingUserId(null);
     }
   };
 
@@ -105,7 +109,7 @@ export const useUsers = () => {
   const paginatedUsers = useMemo(() => {
     return filteredUsers.slice(
       (currentPage - 1) * pageSize,
-      currentPage * pageSize
+      currentPage * pageSize,
     );
   }, [filteredUsers, currentPage]);
 
@@ -131,11 +135,11 @@ export const useUsers = () => {
     setStatusFilter,
 
     // delete modal
-    openDeleteModal,
-    setOpenDeleteModal,
-    isDeleting,
-    handleRequestDelete,
-    handleConfirmDelete,
+    openBlockModal,
+    setOpenBlockModal,
+    isBlocking,
+    handleRequestBlock,
+    handleConfirmBlock,
 
     // actions
     currentPage,

@@ -249,7 +249,7 @@ model Borrowing {
   returnedBy   User?   @relation("returnedBy", fields: [returnedById], references: [id])
 
   borrowerId   String          @map("borrower_id") @db.VarChar(255)
-  borrower     User            @relation(fields: [borrowerId], references: [id], onDelete: Cascade)
+  borrower     User            @relation(fields: [borrowerId], references: [id])
   items        BorrowingItem[]
   UsageHistory UsageHistory[]
 
