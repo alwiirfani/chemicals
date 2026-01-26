@@ -162,11 +162,10 @@ export async function PUT(
   }
 }
 
-export async function DELETE({
-  params,
-}: {
-  params: Promise<{ userId: string }>;
-}) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> },
+) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN"]);
     if (userAccess instanceof NextResponse) return userAccess;
