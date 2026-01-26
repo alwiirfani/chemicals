@@ -185,9 +185,9 @@ model SafetyDataSheet {
   // Relations
   chemical    Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
   chemicalId  String   @unique @map("chemical_id")
-  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
+  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   createdById String   @map("created_by_id") @db.VarChar(255)
-  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
+  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id], onDelete: Cascade)
   updatedById String?  @map("updated_by_id") @db.VarChar(255)
 
   createdAt          DateTime             @default(now()) @map("created_at")
@@ -249,7 +249,7 @@ model Borrowing {
   returnedBy   User?   @relation("returnedBy", fields: [returnedById], references: [id], onDelete: Cascade)
 
   borrowerId   String          @map("borrower_id") @db.VarChar(255)
-  borrower     User            @relation(fields: [borrowerId], references: [id])
+  borrower     User            @relation(fields: [borrowerId], references: [id], onDelete: Cascade)
   items        BorrowingItem[]
   UsageHistory UsageHistory[]
 
@@ -267,9 +267,9 @@ model BorrowingItem {
 
   // Relations
   borrowingId String    @map("borrowing_id")
-  borrowing   Borrowing @relation(fields: [borrowingId], references: [id])
+  borrowing   Borrowing @relation(fields: [borrowingId], references: [id], onDelete: Cascade)
   chemicalId  String    @map("chemical_id")
-  chemical    Chemical  @relation(fields: [chemicalId], references: [id])
+  chemical    Chemical  @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
 
   @@index([borrowingId, chemicalId])
   @@map("borrowing_items")
@@ -286,9 +286,9 @@ model UsageHistory {
 
   // Relations
   borrowingId String?    @db.VarChar(255)
-  borrowing   Borrowing? @relation(fields: [borrowingId], references: [id])
+  borrowing   Borrowing? @relation(fields: [borrowingId], references: [id], onDelete: Cascade)
   chemicalId  String     @map("chemical_id")
-  chemical    Chemical   @relation(fields: [chemicalId], references: [id])
+  chemical    Chemical   @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
 
   @@map("usage_history")
 }
