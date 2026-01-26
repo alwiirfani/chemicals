@@ -13,6 +13,21 @@ import {
 import { Prisma } from "@prisma/client";
 import { mapCharacteristic } from "@/helpers/chemicals/chemical-table";
 
+function cellToDate(value: CellValue | undefined): Date | null {
+  if (!value) return null;
+
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const userAccess = await requireRoleOrNull([
@@ -29,7 +44,7 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { message: "File atau form tidak ditemukan" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (!sheet) {
       return NextResponse.json(
         { message: "Sheet tidak ditemukan dalam file Excel" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,16 +78,14 @@ export async function POST(request: NextRequest) {
         form: form,
         unit: row.getCell(4).value?.toString().trim() || "-",
         stock: Number(row.getCell(5).value) || 0,
-        purchaseDate:
-          row.getCell(6).value?.toString().trim() || new Date().toISOString(),
-        expirationDate:
-          row.getCell(7).value?.toString().trim() || new Date().toISOString(),
+        purchaseDate: cellToDate(row.getCell(6).value),
+        expirationDate: cellToDate(row.getCell(7).value),
       };
 
       console.log(
         "purchaseDate & expirationDate:",
         data.purchaseDate,
-        data.expirationDate
+        data.expirationDate,
       );
 
       if (data.name) rows.push(data);
@@ -82,14 +95,14 @@ export async function POST(request: NextRequest) {
       name: row.name,
       formula: row.formula,
       characteristic: mapCharacteristic(
-        row.characteristic
+        row.characteristic,
       ) as ChemicalCharacteristic,
       form: row.form as ChemicalForm,
       unit: row.unit,
       currentStock: row.stock,
       initialStock: row.stock,
-      purchaseDate: new Date(row.purchaseDate) || new Date(),
-      expirationDate: new Date(row.expirationDate) || null,
+      purchaseDate: row.purchaseDate || new Date(),
+      expirationDate: row.expirationDate || null,
       createdById: userAccess.userId,
       updatedById: userAccess.userId,
     }));
@@ -110,13 +123,13 @@ export async function POST(request: NextRequest) {
       data.map(
         (d) =>
           Prisma.sql`(${nanoid()},${d.name}, ${d.formula}, ${Prisma.raw(
-            `'${d.characteristic.toUpperCase()}'::"ChemicalCharacteristic"`
+            `'${d.characteristic.toUpperCase()}'::"ChemicalCharacteristic"`,
           )} , ${Prisma.raw(`'${d.form.toUpperCase()}'::"ChemicalForm"`)}, ${
             d.unit
           }, ${d.currentStock}, ${d.initialStock}, ${d.purchaseDate}, ${
             d.expirationDate
-          }, NOW(), NOW(), ${d.createdById}, ${d.updatedById})`
-      )
+          }, NOW(), NOW(), ${d.createdById}, ${d.updatedById})`,
+      ),
     )}
     ON CONFLICT ("name")
     DO UPDATE SET
@@ -153,7 +166,7 @@ export async function POST(request: NextRequest) {
     console.error("Error importing chemicals:", error);
     return NextResponse.json(
       { message: "Error importing chemicals" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -41,6 +41,6 @@ export interface ImportChemicalExcelRow {
   form: string;
   unit: string;
   stock: number;
-  purchaseDate: string;
-  expirationDate: string;
+  purchaseDate: Date | null;
+  expirationDate: Date | null;
 }
