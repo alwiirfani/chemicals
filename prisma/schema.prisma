@@ -72,7 +72,7 @@ model User {
 }
 
 model Admin {
-  pin     String @id @db.Char(5)
+  pin     String @id @db.Char(20)
   user_id String @unique @db.VarChar(255)
   user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
@@ -80,7 +80,7 @@ model Admin {
 }
 
 model Mahasiswa {
-  nim       String @id @db.Char(8)
+  nim       String @id @db.Char(20)
   full_name String @db.VarChar(255)
   user_id   String @unique @db.VarChar(255)
   user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -89,7 +89,7 @@ model Mahasiswa {
 }
 
 model Dosen {
-  nidn      String @id @db.Char(10)
+  nidn      String @id @db.Char(20)
   full_name String @db.VarChar(255)
   user_id   String @unique @db.VarChar(255)
   user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -98,7 +98,7 @@ model Dosen {
 }
 
 model Laboran {
-  nip       String @id @db.Char(10)
+  nip       String @id @db.Char(20)
   full_name String @db.VarChar(255)
   user_id   String @unique @db.VarChar(255)
   user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)

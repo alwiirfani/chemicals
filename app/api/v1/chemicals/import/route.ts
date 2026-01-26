@@ -41,7 +41,12 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
     const form = formData.get("form") as ChemicalForm;
 
+    console.log("FORM DATA KEYS:", [...formData.keys()]);
+    console.log("FORM VALUE:", form);
+    console.log("FILE EXIST:", !!file);
+
     if (!file) {
+      console.error("❌ FILE NOT FOUND");
       return NextResponse.json(
         { message: "File atau form tidak ditemukan" },
         { status: 400 },
@@ -57,9 +62,10 @@ export async function POST(request: NextRequest) {
     // Baca Excel
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(tempPath);
-    const sheet = workbook.getWorksheet(1); // Data sheet pertama
+    const sheet = workbook.worksheets[0]; // Data sheet pertama
 
     if (!sheet) {
+      console.error("❌ SHEET NOT FOUND");
       return NextResponse.json(
         { message: "Sheet tidak ditemukan dalam file Excel" },
         { status: 400 },
@@ -77,7 +83,7 @@ export async function POST(request: NextRequest) {
         characteristic: row.getCell(3).value?.toString().trim() || "",
         form: form,
         unit: row.getCell(4).value?.toString().trim() || "-",
-        stock: Number(row.getCell(5).value) || 0,
+        stock: parseFloat(row.getCell(5).value?.toString() ?? "0"),
         purchaseDate: cellToDate(row.getCell(6).value),
         expirationDate: cellToDate(row.getCell(7).value),
       };
