@@ -125,8 +125,8 @@ model Chemical {
   formula        String?                @db.VarChar(255) // Rumus kimia (contoh: H2O, NaCl)
   form           ChemicalForm // Bentuk fisik bahan (contoh: padat, cair, gas)
   characteristic ChemicalCharacteristic // Karakteristik bahan (contoh: asam, basa, oksidator, umum)
-  initialStock   Int                    @default(0) @map("initial_stock") // Jumlah stok bahan yang tersedia
-  currentStock   Int                    @default(0) @map("current_stock") // Jumlah stok bahan saat ini
+  initialStock   Float                  @default(0) @map("initial_stock") // Jumlah stok bahan yang tersedia
+  currentStock   Float                  @default(0) @map("current_stock") // Jumlah stok bahan saat ini
   unit           String                 @db.VarChar(20) // Satuan stok (contoh: gram, liter, botol)
   purchaseDate   DateTime?              @map("purchase_date") // Tanggal pembelian bahan
   expirationDate DateTime?              @map("expiration_date") // Tanggal kadaluarsa (jika ada)
