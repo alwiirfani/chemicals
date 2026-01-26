@@ -134,9 +134,9 @@ model Chemical {
   updatedAt      DateTime               @updatedAt @map("updated_at")
 
   // Relations
-  createdBy   User    @relation("CreatedBy", fields: [createdById], references: [id])
+  createdBy   User    @relation("CreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   createdById String  @map("created_by_id") @db.VarChar(255)
-  updatedBy   User?   @relation("UpdatedBy", fields: [updatedById], references: [id])
+  updatedBy   User?   @relation("UpdatedBy", fields: [updatedById], references: [id], onDelete: Cascade)
   updatedById String? @map("updated_by_id") @db.VarChar(255)
 
   safetyDataSheet SafetyDataSheet?
@@ -167,9 +167,9 @@ model stockMutation {
   chemicalId  String   @map("chemical_id") @db.VarChar(255)
   chemical    Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
   createdById String   @map("created_by_id") @db.VarChar(255)
-  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
+  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   updatedById String?  @map("updated_by_id") @db.VarChar(255)
-  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
+  updatedBy   User?    @relation("UpdatedBy", fields: [updatedById], references: [id], onDelete: Cascade)
 
   @@index([chemicalId])
   @@map("stock_mutations")
@@ -242,11 +242,11 @@ model Borrowing {
 
   // Relations
   approvedById String? @map("approved_by_id") @db.VarChar(255)
-  approvedBy   User?   @relation("approvedBy", fields: [approvedById], references: [id])
+  approvedBy   User?   @relation("approvedBy", fields: [approvedById], references: [id], onDelete: Cascade)
   rejectedById String? @map("rejected_by_id") @db.VarChar(255)
-  rejectedBy   User?   @relation("rejectedBy", fields: [rejectedById], references: [id])
+  rejectedBy   User?   @relation("rejectedBy", fields: [rejectedById], references: [id], onDelete: Cascade)
   returnedById String? @map("returned_by_id") @db.VarChar(255)
-  returnedBy   User?   @relation("returnedBy", fields: [returnedById], references: [id])
+  returnedBy   User?   @relation("returnedBy", fields: [returnedById], references: [id], onDelete: Cascade)
 
   borrowerId   String          @map("borrower_id") @db.VarChar(255)
   borrower     User            @relation(fields: [borrowerId], references: [id])
@@ -267,7 +267,7 @@ model BorrowingItem {
 
   // Relations
   borrowingId String    @map("borrowing_id")
-  borrowing   Borrowing @relation(fields: [borrowingId], references: [id], onDelete: Cascade)
+  borrowing   Borrowing @relation(fields: [borrowingId], references: [id])
   chemicalId  String    @map("chemical_id")
   chemical    Chemical  @relation(fields: [chemicalId], references: [id])
 
@@ -306,7 +306,7 @@ model Report {
 
   // Relations
   createdById String @map("created_by_id") @db.VarChar(255)
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   @@map("reports")
 }

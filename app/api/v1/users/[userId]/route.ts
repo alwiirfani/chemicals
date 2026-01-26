@@ -162,10 +162,11 @@ export async function PUT(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> },
-) {
+export async function DELETE({
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}) {
   try {
     const userAccess = await requireRoleOrNull(["ADMIN"]);
     if (userAccess instanceof NextResponse) return userAccess;
@@ -180,9 +181,8 @@ export async function PATCH(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    await db.user.update({
+    await db.user.delete({
       where: { id: user.id },
-      data: { status: "BLOCKED" },
     });
 
     return NextResponse.json(

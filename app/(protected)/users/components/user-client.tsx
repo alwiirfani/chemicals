@@ -30,15 +30,15 @@ export function UserClient() {
     roleFilter,
     statusFilter,
     loadingTable,
-    isBlocking,
-    openBlockModal,
+    isDeleting,
+    openDeleteModal,
     setSearchTerm,
     setRoleFilter,
     setStatusFilter,
-    setOpenBlockModal,
+    setOpenDeleteModal,
     handlePageChange,
-    handleRequestBlock,
-    handleConfirmBlock,
+    handleRequestDelete,
+    handleConfirmDelete,
 
     fetchUsers,
   } = useUsers();
@@ -113,7 +113,7 @@ export function UserClient() {
               onPageChange={handlePageChange}
               onEdit={handleEditUser}
               onView={handleViewUser}
-              onBlocked={handleRequestBlock}
+              onBlocked={handleRequestDelete}
             />
           )}
         </CardContent>
@@ -144,10 +144,10 @@ export function UserClient() {
 
       {/* Modal Konfirmasi Hapus */}
       <AlertModal
-        isOpen={openBlockModal}
-        onClose={() => setOpenBlockModal(false)}
-        onConfirm={handleConfirmBlock}
-        loading={isBlocking}
+        isOpen={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
       />
     </div>
   );

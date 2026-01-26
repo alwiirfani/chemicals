@@ -11,9 +11,9 @@ export const useUsers = () => {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loadingTable, setLoadingTable] = useState(true);
-  const [isBlocking, setIsBlocking] = useState(false);
-  const [openBlockModal, setOpenBlockModal] = useState(false);
-  const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -44,23 +44,21 @@ export const useUsers = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleRequestBlock = (userId: string) => {
-    setBlockingUserId(userId);
-    setOpenBlockModal(true);
+  const handleRequestDelete = (userId: string) => {
+    setDeletingUserId(userId);
+    setOpenDeleteModal(true);
   };
 
-  const handleConfirmBlock = async () => {
-    if (!blockingUserId) return;
+  const handleConfirmDelete = async () => {
+    if (!deletingUserId) return;
 
     try {
-      setIsBlocking(true);
-      await axios.patch(`/api/v1/users/${blockingUserId}`, {
+      setIsDeleting(true);
+      await axios.delete(`/api/v1/users/${deletingUserId}`, {
         withCredentials: true,
       });
-      setUsers((prev) => prev.filter((u) => u.userId !== blockingUserId));
+      setUsers((prev) => prev.filter((u) => u.userId !== deletingUserId));
       toast({ title: "Berhasil", description: "Pengguna dihapus" });
-      setUsers((prev) => prev.filter((u) => u.userId !== blockingUserId));
-      toast({ title: "Berhasil", description: "Pengguna diblokir" });
     } catch {
       toast({
         title: "Gagal",
@@ -68,9 +66,9 @@ export const useUsers = () => {
         variant: "destructive",
       });
     } finally {
-      setIsBlocking(false);
-      setOpenBlockModal(false);
-      setBlockingUserId(null);
+      setIsDeleting(false);
+      setOpenDeleteModal(false);
+      setDeletingUserId(null);
     }
   };
 
@@ -135,11 +133,11 @@ export const useUsers = () => {
     setStatusFilter,
 
     // delete modal
-    openBlockModal,
-    setOpenBlockModal,
-    isBlocking,
-    handleRequestBlock,
-    handleConfirmBlock,
+    openDeleteModal,
+    setOpenDeleteModal,
+    isDeleting,
+    handleRequestDelete,
+    handleConfirmDelete,
 
     // actions
     currentPage,

@@ -157,7 +157,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                             onClick={() => onBlocked(user.userId)}
                             className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Blokir
+                            Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
