@@ -28,6 +28,32 @@ function cellToDate(value: CellValue | undefined): Date | null {
   return null;
 }
 
+function cellToNumber(value: CellValue | undefined): number {
+  if (value === null || value === undefined) return 0;
+
+  if (typeof value === "number") return value;
+
+  if (typeof value === "string") {
+    // hapus spasi & pemisah ribuan
+    const cleaned = value.replace(/\s/g, "").replace(/,/g, "");
+    const n = Number(cleaned);
+    return isNaN(n) ? 0 : n;
+  }
+
+  if (typeof value === "object") {
+    if ("result" in value && typeof value.result === "number") {
+      return value.result;
+    }
+    if ("text" in value && typeof value.text === "string") {
+      const cleaned = value.text.replace(/\s/g, "").replace(/,/g, "");
+      const n = Number(cleaned);
+      return isNaN(n) ? 0 : n;
+    }
+  }
+
+  return 0;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const userAccess = await requireRoleOrNull([
@@ -83,7 +109,7 @@ export async function POST(request: NextRequest) {
         characteristic: row.getCell(3).value?.toString().trim() || "",
         form: form,
         unit: row.getCell(4).value?.toString().trim() || "-",
-        stock: parseFloat(row.getCell(5).value?.toString().trim() || "0"),
+        stock: cellToNumber(row.getCell(5).value),
         purchaseDate: cellToDate(row.getCell(6).value),
         expirationDate: cellToDate(row.getCell(7).value),
       };
