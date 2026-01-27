@@ -77,15 +77,13 @@ export async function POST(request: NextRequest) {
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return; // Lewatkan header
 
-      const stockRaw = Number(row.getCell(5).value);
-
       const data: ImportChemicalExcelRow = {
         name: row.getCell(1).value?.toString().trim() || "",
         formula: cellToString(row.getCell(2).value),
         characteristic: row.getCell(3).value?.toString().trim() || "",
         form: form,
         unit: row.getCell(4).value?.toString().trim() || "-",
-        stock: isNaN(stockRaw) ? 0 : stockRaw,
+        stock: parseFloat(row.getCell(5).value?.toString().trim() || "0"),
         purchaseDate: cellToDate(row.getCell(6).value),
         expirationDate: cellToDate(row.getCell(7).value),
       };
