@@ -31,21 +31,26 @@ function cellToDate(value: CellValue | undefined): Date | null {
 function cellToNumber(value: CellValue | undefined): number {
   if (value === null || value === undefined) return 0;
 
-  if (typeof value === "number") return value;
+  // Excel numeric cell
+  if (typeof value === "number") {
+    return Math.round(value);
+  }
 
+  // String value (contoh: "6,175")
   if (typeof value === "string") {
-    // hapus spasi & pemisah ribuan
-    const cleaned = value.replace(/\s/g, "").replace(/,/g, "");
+    const cleaned = value.replace(/\./g, "").replace(/,/g, "");
     const n = Number(cleaned);
     return isNaN(n) ? 0 : n;
   }
 
+  // ExcelJS object cell
   if (typeof value === "object") {
     if ("result" in value && typeof value.result === "number") {
-      return value.result;
+      return Math.round(value.result);
     }
+
     if ("text" in value && typeof value.text === "string") {
-      const cleaned = value.text.replace(/\s/g, "").replace(/,/g, "");
+      const cleaned = value.text.replace(/\./g, "").replace(/,/g, "");
       const n = Number(cleaned);
       return isNaN(n) ? 0 : n;
     }
