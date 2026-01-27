@@ -77,13 +77,15 @@ export async function POST(request: NextRequest) {
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return; // Lewatkan header
 
+      const stockRaw = Number(row.getCell(5).value);
+
       const data: ImportChemicalExcelRow = {
         name: row.getCell(1).value?.toString().trim() || "",
         formula: cellToString(row.getCell(2).value),
         characteristic: row.getCell(3).value?.toString().trim() || "",
         form: form,
         unit: row.getCell(4).value?.toString().trim() || "-",
-        stock: parseFloat(row.getCell(5).value?.toString() ?? "0"),
+        stock: isNaN(stockRaw) ? 0 : stockRaw,
         purchaseDate: cellToDate(row.getCell(6).value),
         expirationDate: cellToDate(row.getCell(7).value),
       };
@@ -107,7 +109,7 @@ export async function POST(request: NextRequest) {
       unit: row.unit,
       currentStock: row.stock,
       initialStock: row.stock,
-      purchaseDate: row.purchaseDate || new Date(),
+      purchaseDate: row.purchaseDate || null,
       expirationDate: row.expirationDate || null,
       createdById: userAccess.userId,
       updatedById: userAccess.userId,
@@ -128,13 +130,22 @@ export async function POST(request: NextRequest) {
     VALUES ${Prisma.join(
       data.map(
         (d) =>
-          Prisma.sql`(${nanoid()},${d.name}, ${d.formula}, ${Prisma.raw(
-            `'${d.characteristic.toUpperCase()}'::"ChemicalCharacteristic"`,
-          )} , ${Prisma.raw(`'${d.form.toUpperCase()}'::"ChemicalForm"`)}, ${
-            d.unit
-          }, ${d.currentStock}, ${d.initialStock}, ${d.purchaseDate}, ${
-            d.expirationDate
-          }, NOW(), NOW(), ${d.createdById}, ${d.updatedById})`,
+          Prisma.sql`(
+            ${nanoid()},
+            ${d.name}, 
+            ${d.formula}, 
+            ${Prisma.raw(`'${d.characteristic.toUpperCase()}'::"ChemicalCharacteristic"`)}, 
+            ${Prisma.raw(`'${d.form.toUpperCase()}'::"ChemicalForm"`)}, 
+            ${d.unit}, 
+            ${d.currentStock}, 
+            ${d.initialStock}, 
+            ${d.purchaseDate}, 
+            ${d.expirationDate},
+            NOW(),
+            NOW(), 
+            ${d.createdById}, 
+            ${d.updatedById}
+            )`,
       ),
     )}
     ON CONFLICT ("name")
