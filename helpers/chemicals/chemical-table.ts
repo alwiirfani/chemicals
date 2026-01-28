@@ -12,7 +12,9 @@ export const isExpiringSoon = (date: Date | null) => {
   return date <= thirtyDaysFromNow && date > new Date();
 };
 
-export const mapCharacteristic = (value: string): ChemicalCharacteristic => {
+export const mapCharacteristic = (
+  value: string,
+): ChemicalCharacteristic | null => {
   const normalized = value.trim().toLowerCase();
 
   switch (normalized) {
@@ -27,6 +29,6 @@ export const mapCharacteristic = (value: string): ChemicalCharacteristic => {
     case "indikator":
       return "INDICATOR";
     default:
-      throw new Error(`Invalid characteristic value: ${value}`);
+      return null;
   }
 };
