@@ -410,11 +410,17 @@ export async function POST(request: NextRequest) {
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return;
 
-      const characteristic = mapCharacteristic(
-        row.getCell(3).value?.toString() || "",
-      );
+      const rawCharacteristic = row.getCell(3).value?.toString().trim() || "";
 
-      if (!characteristic) return;
+      const characteristic = mapCharacteristic(rawCharacteristic);
+
+      if (!characteristic) {
+        console.warn(
+          `⏭️ Skip row ${rowNumber} - invalid characteristic:`,
+          rawCharacteristic,
+        );
+        return;
+      }
 
       const data: ImportChemicalExcelRow = {
         name: row.getCell(1).value?.toString().trim() || "",
